@@ -62,6 +62,10 @@ title of every ADR a rule comes from.
 - `docs/engine-reference/[engine]/VERSION.md` for the engine and version.
 - `docs/engine-reference/[engine]/deprecated-apis.md`: these become forbidden APIs.
 - `docs/engine-reference/[engine]/current-best-practices.md`, when it exists.
+- An absent `deprecated-apis.md` or `current-best-practices.md` is named in the
+  report, on any engine, as `NOT SOURCEABLE — <file> is not present`; no
+  forbidden API or practice is written in its place from training data. (A
+  Custom project's `/setup-engine custom` writes only `VERSION.md` there.)
 
 ### What exists already
 

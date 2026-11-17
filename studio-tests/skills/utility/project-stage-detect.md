@@ -268,6 +268,51 @@ Fixture defaults.
 
 ---
 
+### Case 8: Custom engine — engine and game counted apart, tooling never counted as source
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom` (code root `.`), `modes.workflow: standard`
+- `engine/` has `core/`, `memory/`, `jobs/` and `rhi/` with 40 C++ files; the other eight expected modules do not exist
+- `game/src/` has 6 files; `tests/unit/` and `tests/benchmarks/` exist
+- `.claude/`, `docs/`, `production/` and `build/` (CMake output, 300 files) are present
+
+**Input:** `/project-stage-detect`
+
+**Expected behavior:**
+1. `artifact-check.sh` runs first; the Custom steps are read as steps of the phase (not ENGINE_SKIPPED)
+2. Source Code: counts `engine/` per module — lists the four present and the eight absent (`ecs/`, `math/`, `platform/`, `renderer/`, `shaders/`, `physics/`, `assets/`, `tools/`) — and `game/src/` separately; reports the layout as `engine/ + game/`
+3. `.claude/`, `docs/`, `production/` and `build/` are not counted as source; none of the 300 build-output files is in the total
+4. Notes `tests/benchmarks/` beside the unit tests
+5. Asks "May I write" before writing `production/project-stage-report.md`
+
+**Assertions:**
+- [ ] Engine and game counts are separate, with present and absent modules named
+- [ ] Build output and framework folders are excluded from the count
+- [ ] The code root is `.`, not reported as unresolved or as `src/`
+- [ ] "May I write" precedes any write; no stage value is written
+
+---
+
+### Case 9: Non-Custom engine — Custom steps are ENGINE_SKIPPED, never gaps
+
+**Fixture:**
+- `project.yaml`: `engine.name: Godot`, `modes.workflow: standard`, `project.stage: technical-setup`
+- `artifact-check.sh` prints `ENGINE_SKIPPED: 5`; no frame budget, memory invariants or engine module specs exist
+
+**Input:** `/project-stage-detect`
+
+**Expected behavior:**
+1. The five Custom steps are not listed as gaps or missing artifacts
+2. The `ENGINE_SKIPPED:` count is named once in the report
+3. Source counting uses `src/` as before; no `engine/ + game/` layout line
+
+**Assertions:**
+- [ ] No frame-budget, memory-invariants, engine-module-map, engine-adrs or test-setup-custom gap is reported
+- [ ] The skipped count appears once
+- [ ] Stage Confidence and gaps equal those the same fixture gave before the Custom steps existed
+
+---
+
 ## Protocol Compliance
 
 - [ ] Runs `artifact-check.sh` before hand-scanning artifacts

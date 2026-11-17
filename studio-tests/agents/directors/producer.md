@@ -82,6 +82,22 @@ Verified by reading the agent's `.claude/agents/producer.md` frontmatter:
 - [ ] Does not raise the missing sprint plan or velocity as a concern, and does not answer NOT ASSESSED for them — they were passed as "not required at `workflow: minimal`"
 - [ ] Does not invent a sprint capacity to judge the load against
 
+### Case 8: On a Custom Engine Project — first-year milestone plan
+**Fixture:** `project.yaml` sets `engine.name: Custom`; two game teams build on the engine; no engine response targets are recorded.
+**Scenario:** The user asks producer to draft the first-year milestone plan.
+**Expected:** Plans engine milestones beside game milestones, estimated with `chief-engine-architect` and the engine leads, and schedules an engine vertical slice (one representative scene through the full frame, within budget, on target hardware) before content production scales up. Engine risks go on the register: backend parity, toolchain and SDK upgrades, platform certification work. Game-team requests go through one intake queue; with no response targets recorded it reports "engine SLA NOT SET"; engine releases run on a fixed train whose release itself is `release-manager`'s (`/engine-release`).
+**Assertions:**
+- [ ] The plan has an engine vertical slice before content production scales up
+- [ ] "engine SLA NOT SET" is reported
+- [ ] Engine releases are left to `release-manager`
+
+### Case 9: Other engine — the same plan without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`; one game team.
+**Scenario:** The user asks producer to draft the first-year milestone plan.
+**Expected:** Plans game milestones with its normal workflow. It does NOT add engine milestones, an engine vertical slice, an engine intake queue, an engine release train or "engine SLA NOT SET", and does NOT name `chief-engine-architect`.
+**Assertions:**
+- [ ] The Custom section is not applied: no engine-as-product planning and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

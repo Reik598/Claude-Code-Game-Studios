@@ -63,6 +63,46 @@
 - Does NOT provision new build infrastructure for the console entries (e.g., self-hosted runners with the platform SDKs) on its own — "Change server infrastructure without technical-director approval" is forbidden, so it flags the requirement for technical-director approval instead of silently writing it into the config
 - Organizes artifacts by platform name, with versioning and retention (Artifact Management)
 
+### Case 6: On a Custom Engine Project — CI for the engine
+**Fixture**: `project.yaml` sets `engine.name: Custom`; a C++ engine with CMake presets written by `asset-build-tooling-engineer`; one self-hosted GPU machine.
+**Input**: "Set up CI for the engine repository."
+**Expected behavior**:
+- Lays out the jobs from its Custom table: build and unit tests on every compiler in the matrix on every push and PR; ASan/UBSan and TSan on PR or nightly; validation-layer smoke and golden-image runs on a GPU runner; benchmarks on fixed hardware; nightly fuzzing of asset and network parsers
+- Takes the compiler matrix (MSVC, clang, gcc per target) and its versions from `docs/engine-reference/custom/VERSION.md`
+- Caches compilation with ccache or sccache and persists the shader-compile and cook caches keyed by `asset-build-tooling-engineer`'s content hashes
+- Writes down which build-matrix cells run per PR and which nightly; a GPU job that ran without a GPU reports NOT ASSESSED, not a pass
+- Leaves the build graph and presets to `asset-build-tooling-engineer` and stores debug symbols for every CI build
+**Assertions**:
+- [ ] Uses the presets as given rather than rewriting the build graph
+- [ ] A GPU job without a GPU is NOT ASSESSED
+- [ ] Compiler versions come from `docs/engine-reference/custom/VERSION.md`
+
+### Case 7: Other engine — CI without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Godot`; Godot 4.7 project exporting to Windows and Linux.
+**Input**: "Set up CI for the game repository."
+**Expected behavior**:
+- Builds through the engine's headless export and test run, with version-specific behaviour checked against `docs/engine-reference/godot/`
+- Does NOT plan a C++ compiler matrix, sanitizer or Miri jobs, GPU validation-layer runners, a symbol server or a build farm from the Custom section
+- Does NOT name `asset-build-tooling-engineer` as owner of the build graph
+**Assertions**:
+- [ ] The Custom section is not applied: no Custom job table and no Custom-only agent named
+
+### Case 8: Build and CI at Scale — sharded tests, shared caches and a GPU runner on a public engine repository
+**Fixture**: `project.yaml` sets `engine.name: Custom`; a C++ engine on CMake/CTest for Windows (MSVC) and Linux (clang), plus Rust crates tested with cargo-nextest; GitHub Actions; the repository is public; one self-hosted GPU machine; the test suite takes 90 minutes on one machine.
+**Input**: "CI is too slow. Set up distributed builds, a shared compile cache and test sharding, and run the golden-image tests on our GPU box for every pull request."
+**Expected behavior**:
+- Treats the choice of distributed-build and cache tools as an ADR with `chief-engine-architect`, and leaves cache keys and the build graph to `asset-build-tooling-engineer`
+- Checks distributed sccache against the matrix: its build servers are Linux or FreeBSD and a Windows client needs a cross-compilation toolchain named in advance, so the MSVC cells are not assumed to distribute
+- Builds in a fixed path (or maps it out) so cache entries match across machines, and reports the cache-hit rate
+- Shards CTest with `-I m,,n` and nextest with `--partition hash:m/n`, reuses one archived build for the test jobs, and makes the job NOT ASSESSED when a shard did not run
+- Keeps release builds, symbols and benchmark baselines out of the Actions cache (entries unused for over 7 days are evicted) and sets artifact retention within the repository's limit
+- Declines to run the self-hosted GPU machine on pull requests from forks of the public repository, citing GitHub's guidance on self-hosted runners, and offers trusted-branch runs or a GitHub GPU-powered larger runner instead
+**Assertions**:
+- [ ] A shard that did not run makes the result NOT ASSESSED, not a pass
+- [ ] The self-hosted GPU machine is not exposed to pull requests from forks
+- [ ] The MSVC cells are checked before distributed sccache is proposed for them
+- [ ] Tool choices go to an ADR; the cache keys stay `asset-build-tooling-engineer`'s
+
 ---
 
 ## Protocol Compliance

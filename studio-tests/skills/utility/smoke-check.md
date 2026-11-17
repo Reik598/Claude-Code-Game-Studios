@@ -429,6 +429,83 @@ Fixture defaults.
 
 ---
 
+### Case 13: Custom Engine — the `test-run.sh custom` rule row decides; zero tests and `custom:0` are not a pass
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `commands.build: "cmake --preset debug && cmake --build --preset debug"`, `commands.test: "ctest --preset debug --output-on-failure"`
+- `tests/unit/memory/frame_arena_test.cpp` and `tests/integration/` exist; `tests/benchmarks/` holds two benchmark sources
+- Every story COVERED or EXPECTED; nothing selected in Batch 1–3
+- Run A: `bash .claude/scripts/test-run.sh custom` prints `rule custom:ctest-pass` with 48 tests passed
+- Run B: `rule custom:ctest-zero`
+- Run C: `rule custom:0` (a wrapper script, no CTest summary read)
+- Run D: `rule custom:build-failed`
+- Run E: no `commands.test` → `rule custom:no-test-command`
+- Run F: a Rust workspace (`commands.test: "cargo test --workspace"`); `tests/unit/` and `tests/integration/` hold only `.gitkeep`; the tests are inline `#[cfg(test)]` modules in `engine/core/src/` and crate-local `engine/ecs/tests/`; `test-run.sh custom` prints `rule custom:cargo-pass` with 31 tests passed
+- Run G: as Run F, but the crates have no tests: `rule custom:cargo-zero`
+
+**Input:** `/smoke-check`
+
+**Expected behavior:**
+1. Phase 1 counts the C++ sources under `tests/unit/` and `tests/integration/` as test files; `tests/benchmarks/` is not counted
+2. No editor is looked for: the runner is the tool `commands.test` names, through `bash .claude/scripts/test-run.sh custom`
+3. Run A: PASS with the count (48)
+4. Run B: `NOT ASSESSED — no tests found`; verdict NOT ASSESSED
+5. Run C: `NOT ASSESSED — passed by exit code only, test count unknown`; never PASS
+6. Run D: FAIL — no test ran because the build failed
+7. Run E: `NOT ASSESSED — no test command; run /setup-engine custom or set commands.test`
+8. In every run, "May I write" precedes the report
+9. Run F: the empty test-root glob does not decide; Phase 1 runs `test-run.sh custom` once, reads `custom:cargo-pass`, treats the tests as present and uses that run as Phase 2's result → PASS with the count (31); never `WAIVED` and never `NOT ASSESSED — no game tests found`
+10. Run G: the runner observed zero tests → the no-game-tests path, naming `custom:cargo-zero` as the evidence: at the pinned `qa.level: minimal`, `WAIVED — qa.level: minimal, no game tests` with the build check and Batch 1 launch still required; at `standard`, `NOT ASSESSED — no game tests found`
+
+**Assertions:**
+- [ ] The verdict comes from the `rule` row, not from the exit code
+- [ ] Runs B, C and E are NOT ASSESSED; none is PASS
+- [ ] Run D is FAIL
+- [ ] Benchmarks are not counted as test files
+- [ ] Run F: crate-local and inline Rust tests are found through the runner's count; the run is PASS, and `test-run.sh custom` runs once, not twice
+- [ ] Run G: a waiver or NOT ASSESSED is given only on the runner's observed zero, and the rule is named
+
+---
+
+### Case 14: Non-Custom engine — the Custom path is not taken
+
+**Fixture:** As Case 1 (Godot, 12/12 passing).
+
+**Input:** `/smoke-check`
+
+**Expected behavior:** The Godot runner and its rules are used as in Case 1; `test-run.sh custom` is not run and no `custom:*` rule appears in the report.
+
+**Assertions:**
+- [ ] Case 1's assertions all still hold
+- [ ] No `test-run.sh custom` call and no `custom:*` rule in the output
+
+---
+
+### Case 15: Custom Engine at `qa.level: minimal`, no tests — the build check is `commands.build`, never a zero-test smoke run
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `commands.build: "cmake --preset debug && cmake --build --preset debug"`,
+  `commands.test: "ctest --preset debug --output-on-failure"`, `commands.smoke: "ctest --preset debug -L smoke --output-on-failure"`;
+  no `modes.rigor` (so `qa.level` resolves to `minimal`)
+- No test sources; `bash .claude/scripts/test-run.sh custom` prints `rule custom:ctest-zero`
+- `commands.build` exits 0; `commands.smoke` would exit 0 over zero tests
+- Variant: `commands.build` unset
+
+**Input:** `/smoke-check`
+
+**Expected behavior:**
+1. Phase 1 reads `custom:ctest-zero` and records `WAIVED — qa.level: minimal, no game tests`, naming the rule
+2. Phase 2's build check runs `commands.build` and reads its exit code: `Build check: PASS — cmake --preset debug && cmake --build --preset debug exit 0`
+3. `commands.smoke` is not run as the build check, and its exit 0 is never recorded as a pass
+4. Variant: `Build check: NOT RUN — commands.build unset`; the launch in Batch 1 carries the verdict
+
+**Assertions:**
+- [ ] The build check's command is `commands.build`, not `commands.smoke`
+- [ ] No `Build check: PASS` names a CTest or `cargo test` command
+- [ ] The variant's build check is NOT RUN, named in the report, and never passes on its own
+
+---
+
 ## Protocol Compliance
 
 - [ ] Uses `AskUserQuestion` for all manual smoke check batches (Batch 1, Batch 2, Batch 3), and Batch 1 asks whether the build was launched this session; "not launched" yields NOT ASSESSED

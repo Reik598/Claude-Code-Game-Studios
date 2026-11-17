@@ -12,6 +12,7 @@
 - Unity: Edit Mode, then Play Mode as a second run
 - Unreal Engine: build first, commands per OS, macOS
 - Web: two halves, read apart
+- Custom: CTest or cargo test, through the helper
 - Unknown engine / not configured
 - Test runner not available here
 - Build check (the WAIVED path only)
@@ -186,6 +187,30 @@ cannot tell a run of zero tests from a full one, so say so in the report;
 `web:no-test-script` (package.json has no test script, or npm's placeholder):
 `NOT ASSESSED — no tests found`.
 
+**Custom** (a project that builds its own engine) — `commands.test` is the
+project's CTest or `cargo test` command, written by `/setup-engine custom`; a
+CMake project has no default. Run it through the helper, which runs
+`commands.build` first when it is set and reads the runner's output:
+```bash
+bash .claude/scripts/test-run.sh custom
+```
+Its `rule` row gives the verdict:
+- **`custom:ctest-pass`**, **`custom:cargo-pass`** — exit 0 and tests passed: PASS, with the count.
+- **`custom:ctest-failed`**, **`custom:cargo-failed`** — a test failed: FAIL, with the `failed` rows.
+- **`custom:build-failed`** — `commands.build` failed, so no test ran: FAIL.
+- **`custom:cargo-compile-failed`** — the crate did not compile: FAIL, with the `evidence` row.
+- **`custom:ctest-zero`**, **`custom:cargo-zero`** — the runner found no tests and
+  exited 0 anyway: `NOT ASSESSED — no tests found`. **Zero tests are never a pass.**
+- **`custom:no-test-command`** — no `commands.test` (and no `Cargo.toml` for the
+  `cargo test` default): `NOT ASSESSED — no test command; run /setup-engine custom
+  or set commands.test`.
+- **`custom:0`** — exit 0 with no summary line read (another runner, read by exit
+  code only): it cannot tell a run of zero tests from a full one, so
+  `NOT ASSESSED — passed by exit code only, test count unknown`, never PASS.
+- **`custom:nonzero`** — any other non-zero exit: FAIL.
+- **`timeout`** — FAIL, as for every engine; **`runner-unavailable`** — the runner
+  is not available here (below).
+
 **Unknown engine / not configured:**
 "Engine not configured in `project.yaml` or
 `.claude/docs/technical-preferences.md`. Run `/setup-engine` to specify the
@@ -223,7 +248,13 @@ Phase 1 step 3 resolved, under the same timeout rules (`timeout 900`, or
 import line above first. Read the result as `/setup-engine` documents it:
 Godot `smoke` exits 0 even on a parse error, so a `SCRIPT ERROR` line in its
 output is a FAIL, and so is `Can't run project: no main scene defined` — the
-game cannot launch; Unity `smoke` exits 1 on a compile error; any other
+game cannot launch; Unity `smoke` exits 1 on a compile error; on Custom,
+the build check runs `commands.build` alone and reads its exit code, never
+`commands.smoke`: this path is taken on Custom when the runner counted no
+tests (`bash .claude/scripts/test-run.sh custom` printed `custom:ctest-zero`
+or `custom:cargo-zero`), so a smoke run here reads zero tests, which
+`/setup-engine custom` documents as not a pass; with
+`commands.build` unset it is `NOT RUN — commands.build unset`; any other
 non-zero exit is a FAIL. Record `Build check: PASS — [command] exit 0`,
 `FAIL — [reason]`, or `NOT RUN — [commands.smoke and commands.build unset |
 executable not found]`. A build check that did not run is named in the report

@@ -74,6 +74,16 @@ or the ADR list names as directly relevant, and only their `## Dependencies`,
 speculative full read of `design/gdd/*.md` looking for anything that might
 relate.
 
+**Custom, full engine mode** (`engine.name: Custom`; `references/engine-mode.md`,
+change 6): when `docs/architecture/modules/<module>.md` exists for a module the
+decision governs, the module spec stands in for the GDD. Read its section 10,
+`bash .claude/scripts/md-section.sh extract docs/architecture/modules/<module>.md "10. Test Plan and Acceptance Criteria"`,
+and the module's `TR-<module>-NNN` entries in `docs/architecture/tr-registry.yaml`
+(the entries whose `gdd:` is `docs/architecture/modules/<module>.md`, never
+by `system:` alone: a game GDD with the same slug shares it). On Custom this
+read is never skipped by the rule below: the ADR's GDD Requirements Addressed
+table needs it.
+
 Skip 3b entirely if the registry already answers everything this decision
 needs — most ADRs will.
 

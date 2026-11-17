@@ -230,6 +230,25 @@ Fixture defaults.
 
 ---
 
+### Case 7: Absent engine-reference files — named NOT SOURCEABLE, on any engine
+
+**Fixture:**
+- As Case 1, with `engine.name: Custom` and `docs/engine-reference/custom/VERSION.md` the only file there (what `/setup-engine custom` writes)
+- Variant: a Godot project as Case 1 with `docs/engine-reference/godot/deprecated-apis.md` absent
+
+**Input:** `/create-control-manifest`
+
+**Expected behavior:**
+1. Custom: the report names `NOT SOURCEABLE — deprecated-apis.md is not present` and `NOT SOURCEABLE — current-best-practices.md is not present`
+2. Godot variant: `NOT SOURCEABLE — deprecated-apis.md is not present` is named the same way
+3. The manifest's forbidden-API list holds only what the Accepted ADRs and the files that exist say; nothing is added from training data
+
+**Assertions:**
+- [ ] Each absent file is named with the literal `NOT SOURCEABLE — <file> is not present`
+- [ ] No forbidden API in the manifest is attributed to `deprecated-apis.md` when that file is absent
+
+---
+
 ## Protocol Compliance
 
 - [ ] Counts ADRs and resolves `## Status` before reading ADR sections

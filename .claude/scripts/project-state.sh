@@ -182,6 +182,18 @@ fi
 # engine's folder. code_root_check is _yh_code_root_check in yaml-helper.sh,
 # copied: keep the two the same.
 CODE_ROOT_SKIP=".claude .git production design docs tests studio-tests prototypes tools node_modules dist"
+# Build output and vendored code, skipped only on Custom, and tools/, scanned
+# only on Custom (CODE_ROOT_SKIP_CUSTOM and CODE_ROOT_SCAN_CUSTOM in yaml-helper.sh).
+CODE_ROOT_SKIP_CUSTOM="build target out third_party external vendor"
+CODE_ROOT_SCAN_CUSTOM="tools"
+case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
+  custom)
+    _skip=""
+    for d in $CODE_ROOT_SKIP; do
+      case " $CODE_ROOT_SCAN_CUSTOM " in *" $d "*) ;; *) _skip="${_skip:+$_skip }$d" ;; esac
+    done
+    CODE_ROOT_SKIP="$_skip $CODE_ROOT_SKIP_CUSTOM" ;;
+esac
 CODE_ROOT_DENY=".claude .git production design docs tests studio-tests prototypes"
 TAB=$(printf '\t')
 code_root_check() {

@@ -93,8 +93,18 @@ fi
 #
 # Tested directly rather than through resolve_code_root: this check runs before
 # the config helper is guaranteed to be sourced, and "is there any code at all"
-# does not need the engine to be known.
-for _root in src Assets Source; do
+# does not need the engine to be known. `engine` and `game` are a Custom
+# project's (its own engine beside the game, code root `.`), and are looked in
+# only when engine.name is Custom: on any other engine a game/ folder is not a
+# source root. Read with yaml-get.awk, as Check 1 below does, so no helper needs
+# to be sourced.
+_DG_ROOTS="src Assets Source"
+if [ -f project.yaml ] && [ -f .claude/scripts/yaml-get.awk ]; then
+  case "$(YG_PATH=engine.name awk -f .claude/scripts/yaml-get.awk project.yaml 2>/dev/null | tr -d '\r' | tr 'A-Z' 'a-z')" in
+    custom) _DG_ROOTS="$_DG_ROOTS engine game" ;;
+  esac
+fi
+for _root in $_DG_ROOTS; do
   [ -d "$_root" ] || continue
   SRC_CHECK=$(find "$_root" -type f \( -name "*.gd" -o -name "*.cs" -o -name "*.cpp" -o -name "*.c" -o -name "*.h" -o -name "*.hpp" -o -name "*.rs" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) 2>/dev/null | head -1)
   if [ -n "$SRC_CHECK" ]; then
@@ -209,9 +219,35 @@ fi
 if [ -n "$CODE_ROOT" ] && [ -d "$CODE_ROOT" ]; then
   # Count source files (cross-platform, handles Windows paths)
   # code_root_find is find, except that a root of `.` skips the framework's folders.
-  SRC_FILES=$(code_root_find "$CODE_ROOT" -type f \( -name "*.gd" -o -name "*.cs" -o -name "*.cpp" -o -name "*.c" -o -name "*.h" -o -name "*.hpp" -o -name "*.rs" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) | wc -l)
+  # Custom: only the game's code (game/) answers to design docs; the engine's
+  # own code (engine/) answers to ADRs, which Check 3 looks for. So Check 1
+  # reads DESIGN_SRC_FILES (game/ only); Checks 5 and 6 read SRC_FILES, the
+  # whole code root, as on every other engine.
+  # Only a code root of `.` can be Custom's, so other engines skip the lookup;
+  # yaml-get.awk, not _yh_engine_name, which starts Python.
+  _DG_EN=""
+  if [ "$CODE_ROOT" = . ] && [ -f project.yaml ] && [ -f .claude/scripts/yaml-get.awk ]; then
+    _DG_EN=$(YG_PATH=engine.name awk -f .claude/scripts/yaml-get.awk project.yaml 2>/dev/null | tr -d '\r' | tr 'A-Z' 'a-z')
+  fi
+  if [ "$_DG_EN" = custom ] && [ "$CODE_ROOT" = . ]; then
+    _DG_SRCROOT=game
+  else
+    _DG_SRCROOT="$CODE_ROOT"
+  fi
+  _dg_count() {
+    code_root_find "$1" -type f \( -name "*.gd" -o -name "*.cs" -o -name "*.cpp" -o -name "*.c" -o -name "*.h" -o -name "*.hpp" -o -name "*.rs" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) | wc -l
+  }
+  SRC_FILES=$(_dg_count "$CODE_ROOT")
+  if [ "$_DG_SRCROOT" = "$CODE_ROOT" ]; then
+    DESIGN_SRC_FILES="$SRC_FILES"
+  elif [ -d "$_DG_SRCROOT" ]; then
+    DESIGN_SRC_FILES=$(_dg_count "$_DG_SRCROOT")
+  else
+    DESIGN_SRC_FILES=0
+  fi
 else
   SRC_FILES=0
+  DESIGN_SRC_FILES=0
 fi
 
 # Only the GDDs at the top of design/gdd/ count, as in the commit check: copies
@@ -226,13 +262,14 @@ fi
 
 # Normalize whitespace from wc output
 SRC_FILES=$(echo "$SRC_FILES" | tr -d ' ')
+DESIGN_SRC_FILES=$(echo "$DESIGN_SRC_FILES" | tr -d ' ')
 DESIGN_FILES=$(echo "$DESIGN_FILES" | tr -d ' ')
 SUB_DESIGN_FILES=$(echo "$SUB_DESIGN_FILES" | tr -d ' ')
 
-if [ "$DOC_CHECKS" = true ] && [ "$SRC_FILES" -gt 50 ] && [ "$DESIGN_FILES" -lt 5 ]; then
-  echo "⚠️  GAP: Substantial codebase ($SRC_FILES source files) but sparse design docs ($DESIGN_FILES files)"
+if [ "$DOC_CHECKS" = true ] && [ "$DESIGN_SRC_FILES" -gt 50 ] && [ "$DESIGN_FILES" -lt 5 ]; then
+  echo "⚠️  GAP: Substantial codebase ($DESIGN_SRC_FILES source files) but sparse design docs ($DESIGN_FILES files)"
   [ "$SUB_DESIGN_FILES" -gt 0 ] && echo "    Not counted: $SUB_DESIGN_FILES .md file(s) in design/gdd/ subfolders (such as archive/)"
-  echo "    Suggested action: /reverse-document design ${CODE_ROOT:-<code root>}/[system]"
+  echo "    Suggested action: /reverse-document design ${_DG_SRCROOT:-${CODE_ROOT:-<code root>}}/[system]"
   echo "    Or run: /project-stage-detect to get full analysis"
 fi
 
@@ -269,12 +306,25 @@ if [ "$DOC_CHECKS" = true ] && [ -n "$CODE_ROOT" ] && { [ -d "$CODE_ROOT/core" ]
     echo "⚠️  GAP: Core engine/systems exist but no docs/architecture/ directory"
     echo "    Suggested action: Create docs/architecture/ and run /architecture-decision"
   else
-    ADR_COUNT=$(find docs/architecture -type f -name "*.md" 2>/dev/null | wc -l)
+    # Custom keeps module specs, frame-budget.md and memory-invariants.md in
+    # docs/architecture/ too: count only the ADRs there (adr-*.md, as
+    # project-state.sh does). Other engines count as at the base release.
+    if [ "${_DG_EN:-}" = custom ]; then
+      ADR_COUNT=$(find docs/architecture -maxdepth 1 -type f -name "adr-*.md" 2>/dev/null | wc -l)
+    else
+      ADR_COUNT=$(find docs/architecture -type f -name "*.md" 2>/dev/null | wc -l)
+    fi
     ADR_COUNT=$(echo "$ADR_COUNT" | tr -d ' ')
 
     if [ "$ADR_COUNT" -lt 3 ]; then
       echo "⚠️  GAP: Core systems exist but only $ADR_COUNT ADR(s) documented"
-      echo "    Suggested action: /reverse-document architecture $CODE_ROOT/core/[system]"
+      # Custom: the code root is `.` and the engine's modules sit in engine/
+      # (_DG_EN is read in Check 1, which runs whenever this check can).
+      if [ "${_DG_EN:-}" = custom ]; then
+        echo "    Suggested action: /reverse-document architecture engine/[module]"
+      else
+        echo "    Suggested action: /reverse-document architecture $CODE_ROOT/core/[system]"
+      fi
     fi
   fi
 fi

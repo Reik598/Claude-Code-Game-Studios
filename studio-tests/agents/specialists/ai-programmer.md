@@ -59,6 +59,31 @@ No gate IDs assigned.
 - Keeps waypoints and choke points in data, not hardcoded positions
 - Does not invent geometry or behavior the documents do not give; where they leave a case open (e.g., both choke points equally near), asks the spec owner instead of deciding
 
+### Case 6: On a Custom Engine Project — navigation across a streamed world
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the engine has no navigation module yet and the world streams in cells.
+**Input:** "Enemies need to path across the whole open world. Set up navigation."
+**Expected behavior:**
+- States that there is no engine navigation system: it is built or integrated
+- Builds navmesh tiles from collision geometry — offline in the cooker, at runtime for dynamic obstacles — and streams them with the world
+- Names Recast/Detour as one library option and makes build-vs-buy an ADR raised through `chief-engine-architect`, using its navigation-choice table (a ground-based walkable navmesh points to a library)
+- Time-slices path queries into a per-frame budget; the tick never blocks on a path query
+- Keeps agent state in ECS components with `ecs-dod-architect`, batches updates as jobs with `concurrency-job-system-engineer`, and does perception raycasts through `physics-simulation-engineer`'s query API
+**Assertions:**
+- [ ] Build-vs-buy is an ADR through `chief-engine-architect`, not decided alone
+- [ ] No design blocks the tick on a path query
+- [ ] ECS, job and physics-query work is routed to the owners its Custom section names
+
+### Case 7: Other engine — navigation without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`; the world streams in chunks.
+**Input:** "Enemies need to path across the whole open world. Set up navigation."
+**Expected behavior:**
+- Works with the engine's own navigation system
+- Does NOT state that there is no engine navigation system, plan navmesh tiles in a cooker, or raise a build-vs-buy ADR through `chief-engine-architect`
+- Does NOT route work to `ecs-dod-architect`, `concurrency-job-system-engineer` or `physics-simulation-engineer`
+**Assertions:**
+- [ ] The Custom section is not applied: no in-house navigation build and no Custom-only agent named
+- [ ] The design uses the configured engine's navigation
+
 ---
 
 ## Protocol Compliance

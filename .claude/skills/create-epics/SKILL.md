@@ -62,6 +62,13 @@ when they asked for epics.
 
 ### `minimal`: the brief
 
+**Custom with module specs** (`engine.name: Custom` and any
+`docs/architecture/modules/*.md`): stop before reading the brief, with "The
+engine module route needs workflow standard or full: run `/project-settings
+modes.workflow=standard`, then `/create-epics` again. At `minimal` only the
+brief's epics exist, and no module spec becomes an epic." A Custom project with
+no module spec takes this branch as any other engine does.
+
 Read `design/game-brief.md`. None: stop, "No `design/game-brief.md` — run `/start`
 or `/brainstorm` first." Never ask for GDDs, a systems index, an architecture
 document, ADRs, a TR registry or a control manifest, and never send the user to
@@ -88,6 +95,26 @@ per group of features that ship together. Every epic names its slug, since
    system GDD; the game concept, systems index, pillars, cross-reviews and the other
    non-system documents are left out for you. Their count is **N**. N is 0: stop,
    "No system GDDs found in `design/gdd/` — run `/design-system` first."
+
+   **Custom** (`engine.name: Custom`): an engine module's spec,
+   `docs/architecture/modules/<module>.md` (from
+   `.claude/docs/templates/engine-module-spec.md`), stands in for a GDD on the
+   engine side. N counts the system GDDs plus the module specs, and the stop
+   fires only when both are zero: "No system GDDs in `design/gdd/` and no module
+   specs in `docs/architecture/modules/` — run `/design-system` for a game
+   system, or write a module spec from `.claude/docs/templates/engine-module-spec.md`."
+   Each module spec is one epic, slugged `engine-<module>`
+   (`production/epics/engine-<module>/EPIC.md`), never the bare module name, so
+   it never shares a folder with a game system's epic of the same name: a
+   `design/gdd/audio.md` and a `docs/architecture/modules/audio.md` are two
+   epics, `audio` and `engine-audio`. Its header names
+   `**Module**: docs/architecture/modules/<module>.md` where a game epic names
+   `**GDD**:`; its layer is the one `architecture.md` gives the module; read the
+   spec by section ("1. Purpose" and "10. Test Plan and Acceptance Criteria" in
+   place of Overview and Acceptance Criteria); its TR registry entries are those
+   whose `gdd:` is `docs/architecture/modules/<module>.md`, never selected by
+   `system:` alone (a game GDD with the same slug shares it). An epic that would name both a GDD and a
+   module spec is reported to the user, never guessed at.
 2. **What is in scope.** Each GDD's `## Summary` quick reference gives its layer and
    priority. A GDD with no Summary (older GDDs predate it) takes its layer from
    `design/gdd/systems-index.md`. Never treat an absent `## Summary` as an absent system:

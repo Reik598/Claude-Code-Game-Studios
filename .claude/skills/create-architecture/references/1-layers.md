@@ -32,6 +32,12 @@ For each GDD system, ask:
 - What are its module boundaries?
 - What does it own exclusively? (data, state, behaviour)
 
+**Custom** (`engine.name: Custom`): map the engine's modules too, not only the
+systems of `systems-index.md`. Each module spec in `docs/architecture/modules/`
+(read in Phase 0) is placed in a layer the same way, beside the systems; the
+three questions above apply to it. No module spec yet: say so, and place no
+module that has none.
+
 Present the proposed layer assignment and ask for approval before proceeding to
 the next section. Record the approved layer map in
 `production/session-state/active.md`; it goes into the document at Phase 7.

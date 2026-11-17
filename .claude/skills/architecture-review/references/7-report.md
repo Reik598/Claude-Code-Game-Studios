@@ -81,6 +81,18 @@ FAIL: Critical gaps (Foundation/Core layer requirements uncovered),
   engine reference to audit the ADRs against, and the specialist look was
   skipped. Record the `Engine validation: NOT ASSESSED` line item; like Phase 6
   above, it keeps the verdict from PASS.
+- **A Custom engine claim is NOT SOURCEABLE** (`engine.name: Custom`) — the
+  Custom lens (`references/lens-engine.md`) wrote
+  `NOT SOURCEABLE — <claim> is not covered by docs/engine-reference/custom/`
+  for an ADR, or `docs/engine-reference/custom/VERSION.md` does not exist.
+  Each is a named `NOT ASSESSED` line item for that ADR's engine compatibility;
+  like Phase 6 above, it keeps the verdict from PASS.
+- **A Custom module spec has no section 10, or there is none**
+  (`engine.name: Custom`) — `docs/architecture/modules/` holds no spec, or a
+  spec has no "10. Test Plan and Acceptance Criteria" section, so its engine
+  requirements were not extracted. Each is a named `NOT ASSESSED` line item
+  (`Module requirements: NOT ASSESSED — <spec | no module spec>`); like Phase 6
+  above, it keeps the verdict from PASS.
 
 Do not resolve any of these to PASS on the grounds that no gap was *found*. No
 gap was looked for.

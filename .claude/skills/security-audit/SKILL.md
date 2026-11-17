@@ -131,7 +131,7 @@ empty code root is the insufficient-implementation case in Phase 5, and each
 category that scans code reads `NOT ASSESSED — no source under <root>`, not zero
 findings. Neither is ever reported clean.
 
-The security-engineer runs the audit across 6 categories (see Phase 3). Collect their full findings before proceeding.
+The security-engineer runs the audit across 6 categories, 7 on a Custom engine (see Phase 3). Collect their full findings before proceeding.
 
 ---
 
@@ -144,18 +144,22 @@ platform.online are false`).
 
 ### Engine pattern sets — read this before any Category below
 
-**Every pattern list in Categories 1–3 is written for Godot.** On a Unity or
-Unreal project they match nothing, and a zero-hit scan renders the report clean,
+**Every pattern list in Categories 1–3 is written for Godot.** On a Unity,
+Unreal or Custom project they match nothing, and a zero-hit scan renders the report clean,
 "the most dangerous possible failure for a security audit". Use the table for
 `engine.name` resolved in Phase 1.
 
-| Category | Godot | Unity | Unreal |
-|---|---|---|---|
-| 1 — Save / serialization | the Godot list below | **NOT SOURCEABLE** | **NOT SOURCEABLE** |
-| 2 — Network / multiplayer | the Godot list below | `ServerRpc`, `ClientRpc`, `NetworkVariable`, `NetworkObject`, `NetworkManager`, `NetworkBehaviour`, `IsServer`, `IsOwner` | `UFUNCTION`, `Server`, `Client`, `NetMulticast`, `Replicated`, `DOREPLIFETIME`, `GetLifetimeReplicatedProps`, `HasAuthority` |
-| 3 — Input | the Godot list below | `InputSystem`, `PlayerInput`, `ReadValue`, `InputValue` | `EnhancedInput`, `UInputAction`, `InputMappingContext`, `BindAction`, `FInputActionValue` |
-| 4 — Data exposure | engine-agnostic — the list below applies to all three | | |
-| 5, 6 | judgement and manifests, not greps — no engine set needed | | |
+| Category | Godot | Unity | Unreal | Custom |
+|---|---|---|---|---|
+| 1 — Save / serialization | the Godot list below | **NOT SOURCEABLE** | **NOT SOURCEABLE** | **NOT SOURCEABLE** unless `docs/engine-reference/custom/` names the project's save and asset-parser entry points |
+| 2 — Network / multiplayer | the Godot list below | `ServerRpc`, `ClientRpc`, `NetworkVariable`, `NetworkObject`, `NetworkManager`, `NetworkBehaviour`, `IsServer`, `IsOwner` | `UFUNCTION`, `Server`, `Client`, `NetMulticast`, `Replicated`, `DOREPLIFETIME`, `GetLifetimeReplicatedProps`, `HasAuthority` | **NOT SOURCEABLE** unless `docs/engine-reference/custom/` names the project's packet-receive entry points |
+| 3 — Input | the Godot list below | `InputSystem`, `PlayerInput`, `ReadValue`, `InputValue` | `EnhancedInput`, `UInputAction`, `InputMappingContext`, `BindAction`, `FInputActionValue` | **NOT SOURCEABLE** unless `docs/engine-reference/custom/` names the project's input API |
+| 4 — Data exposure | engine-agnostic — the list below applies to all four | | | |
+| 5, 6 | judgement and manifests, not greps — no engine set needed | | | |
+| 7 — Engine memory safety | — | — | — | Category 7 below (Custom only) |
+
+A Custom project's engine API is its own, so no list here can name it: the
+pattern names come from `docs/engine-reference/custom/` or not at all.
 
 The Unity and Unreal names above are **sourced from this repo's pinned
 references** (`docs/engine-reference/unity/modules/{networking,input}.md`,
@@ -233,7 +237,9 @@ Grep for: `get_input`, `Input.get_`, `input_map`, user-facing text fields — ch
 Grep case-insensitively in release-facing code for: `api[_-]?key`, `secret`,
 `password`, `token`, `private[_-]?key`, `sk_live`, `BEGIN PRIVATE KEY`, `DEBUG`,
 and the engine's print call (`print(` on Godot, `Debug.Log` on Unity, `UE_LOG`
-on Unreal).
+on Unreal; on Custom the project's own log macro, from
+`docs/engine-reference/custom/` or the logging module under `engine/core/` —
+name which).
 
 ### Category 5: Cheat and Anti-Tamper Vectors
 - Are gameplay-critical values stored only in memory, not in easily-editable files?
@@ -249,6 +255,55 @@ Note: Client-side anti-cheat is largely unenforceable. Focus on server-side vali
 - Are plugin sources verified (official marketplace, reviewed repository)?
 
 Glob for: `addons/`, `plugins/`, `third_party/`, `vendor/` — list all external dependencies.
+On Custom, also list what the build pulls in: `Cargo.lock`, `vcpkg.json`,
+`conanfile.*`, and `FetchContent` or `ExternalProject` calls in `CMakeLists.txt`
+files, plus graphics SDKs and shader compilers the build names.
+
+### Category 7: Engine Memory Safety and Untrusted Input (Custom only)
+
+Runs in `full` and `quick` when `engine.name` is `Custom`; on any other engine it is skipped and the
+Executive Summary says so (`Category 7 — skipped: engine.name is <engine>, not
+Custom`). A game on its own engine parses every untrusted byte itself — asset
+files, mods, saves, packets — so a memory bug there is a code-execution bug.
+
+- **Parsers of untrusted data** — find the code that reads asset, save, mod and
+  network data (`engine/assets/`, loaders, deserialisers, packet handlers). For
+  each: are lengths, counts and offsets read from the file checked against the
+  buffer before use? Are sizes multiplied without overflow checks before an
+  allocation? Does a parse failure leave a half-initialised object reachable?
+- **C++ memory safety** on those paths: raw buffer copies whose size comes from
+  the input, indexing with input values, `reinterpret_cast` over input buffers,
+  ownership of what a parser returns. **Rust**: every `unsafe` block on those
+  paths, and `from_raw_parts` lengths taken from input.
+- **Sanitizer evidence** — is there a sanitizer run (ASan, UBSan; Miri for Rust
+  `unsafe`) over the parsers' tests? Read it as `/memory-audit` does. None →
+  `Category 7 sanitizers: NOT ASSESSED — no sanitizer output`.
+- **Fuzzing** — does each parser of untrusted data have a fuzz target and an
+  execution receipt: completed local log or CI run with target, command,
+  candidate build/commit, duration or execution count, exit status, and findings?
+  A corpus, crash directory or CI job definition alone proves no run occurred.
+  Apply `/memory-audit`'s evidence freshness checks to the receipt; stale,
+  unknown-build or unconfirmed working-tree evidence is NOT ASSESSED. An open
+  reproducible crash remains a finding even if the receipt is stale. A parser of
+  untrusted files with no fuzz target is a MEDIUM finding; fuzz targets with no
+  evidence of a run → `Category 7 fuzzing: NOT ASSESSED — no fuzz run found`.
+
+**The sanitizer and fuzzing lines reach the verdict.** Either one reading
+`NOT ASSESSED` makes **Category 7 `NOT ASSESSED`** for the release
+recommendation (Phase 5), with that line as the reason — a parser read by eye
+has not been shown free of memory errors, and a parser nobody fuzzed has not
+been shown to survive hostile input. It ranks as Phase 5's rule says: below an
+open CRITICAL or HIGH, in place of CLEAR TO SHIP. A parser of untrusted data with
+no fuzz target at all is the MEDIUM finding above **and** leaves fuzzing
+NOT ASSESSED for that parser.
+
+Grep patterns for this category come from `docs/engine-reference/custom/` (the
+project's parser entry points, its unsafe-API list). Without them the category
+is still read by judgement as above, but its pattern scan is `NOT SOURCEABLE —
+parser entry points are not covered by docs/engine-reference/custom/`, and the
+category is `NOT ASSESSED` for the release recommendation (Phase 5) — a read of
+the parsers you happened to find is not a scan of all of them. Run
+`/memory-audit` for the full allocator, leak and use-after-free audit.
 
 ---
 
@@ -323,13 +378,20 @@ Choose it by the open findings, first match wins:
 > the category stays NOT ASSESSED — never "reviewed", "verified safe" or passed.
 > A scan that could not look is not a scan that found nothing, and only the
 > report can tell the reader which of the two happened.
+>
+> **Category 7's evidence lines are part of the same rule** (Custom only). When
+> `Category 7 sanitizers` or `Category 7 fuzzing` reads `NOT ASSESSED`, Category
+> 7 is `NOT ASSESSED`, the Executive Summary names it with that line, and
+> `CLEAR TO SHIP` is unreachable for the run — the recommendation is NOT
+> ASSESSED where it would otherwise have been CLEAR TO SHIP, and an open
+> CRITICAL or HIGH still decides it first.
 
 ---
 
 ## CRITICAL Findings
 
 ### SEC-001: [Title]
-**Category**: [Save / Network / Input / Data / Cheat / Dependency]
+**Category**: [Save / Network / Input / Data / Cheat / Dependency / Engine memory (Custom only)]
 **File**: `[path]` line [N]
 **Description**: [What the vulnerability is]
 **Attack scenario**: [How a malicious user would exploit it]
@@ -422,9 +484,10 @@ If it is **NOT ASSESSED**:
 >
 > Name the missing input for each category: `engine.name`, the code root, the
 > multiplayer scope (`/project-settings platform.multiplayer=…`), or — for a category the
-> Phase 3 table marks NOT SOURCEABLE on this engine, the usual cause on Unity and
-> Unreal — a save/serialization module in `docs/engine-reference/<engine>/modules/`
-> (Phase 3), naming that category.
+> Phase 3 table marks NOT SOURCEABLE on this engine, the usual cause on Unity,
+> Unreal and Custom — a save/serialization module in `docs/engine-reference/<engine>/modules/`
+> (Phase 3), naming that category; on Custom, the project's own entry points in
+> `docs/engine-reference/custom/`, and for Category 7 a sanitizer run and a fuzz run.
 
 If it is **CLEAR TO SHIP**:
 > "✅ No blocking security findings. Report written to `production/security/`. Include this path when running `/gate-check release`."

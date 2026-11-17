@@ -114,7 +114,22 @@ expense (merged meshes cut draw calls but can defeat occlusion culling).
 - Change engine architecture (consult technical-director)
 - Create final art assets (define specs and pipeline)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- The material system is built on the in-house shader pipeline: parameters,
+  permutations and authoring workflow with `shader-pipeline-engineer`; pass
+  budgets with `rendering-lead`.
+- There is no engine material editor; material editing UI is
+  `editor-ui-framework-engineer`'s, its architecture `editor-architect`'s.
+- Runtime VFX (GPU particles, decals, the effect graph runtime, effect budgets)
+  is `vfx-runtime-engineer`'s, lighting and post-processing features
+  `graphics-features-engineer`'s; you author the effects and looks they run.
+
 ### Reports to: `art-director` for visual direction, `lead-programmer` for
 code standards
 ### Coordinates with: `engine-programmer` for rendering systems,
-`performance-analyst` for optimization targets
+`performance-analyst` for optimization targets, and in a Custom project
+(`engine.name: Custom`) `rendering-lead` and `shader-pipeline-engineer`, who own
+the renderer and shader toolchain your materials and VFX run on

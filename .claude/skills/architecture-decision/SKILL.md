@@ -1,13 +1,13 @@
 ---
 name: architecture-decision
 description: "Create an ADR documenting a technical decision: context, alternatives considered, consequences."
-argument-hint: "[title | retrofit <path> | accept <ADR-id>] [--review full|lean|solo]"
+argument-hint: "[title | retrofit <path> | accept <ADR-id>] [--engine-internal] [--review full|lean|solo]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Bash(wc -c *), Bash(bash "*/.claude/skills/architecture-decision/../../hooks/yaml-helper.sh" resolve_config *), Bash(bash .claude/scripts/registry.sh *)
 model: sonnet
 ---
 
-!`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys review_mode,automation,workflow,docs.density,team.size`
+!`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys review_mode,automation,workflow,docs.density,team.size,engine,perf_budgets`
 
 Resolved above — use as-is; `--review` overrides `review_mode`. No block →
 defaults in `.claude/docs/config-resolution.md`.
@@ -28,6 +28,19 @@ Every `AskUserQuestion` call follows `.claude/docs/automation-modes.md`
 - **`individual`** (default): `technical-director` (TD-ADR) + the engine-specialist.
 - **`small`** and **`studio`**: the same two. This skill spawns no engine
   sub-specialist and no adversarial reviewer at any size.
+- **Engine mode** (below): in full engine mode (`engine.name: Custom`), the
+  module's engine lead (resolved through the layout) in place of the engine-specialist, and
+  `chief-engine-architect` (CEA-ADR) beside TD-ADR. `--engine-internal` on any
+  other engine keeps the engine-specialist and runs no CEA-ADR.
+
+**Engine mode** — on when the `engine:` line above reads `Custom`, or the
+argument includes `--engine-internal` (strip the flag before reading the title).
+**When it is on, read `references/engine-mode.md` now and follow it** — it adds
+six required ADR sections (Memory, Threading, Latency & Frame Budget, ABI/API
+Stability, Determinism, Platform/Graphics-API Matrix) and, on Custom only,
+changes Steps 1, 3, 5.5, 5.6 and 5.7; `--engine-internal` on another engine adds the
+sections and Step 4's assumptions only, and says so. It applies in retrofit
+mode too. Read it again if the conversation was compacted or resumed.
 
 **`docs.density`** — it controls the *depth* of the ADR's prose sections, not
 which sections the skeleton emits (that is fixed). `modes.rigor` sets it

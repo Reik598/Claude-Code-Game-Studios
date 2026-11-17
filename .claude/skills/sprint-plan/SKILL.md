@@ -188,6 +188,8 @@ story of its own.
    `Content/**/*.umap` for Unreal. Find anything else by the path or name the
    stories use. With no engine set, check by name only and say the scene search
    did not run.
+   On Custom (`engine.name: Custom`) the scene format is the project's own engine's,
+   with no file type to search for: check by name only and say the scene search did not run.
 4. **Fill in the Goal Prerequisites section**: each need with `exists`,
    `built by [story ID]` or **missing**, or the single row "None: the goal has
    nothing to run or show". Copy each missing one into Risks. When you present

@@ -59,6 +59,26 @@ No gate IDs assigned.
 - Adds a warning or error report for assets that fail to meet the specified settings
 - Treats the three settings as given: does NOT change or add requirements itself — any change it thinks is needed is raised with `technical-artist`, its partner for art pipeline tools
 
+### Case 6: On a Custom Engine Project — debug console and editor inspector
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the editor is in-house.
+**Input:** "Build an in-game debug console, and a property inspector panel in the editor for level designers."
+**Expected behavior:**
+- Takes the in-game debug console: built on the console and cvar framework owned by `core-systems-lead`, compiled out of shipping builds behind the profiler-instrumentation switch; Dear ImGui is a sound choice for it
+- Does not build the property inspector: it is `editor-ui-framework-engineer`'s, under `editor-architect`'s architecture
+- Does not present Dear ImGui as the editor's framework — that is an ADR owned by `editor-architect`
+**Assertions:**
+- [ ] The inspector is routed to `editor-ui-framework-engineer`
+- [ ] The debug console compiles out of shipping builds
+
+### Case 7: Other engine — the same request without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unity`.
+**Input:** "Build an in-game debug console, and a property inspector panel in the editor for level designers."
+**Expected behavior:**
+- Builds the inspector as an extension of the engine's editor, as its normal tools role does
+- Does NOT route the inspector to `editor-ui-framework-engineer` or `editor-architect`, or the console to `core-systems-lead`'s cvar framework
+**Assertions:**
+- [ ] The Custom section is not applied: no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

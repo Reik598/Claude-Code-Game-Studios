@@ -418,6 +418,81 @@ before it is made.
 
 ---
 
+### Case 11: Custom Engine, Technical Setup → Pre-Production — budget unset and zero tests are NOT ASSESSED; CEA-ADR reviews unreviewed ADRs
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard`, `modes.review_mode: full` (pinned: CEA gates are not PHASE-GATEs, so only `full` runs them); no `performance` block
+- All game items of `gate-pre-production.md` are present and pass
+- Accepted engine-mode ADRs cover memory, threading, job system, RHI and platform layer; `ADR-0003` (threading) has no recorded CEA-ADR verdict (it was written at `lean`); `.claude/docs/director-gates/cea-adr.md` exists
+- `docs/architecture/frame-budget.md` and `memory-invariants.md` exist with real content
+- `bash .claude/scripts/test-run.sh custom` prints `rule custom:ctest-zero`
+
+**Input:** `/gate-check pre-production`
+
+**Expected behavior:**
+1. The resolved block includes `engine` and `perf_budgets`; `artifact-check.sh` prints `ENGINE: Custom` and evaluates the `engine=Custom` rows
+2. The gate file's `## Custom engine additions` block is added to the checklist (tier `standard` reductions applied); it replaces no game item
+3. `performance.frame_budget_ms is set` → **NOT ASSESSED** (unset), never PASS
+4. Engine tests: `custom:ctest-zero` → **NOT ASSESSED**, naming the rule — zero tests are never a pass
+5. Section 4b spawns `chief-engine-architect` with gate CEA-ADR for `ADR-0003`, in parallel with the panel; the prompt tells it to read `.claude/docs/director-gates/cea-adr.md` first; its result appears as a `Chief Engine Architect:` row under the Director Panel summary
+6. Verdict: NOT ASSESSED (no Blocker found), naming the unset budget and the zero-test run; the stage is not written
+
+**Assertions:**
+- [ ] The Custom block's items appear in the checklist alongside, not instead of, the game items
+- [ ] The budget and engine-test items are NOT ASSESSED, not PASS
+- [ ] `chief-engine-architect` is spawned once, for `ADR-0003` only, and reported in its own row
+- [ ] Verdict is not PASS; the stage is not advanced
+- [ ] Variant — `review_mode: solo`: no CEA call; the report prints `CEA-ADR skipped — Solo mode` and `CEA-ADR not run — Solo mode` for `ADR-0003`
+- [ ] Variant — `review_mode: lean`: the PHASE-GATE panel still runs, but no CEA call — CEA gates are per-skill gates, skipped in lean by the shared `director-gates.md` rule; the report prints `CEA-ADR skipped — Lean mode` and `CEA-ADR not run — Lean mode` for `ADR-0003`, by name, and the skipped review is left out of the verdict
+- [ ] Variant — `modes.workflow: minimal`, `commands.build` set, no `commands.test` (CMake): `test-run.sh custom` prints `rule custom:no-test-command` with no `build_exit` row (the build never ran) → "the engine builds" is **NOT ASSESSED** ("no affirmative build evidence"), never PASS; with `commands.test` set and a `build_exit 0` / `build_timed_out no` row it passes; a `timeout` or `runner-unavailable` rule is NOT ASSESSED
+- [ ] Variant — test rule `custom:0`: still NOT ASSESSED (exit code only); `custom:build-failed`: a Blocker and the verdict FAIL
+
+---
+
+### Case 12: Custom Engine, Production → Polish — CEA-FRAME-BUDGET REJECT under `performance.enforce`
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard`, `modes.review_mode: full`, `performance.frame_budget_ms: 8.33`
+- Run A: `performance.enforce: block`. Run B: `performance.enforce: warn`
+- The game items of `gate-polish.md` pass; the newest `production/qa/benchmarks/benchmark-*.md` (release preset, reference hardware) shows GPU frame P99 9.6 ms; a baseline report exists
+- No Accepted ADR claims determinism
+
+**Input:** `/gate-check polish`
+
+**Expected behavior:**
+1. The Custom block's frame item reads the newest report against the baseline
+2. Section 4b spawns `chief-engine-architect` with CEA-FRAME-BUDGET; it returns `CEA-FRAME-BUDGET: REJECT`
+3. Run A (`block`): the breach is a **Blocker** → verdict FAIL
+4. Run B (`warn`): the breach is CONCERNS → verdict CONCERNS
+5. The determinism item reads `N/A — no ADR claims determinism`
+6. Neither run writes the stage without the user's explicit acceptance (Run B) — Run A never
+
+**Assertions:**
+- [ ] The CEA-FRAME-BUDGET verdict is weighted by `performance.enforce` (Blocker at `block`, CONCERNS at `warn`)
+- [ ] The frame item is never PASS while P99 exceeds 8.33 ms
+- [ ] Variant — no benchmark report: no CEA call; `CEA-FRAME-BUDGET not run — no /benchmark-report to review`, and the frame item is NOT ASSESSED
+- [ ] Variant — `/gate-check production` (Pre-Production → Production) with `performance.enforce: block` and CEA-FRAME-BUDGET REJECT on the baseline: the breach is **CONCERNS**, not a Blocker — `block` makes breaches Blockers only from the Polish gate on (Section 3), and CEA-FRAME-BUDGET follows the same stage rule
+- [ ] Variant — the newest report's `Regression result` reads `NOT ASSESSED — captures not comparable (...)` while its verdict word is `WITHIN BUDGET`: the frame item is NOT ASSESSED (the gate reads the Regression result line, not the verdict word)
+
+---
+
+### Case 13: Non-Custom Engine — the Custom block is skipped with one line; no CEA call
+
+**Fixture:**
+- As Case 11, but `engine.name: Godot` and `performance.frame_budget_ms: 16.6`; the Godot test root has passing tests
+
+**Input:** `/gate-check pre-production`
+
+**Expected behavior:** The report prints `Custom engine additions: skipped — engine is Godot` once; none of its items is checked or counted (the zero-required-artifacts count excludes them); `artifact-check.sh`'s `ENGINE_SKIPPED:` count is printed as one line and no `engine=Custom` row is a blocker; `chief-engine-architect` is not spawned and no `Chief Engine Architect:` row appears; `test-run.sh custom` is not run.
+
+**Assertions:**
+- [ ] Exactly one skip line for the Custom block
+- [ ] No frame-budget.md, memory-invariants.md, module-map or engine-ADR item in the checklist
+- [ ] No CEA gate and no `chief-engine-architect` row
+- [ ] The verdict equals the one this fixture gives with the Custom blocks absent from the gate files
+
+---
+
 ## Protocol Compliance
 
 - [ ] Asks before updating the stage ("May I update `project.stage` in `project.yaml` … (and the legacy `production/stage.txt`)?")
@@ -433,7 +508,8 @@ before it is made.
 
 - The Production → Polish and Polish → Release gates are not covered here
   because they require complex multi-artifact setups (sprint plans, playtest
-  data, QA sign-off); these are deferred to dedicated follow-up specs.
+  data, QA sign-off); these are deferred to dedicated follow-up specs. Only the
+  Custom engine frame item of Production → Polish is exercised (Case 12).
 - The `minimal`-tier Concept gate target (`design/game-brief.md` instead of
   `game-concept.md`) and `system_overrides` key validation are not covered.
 - The Vertical Slice validation block (Pre-Production → Production gate at

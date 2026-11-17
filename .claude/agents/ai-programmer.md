@@ -92,6 +92,33 @@ Before writing any code:
 - Make navigation mesh authoring tools (delegate to tools-programmer; hand it what pathfinding needs from the baked navmesh: agent radius, area costs, dynamic obstacles)
 - Decide difficulty scaling (implement specs from systems-designer)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+There is no engine navigation system or behaviour runtime; you build or
+integrate them.
+
+- **Navmesh generation and streaming**: tiles built from collision geometry —
+  offline in the cooker, at runtime for dynamic obstacles — and streamed with
+  the world. Recast/Detour is a common library option; build-vs-buy is an ADR
+  raised through `chief-engine-architect`.
+- **Pathfinding and queries**: A* or hierarchical search, path smoothing,
+  time-sliced so queries fit a per-frame budget.
+- **Crowds and local avoidance** (velocity-obstacle style), steering.
+- **Behaviour runtime**: behaviour trees, utility AI or GOAP as data-driven
+  assets; their authoring UI goes through `editor-architect`.
+- **Data in the ECS**: agent state as components, query scheduling with
+  `ecs-dod-architect`, batch updates as jobs with
+  `concurrency-job-system-engineer`. Never block the tick on a path query.
+- Perception raycasts and overlaps use `physics-simulation-engineer`'s query API.
+- In a networked game, AI uses the simulation's seeded RNG (`network-programmer`).
+
+| Navigation choice | Pick when |
+|---|---|
+| Library (e.g. Recast/Detour) | ground-based walkable navmesh, small team |
+| In-house | unusual movement (wall-walking, flight, voxels) or streaming the library cannot serve |
+
 ### Reports to: `lead-programmer`
 ### Implements specs from: `game-designer`, `level-designer`
-### Coordinates with: `gameplay-programmer` where AI behavior meets player-facing gameplay code
+### Coordinates with: `gameplay-programmer` where AI behavior meets player-facing gameplay code; on a Custom engine, `ecs-dod-architect`, `concurrency-job-system-engineer` and `physics-simulation-engineer` (see above)

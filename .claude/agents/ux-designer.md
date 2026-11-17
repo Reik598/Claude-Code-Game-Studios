@@ -104,4 +104,7 @@ Every feature must pass:
 ### Reports to: `art-director` for visual UX, `game-designer` for gameplay UX
 ### Coordinates with: `ui-programmer` for implementation feasibility,
 `analytics-engineer` for UX metrics, `accessibility-specialist` for the
-accessibility standards every flow must meet
+accessibility standards every flow must meet. On a Custom engine project
+(`engine.name: Custom`), editor UX flows (level editing, inspectors, content
+browser) are designed with `editor-architect` and built by
+`editor-ui-framework-engineer`

@@ -71,13 +71,27 @@ the session's model. Whether the tier takes effect depends on how the skill star
 (see the table at the top of this file).
 
 **Agent model tiers.** 30 agents use `model: inherit` and run on the session's
-model. 19 are pinned:
+model. 44 are pinned:
 
-- **opus (3):** `creative-director`, `producer`, `technical-director`. Under an
+- **opus (4):** `creative-director`, `producer`, `technical-director`, and
+  `chief-engine-architect` (Custom engine only). Under an
   Opus session an `opus` pin runs on the session's exact model, `[1m]` included,
   so it never gets a smaller window than its parent.
-- **sonnet (16):** `lead-programmer`, `prototyper`, `devops-engineer`,
-  `community-manager` and the 12 engine sub-specialists:
+- **sonnet (40):** `lead-programmer`, `prototyper`, `devops-engineer`,
+  `community-manager`, the 24 Custom-engine leads and specialists, and the 12
+  engine sub-specialists. The Custom-engine twenty-four, used only when
+  `engine.name` is `Custom`: `core-systems-lead`, `rendering-lead`,
+  `simulation-systems-lead`, `editor-architect`, `memory-allocator-specialist`,
+  `concurrency-job-system-engineer`, `ecs-dod-architect`, `platform-engineer`,
+  `world-streaming-engineer`, `online-services-engineer`,
+  `asset-build-tooling-engineer`, `rhi-backend-engineer`,
+  `render-graph-specialist`, `shader-pipeline-engineer`,
+  `graphics-features-engineer`, `vfx-runtime-engineer`,
+  `physics-simulation-engineer`, `animation-systems-engineer`,
+  `scripting-runtime-engineer`, `audio-engine-engineer`,
+  `level-editor-engineer`, `editor-ui-framework-engineer`,
+  `cinematics-sequencer-engineer`, `engine-technical-writer`. The engine
+  sub-specialists:
   `godot-csharp-specialist`, `godot-gdextension-specialist`,
   `godot-gdscript-specialist`, `godot-shader-specialist`,
   `ue-blueprint-specialist`, `ue-gas-specialist`, `ue-replication-specialist`,
@@ -109,6 +123,6 @@ the session's model with one line in your `.claude/settings.local.json`
 { "env": { "CLAUDE_CODE_SUBAGENT_MODEL_FORCE": "1" } }
 ```
 
-It applies to **every** pin, the three `opus` directors included: under a
+It applies to **every** pin, the four `opus` agents included: under a
 Sonnet session they run on Sonnet too. `CLAUDE_CODE_SUBAGENT_MODEL` alone does
 not do it: it applies only to agents that set no model of their own.

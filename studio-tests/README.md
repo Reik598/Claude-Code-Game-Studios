@@ -6,7 +6,7 @@ Tests the skills and agents themselves — not any game built with them.
 **This ships as part of the template, and it is meant to.** Claude Code Game Studios is a template
 you are expected to customize — edit a skill, add your own, retune an agent. This
 folder is how you check that what you changed still holds up: `catalog.yaml`
-tracks all 75 skills and 49 agents, `quality-rubric.md` defines per-category
+tracks all 81 skills and 74 agents, `quality-rubric.md` defines per-category
 pass/fail metrics, and `templates/` gives you the spec format for anything new
 you write. Driven by `/skill-test` and `/skill-improve`.
 
@@ -31,10 +31,10 @@ you write. Driven by `/skill-test` and `/skill-improve`.
 studio-tests/
 ├── README.md              ← you are here
 ├── CLAUDE.md              ← tells Claude how to use this framework
-├── catalog.yaml           ← master registry: all 75 skills + 49 agents, coverage tracking
+├── catalog.yaml           ← master registry: all 81 skills + 74 agents, coverage tracking
 ├── quality-rubric.md      ← category-specific pass/fail metrics for /skill-test category
 │
-├── skills/                ← behavioral spec files for all 75 skills
+├── skills/                ← behavioral spec files for all 81 skills
 │   ├── gate/              ← gate category specs
 │   ├── review/            ← review category specs
 │   ├── authoring/         ← authoring category specs
@@ -52,7 +52,8 @@ studio-tests/
 │   ├── engine/            ← engine-specific specialists, split per engine:
 │   │   ├── godot/         ← Godot-specific specialists
 │   │   ├── unity/         ← Unity-specific specialists
-│   │   └── unreal/        ← Unreal-specific specialists
+│   │   ├── unreal/        ← Unreal-specific specialists
+│   │   └── custom/        ← Custom-engine leads and specialists
 │   ├── operations/        ← devops, release, live-ops, community, analytics, economy, localization
 │   └── qa/                ← qa-tester, security-engineer, accessibility-specialist
 │
@@ -67,13 +68,51 @@ studio-tests/
 
 ## How to use it
 
-All testing is driven by two skills already in the framework:
+Behavioral evaluation uses the two skills below. Executable regressions also run
+directly from the repository root:
+
+```bash
+python -m unittest discover -s studio-tests -p 'test_*.py' -v
+python studio-tests/check_audio_examples.py  # requires rustc; offline callback fixtures
+```
+
+The unit suite checks registry/rule/ownership contracts and generated CI with
+deterministic runners. The audio check compiles the actual Rust rule example.
+Neither runs Claude behavioral scenarios or verifies a real engine/device.
+
+Several engine-support tests compare files and hook or script output with the
+framework's base release (commit `abc0de7`, `BASE_RELEASE` in
+`test_engine_support.py`). They are tests of this framework repository, not of
+a game project built on it: in a clone without that commit they skip with a
+named reason, and a skip is not a pass. In a game project where
+`/setup-engine` has edited a Godot, Unity or Unreal agent or
+`docs/engine-reference/<engine>/`, the comparison with the base release fails
+by design.
+
+### Shared agent and skill files: re-pinning after an edit
+
+`test_engine_shared_guard.py` holds every agent and skill file of the base
+release to "base plus the hunks pinned in `shared-file-hunks.json`", and pins
+the whole text of a file added inside a base skill directory. Any edit to such a
+file fails the test until the manifest is re-pinned:
+
+```bash
+python studio-tests/shared_hunks.py propose   # rewrites the manifest; lists each NEW hunk
+# read each NEW hunk and type its reason id into shared-file-hunks.json by hand
+python studio-tests/shared_hunks.py check     # must print "0 problem(s)"
+```
+
+`propose` never writes a reason. `custom-addition` is allowed only where its
+verdict says so; anything else needs a `departure` reason whose `ref` cites an
+id the fix plan defines. A hunk listed with `supersedes` replaces text that was
+pinned under a departure reason, and its reason must cite a plan id that reason
+did not. The full rules are in the docstring of `shared_hunks.py`.
 
 ### Check structural compliance
 
 ```
 /skill-test static [skill-name]     # Check one skill (7 checks)
-/skill-test static all              # Check all 75 skills
+/skill-test static all              # Check all 81 skills
 ```
 
 ### Run a behavioral spec test
@@ -111,7 +150,7 @@ All testing is driven by two skills already in the framework:
 | Category | Skills | Key metrics |
 |----------|--------|-------------|
 | `gate` | gate-check | Review mode read, full/lean/solo director panel, no auto-advance |
-| `review` | design-review, architecture-review, review-all-gdds | Read-only, 8-section check, correct verdicts |
+| `review` | design-review, architecture-review, review-all-gdds, api-review | Read-only, 8-section check, correct verdicts |
 | `authoring` | design-system, quick-design, art-bible, create-architecture, … | Section-by-section May-I-write, skeleton-first |
 | `readiness` | story-readiness, story-done | Blockers surfaced, director gate in full mode |
 | `pipeline` | create-epics, create-stories, dev-story, map-systems, … | Upstream dependency check, handoff path clear |
@@ -132,6 +171,7 @@ All testing is driven by two skills already in the framework:
 | `engine/godot` | godot-specialist, godot-gdscript-specialist, godot-csharp-specialist, godot-shader-specialist, godot-gdextension-specialist |
 | `engine/unity` | unity-specialist, unity-ui-specialist, unity-shader-specialist, unity-dots-specialist, unity-addressables-specialist |
 | `engine/unreal` | unreal-specialist, ue-gas-specialist, ue-replication-specialist, ue-umg-specialist, ue-blueprint-specialist |
+| `engine/custom` | chief-engine-architect, core-systems-lead, rendering-lead, simulation-systems-lead, editor-architect, memory-allocator-specialist, concurrency-job-system-engineer, ecs-dod-architect, platform-engineer, world-streaming-engineer, online-services-engineer, asset-build-tooling-engineer, rhi-backend-engineer, render-graph-specialist, shader-pipeline-engineer, graphics-features-engineer, vfx-runtime-engineer, physics-simulation-engineer, animation-systems-engineer, scripting-runtime-engineer, audio-engine-engineer, level-editor-engineer, editor-ui-framework-engineer, cinematics-sequencer-engineer, engine-technical-writer |
 | `operations` | devops-engineer, release-manager, live-ops-designer, community-manager, analytics-engineer, economy-designer, localization-lead |
 | `qa` | qa-tester, security-engineer, accessibility-specialist |
 

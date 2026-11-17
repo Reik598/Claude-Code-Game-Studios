@@ -162,6 +162,59 @@ to implement it.]
 - **Load Time**: [Expected impact]
 - **Network**: [Expected impact, if applicable]
 
+<!-- Engine-internal ADRs only: when engine.name is Custom or
+     /architecture-decision ran with --engine-internal (see
+     .claude/skills/architecture-decision/references/engine-mode.md), copy the
+     six sections below out of this comment, directly after Performance
+     Implications. Each is required in that case; write "N/A — <why>" rather
+     than leaving one out. Any other ADR leaves them here: inside the comment
+     they are not sections of the template. With the CEA-ADR gate run (Custom,
+     review_mode full), the ADR also carries the line
+     `CEA-ADR: <verdict> (<date>[, CONCERNS accepted])` under its Status.
+
+## Memory
+*Engine-internal ADRs only.*
+- **Allocation strategy**: [arena / pool / slab / TLSF / general heap / none — per allocation site]
+- **Ownership**: [who creates, who owns, who frees; handle or pointer; lifetime bound to frame / level / process]
+- **Footprint**: [steady-state MB and peak MB, and what drives the peak]
+- **Hot-path allocations**: [none, or each one and why it is allowed]
+
+## Threading
+*Engine-internal ADRs only.*
+- **Threads and jobs that touch it**: [main / render / worker jobs / IO / GPU queues — read or write each]
+- **Synchronisation**: [primitives used — atomics, locks, job dependencies, fences, barriers]
+- **Contention**: [where two threads meet, and the expected wait]
+
+## Latency & Frame Budget
+*Engine-internal ADRs only.*
+
+| Work | Thread / queue | ms per frame | Share of budget |
+|------|----------------|--------------|-----------------|
+| [stage] | [thread or queue] | [ms] | [% of performance.frame_budget_ms] |
+
+Frame budget: [X ms — performance.frame_budget_ms | NOT ASSESSED — performance.frame_budget_ms unset]
+Latency added: [frames or ms, or none]
+
+## ABI / API Stability
+*Engine-internal ADRs only.*
+- **Public headers / traits affected**: [paths, or the crate's pub items]
+- **Break or compatible**: [source break / binary break / compatible]
+- **Versioning**: [version bump, deprecation window, migration path for game code]
+
+## Determinism
+*Engine-internal ADRs only.*
+- **Must it be deterministic?**: [yes — replay / lockstep / tests; no — why]
+- **What could break it**: [float order, thread scheduling, hash iteration order, platform math]
+- **How it is kept**: [fixed step, ordered reduction, fixed-seed RNG, bit-exact math paths]
+
+## Platform / Graphics-API Matrix
+*Engine-internal ADRs only.*
+
+| Platform | Graphics API | Supported | Differences / fallbacks |
+|----------|--------------|-----------|-------------------------|
+| [platform] | [Vulkan 1.4 / Direct3D 12 / Metal] | [yes / no / partial] | [fallback] |
+-->
+
 ## Migration Plan
 [If this changes existing code, how do we get from here to there?]
 

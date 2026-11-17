@@ -4,7 +4,7 @@ description: "Implements one story in code with tests, following its ADRs. Use w
 argument-hint: "[story-path]"
 user-invocable: true
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Bash(bash "*/.claude/skills/dev-story/../../hooks/yaml-helper.sh" resolve_config *), Bash(bash .claude/scripts/story-facts.sh *), Bash(bash .claude/scripts/adr-status.sh *), Bash(bash .claude/scripts/md-section.sh *), Bash(bash .claude/scripts/session-state.sh *), Bash(bash .claude/scripts/review-receipts.sh hash *), Bash(godot *), Bash(mkdir -p production/qa/evidence/*), Bash(npm run smoke), Bash(npm run build:single), Bash(bash .claude/scripts/page-shot.sh *), Bash(bash .claude/scripts/one-shot-grow.sh replay *), Bash(bash .claude/scripts/one-shot-grow.sh accept *)
+allowed-tools: Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Bash(bash "*/.claude/skills/dev-story/../../hooks/yaml-helper.sh" resolve_config *), Bash(bash .claude/scripts/story-facts.sh *), Bash(bash .claude/scripts/adr-status.sh *), Bash(bash .claude/scripts/md-section.sh *), Bash(bash .claude/scripts/session-state.sh *), Bash(bash .claude/scripts/test-run.sh custom), Bash(bash .claude/scripts/review-receipts.sh hash *), Bash(godot *), Bash(mkdir -p production/qa/evidence/*), Bash(npm run smoke), Bash(npm run build:single), Bash(bash .claude/scripts/page-shot.sh *), Bash(bash .claude/scripts/one-shot-grow.sh replay *), Bash(bash .claude/scripts/one-shot-grow.sh accept *)
 model: sonnet
 ---
 
@@ -129,6 +129,30 @@ summary, and go on.
 
 ## Phase 4: Who implements it
 
+**Custom engine routing takes precedence over the table below.** When
+`engine.name` is `Custom`, read the Owner agent table in
+`.claude/docs/custom-engine-layout.md` and the project's module map. Resolve
+every planned engine path (including `crates/<module>/`) to its owner. Route
+engine internals through that owner's lead; `chief-engine-architect` coordinates
+stories spanning leads or changing public interfaces. The lead delegates to
+the named specialist with the Phase 5 brief. Where the path's Lead is
+`chief-engine-architect`, the Owner is itself a lead
+(`engine/core/` → `core-systems-lead`, `engine/sim/` →
+`simulation-systems-lead`, `engine/editor/` → `editor-architect`) and takes the
+story directly: `chief-engine-architect` coordinates and never implements. A
+Lead of `none` puts the Owner outside the engine hierarchy, and it is not a
+lead: `game/data/` is `systems-designer`'s (a Config/Data story needs no agent,
+below), `tests/` is `qa-lead`'s, and a `third_party/`, `external/` or `vendor/`
+change follows `third-party.md`: `asset-build-tooling-engineer` does the build
+integration, `security-engineer` reviews the dependency and never implements
+it, and adding one to the engine is an ADR option `chief-engine-architect`
+approves. `engine-programmer` implements
+game-facing integration glue only. Game stories still use the table below.
+List the path, owner, lead and engine/game API handoff before delegation;
+an unknown owner blocks implementation until the module map is agreed.
+The Custom code root `.` includes engine modules, game modules and registered
+crate paths; the story's named paths remain the write boundary.
+
 **Config/Data stories need no agent.** Show each value change as from → to, ask "May
 I write [data file]?", and edit it. Go to Phase 6.
 
@@ -151,6 +175,19 @@ and go on without one. On Web there is no engine specialist: `primary` is
 `lead-programmer`, and the engine check below goes to it, against
 `docs/engine-reference/web/`. Say so in one line ("Web: engine check by
 lead-programmer against docs/engine-reference/web/").
+
+On Custom, use the resolved subsystem owner for the engine check; do not send
+every subsystem to `specialists.code` (`core-systems-lead`). Public API changes
+also require `/api-review`; tick/frame-graph changes require
+`/team-frame-pipeline` and its evidence gates. A story whose
+`Frame pipeline: yes` line puts it on the frame pipeline needs perf evidence
+before `/story-done`: `/team-frame-pipeline --story <story path>` for a tick or
+frame-graph change, otherwise `/benchmark-report <capture> --story <story path>`
+(a command for the user to run: it is user-invoked only); say which in the
+summary. Pass the affected scoped rules,
+test command and budget slice in the brief. Run the configured build and tests
+through `.claude/scripts/test-run.sh custom` before claiming verification;
+zero tests, absent commands or unavailable hardware remain NOT ASSESSED.
 
 ## Phase 5: Hand out the work
 
@@ -236,6 +273,15 @@ command, the exit code and any error lines:
   run-tests.sh` is not the editor), else `engine.path`, else `godot`. Never search the disk for
   one: when none of the three runs, the check is not verified.
 - **Unity, Unreal:** read `references/engine-checks.md`.
+- **Custom:** run `bash .claude/scripts/test-run.sh custom`. Record the build
+  command/result and test count; only `custom:ctest-pass` or `custom:cargo-pass`
+  shows executed tests passed. A failed build or test leaves the story INCOMPLETE;
+  zero tests, unknown result, missing command or unavailable target is NOT
+  VERIFIED. Run the project's configured formatter/linter as well; name absent
+  checks rather than inventing commands. For visible editor/runtime changes,
+  launch the configured executable (`commands.run`; the launch is not
+  pre-allowed, so it asks for permission) and retain captures under the same
+  observation requirement below. CPU-only tests cannot verify GPU/platform behavior.
 - **Web:** the game's own smoke script, whenever `package.json` has a `smoke`
   script: `npm run smoke`, after every story, a grown game's too. The scaffold's is
   the type check (`tsc --noEmit`) and the single-file build, then Playwright's

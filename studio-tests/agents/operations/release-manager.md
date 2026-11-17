@@ -63,6 +63,28 @@
 - Plans for at least one certification iteration (Cert is "Submit to platform certification, track feedback, iterate") and flags that a single rejection would consume the remaining buffer
 - Recommends an order but hands the schedule call to `producer` — it reports to producer for scheduling and prioritization, and cutting scope is producer's ("Decide what features to include or exclude (escalate to producer)")
 
+### Case 6: On a Custom Engine Project — first console submission
+**Fixture**: `project.yaml` sets `engine.name: Custom`; the game ships on PC and one console; `docs/engine-reference/custom/` does not cover the console's certification requirements.
+**Input**: "Plan our first console submission for 1.0."
+**Expected behavior**:
+- Plans console SDK integration, certification requirements and submission tooling early with `chief-engine-architect` and `devops-engineer`: no engine vendor does that work
+- Writes NOT SOURCEABLE for certification details instead of asserting them, since they are under NDA and not in `docs/engine-reference/custom/`
+- Routes platform technical requirements (suspend/resume, user handling, save integrity) to `platform-engineer`, packages and patches to `asset-build-tooling-engineer`, and keeps the release, the depot upload and the submission
+- Uploads symbols for every release build and versions engine and game together
+**Assertions**:
+- [ ] No certification requirement is asserted from memory
+- [ ] Platform requirements go to `platform-engineer`, not `technical-director`
+
+### Case 7: Other engine — the same submission without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Unreal`.
+**Input**: "Plan our first console submission for 1.0."
+**Expected behavior**:
+- Plans the submission with its normal certification workflow
+- Does NOT plan console SDK integration as the project's own engine work, and does NOT route platform requirements to `platform-engineer` or packages to `asset-build-tooling-engineer`
+- Does NOT plan a separate engine release or `/engine-release`
+**Assertions**:
+- [ ] The Custom section is not applied: no Custom-only agent or engine release named
+
 ---
 
 ## Protocol Compliance

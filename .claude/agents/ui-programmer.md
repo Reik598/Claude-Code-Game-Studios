@@ -112,5 +112,37 @@ If the reference files do not cover an API or a difference, say so and mark it u
 - Implement gameplay logic in UI code (UI displays state, does not own it)
 - Modify game state directly (use commands/events through the game layer)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+There is no engine UI: the game's runtime UI framework is yours.
+
+- **Layout**: a retained-mode widget tree with anchor/flex layout, or
+  immediate-mode for a simple HUD — an ADR.
+- **Text**: shaping (e.g. HarfBuzz) plus rasterization to a glyph atlas (e.g.
+  FreeType), or SDF/MSDF fonts for scalable text; bidirectional text and line
+  breaking for localization. Library choices go in an ADR.
+- **Rendering** on the in-house renderer: batched quads and glyphs in a UI pass
+  whose slot and budget come from `rendering-lead`; UI shaders through
+  `shader-pipeline-engineer`.
+- **Input and focus**: mouse, keyboard, gamepad and touch navigation, a focus
+  model, IME for text entry.
+- **Localization** (string tables, plurals, font fallback) with
+  `localization-lead`; **accessibility** (text scaling, contrast, screen-reader
+  output through the platform API) with `accessibility-specialist`.
+- UI reads game state through events/commands, never by mutating ECS data.
+- The runtime text stack (shaping, bidi, font loading and fallback, glyph
+  atlases) is yours, in `engine/ui/`; game and editor share it. Editor UI is
+  `editor-ui-framework-engineer`'s: the editor consumes your text stack through
+  the interface an ADR records and does not fork it.
+
+| Approach | Pick when | Cost |
+|---|---|---|
+| Retained-mode, in-house | menu-heavy game, animation, accessibility | most code to write |
+| Immediate-mode HUD | simple HUDs | weak styling and accessibility |
+| UI middleware | the UI team already knows it | licence, memory, integration |
+
 ### Reports to: `lead-programmer`
 ### Implements specs from: `art-director`, `ux-designer`
+### Coordinates with (Custom engine only): `rendering-lead`, `shader-pipeline-engineer`, `editor-ui-framework-engineer`

@@ -30,6 +30,7 @@ the only place its test runner compiles them (`.claude/docs/directory-structure.
 | Godot | `tests/helpers/` |
 | Unity | `Assets/Tests/EditMode/Helpers/` — inside the `EditModeTests` assembly `/test-setup` creates. If PlayMode tests need the same helpers, ask before creating `Assets/Tests/Helpers/TestHelpers.asmdef` and referencing it from both test assemblies. |
 | Unreal | `Source/<Module>/Private/Tests/Helpers/` |
+| Custom | C++: `tests/helpers/` registered with the chosen CMake test target. Rust: the consuming crate's `tests/common/mod.rs` for integration helpers, or a private test module for unit helpers. |
 
 `tests/helpers/` below means the helper root for the project's engine.
 
@@ -98,6 +99,11 @@ If the engine is not configured in either source: "Engine not configured. Run `/
 Scan the engine's test root for patterns already in use (Godot `tests/`, Unity
 `Assets/Tests/`, Unreal `Source/<Module>/Private/Tests/`):
 
+On Custom, resolve the requested module through the module map in
+`.claude/docs/custom-engine-layout.md` first. Read its registered CMake test
+sources or Cargo unit/integration tests, including `crates/<module>/tests/`
+and inline Rust test modules.
+
 ```
 Glob pattern="tests/**/*_test.*"                  (Godot)
 Glob pattern="Assets/Tests/**/*Tests.cs"          (Unity)
@@ -120,9 +126,34 @@ Also read:
   content mode) and Read those ranges with offset and limit.
 - `docs/architecture/tr-registry.yaml` — to map requirements to tested systems
 
+For Custom engine-module helpers, read the module spec and governing Accepted
+ADRs instead. A missing game GDD does not block this branch; missing module
+contracts are named before proposing fixtures.
+
 ---
 
 ## 4. Generate Engine-Specific Helpers
+
+### Custom (C++ / Rust)
+
+Read `testing.framework`, `commands.test`, the owning module's build manifest,
+and existing tests first. CTest is a test driver, not an assertion library:
+use the pinned C++ test framework's real assertions. Rust uses its configured
+test harness and assertion macros. With no framework or registered target,
+generate nothing and report NOT ASSESSED. The route out: choose the C++ test
+framework in an ADR (`/architecture-decision`), record it as
+`testing.framework` with `/project-settings testing.framework=<name>`, and
+register the test target in the module's CMake manifest; then run this skill
+again.
+
+Derive fixtures from the module API and Accepted ADR invariants rather than
+requiring game GDDs for allocator, scheduler or RHI tests. Provide deterministic
+seeds, an explicit clock, bounded scratch storage and teardown appropriate to
+that module. Keep GPU/platform integration helpers distinct from CPU unit
+fixtures. Register C++ sources and Rust modules through the existing manifests;
+do not add a dependency just to create helpers. Show the proposed files and
+manifest changes together before writing. Run the configured build and affected
+test target; a created helper without a consuming test is not verified.
 
 ### Godot 4 (GDUnit4 / GDScript)
 

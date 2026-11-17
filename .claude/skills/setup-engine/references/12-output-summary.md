@@ -11,7 +11,7 @@ After setup is complete, output:
 Engine Setup Complete
 =====================
 Engine:          [name] [version]
-Language:        [GDScript | C# | GDScript + C# | C# | C++ + Blueprint | Blueprint + C++ | TypeScript]
+Language:        [GDScript | C# | GDScript + C# | C# | C++ + Blueprint | Blueprint + C++ | TypeScript | C++23 | Rust]
 Knowledge Risk:  [LOW/MEDIUM/HIGH]
 Reference Docs:  [created/skipped]
 CLAUDE.md:       [updated]
@@ -24,7 +24,10 @@ Next Steps:
 ```
 
 Then print **one** Next-Steps list: the main path, at every tier, in `/next-step`'s
-order (make a game, change it after you play it, grow it). Pick it by `/next-step`'s
+order (make a game, change it after you play it, grow it). On **Custom** the
+list is `references/custom.md` C5's instead (the first ADRs with
+`/architecture-decision`, the module layout, `/test-setup`), with C6's build
+and test result, `NOT ASSESSED` included, under it. Pick it by `/next-step`'s
 test: is there a game yet (`prototypes/*/index.html`, or 10 or more source files in
 the code root)?
 

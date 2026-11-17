@@ -64,6 +64,26 @@ No gate IDs assigned.
 - Notes the reference material (The Witcher 3) as a benchmark for mix levels and transient design
 - Does NOT produce specs that contradict the style guide (e.g., no ethereal or heavily reverb-processed specs); where a sound seems to need something the guide rules out, flags it for audio-director instead of deciding the sonic palette itself
 
+### Case 6: On a Custom Engine Project — event specs before the audio ADR
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the audio ADR (middleware or in-house mixer) is not written yet.
+**Input:** "Spec the footstep sound events."
+**Expected behavior:**
+- Writes the specs in neutral terms (Event, Discrete parameter, Continuous parameter, Mix group) and marks them for mapping once the ADR picks a runtime
+- Lists for each event its trigger, parameters and ranges, voice limit and priority, streamed or in memory, and spatialization
+- Sends a question about what the runtime can do to `audio-director`, who routes it to `audio-engine-engineer`
+**Assertions:**
+- [ ] No middleware term is presented as decided before the ADR
+- [ ] Every event carries voice limit, priority and streaming
+
+### Case 7: Other engine — the same specs without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`; no audio middleware, the engine's built-in audio.
+**Input:** "Spec the footstep sound events."
+**Expected behavior:**
+- Writes the specs against the engine's built-in audio (players and buses)
+- Does NOT use the neutral-term mapping table or wait for an audio ADR, and does NOT name `audio-engine-engineer`
+**Assertions:**
+- [ ] The Custom section is not applied: no neutral-term mapping and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

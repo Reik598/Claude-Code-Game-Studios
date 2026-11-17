@@ -22,6 +22,12 @@ across all of them:
 > not named keep their baseline status. Reductions only ever *relax* a
 > requirement — the only thing that adds one is `workflow_overrides` (below).
 >
+> **Custom engine additions follow the same rules.** On a `Custom` engine the
+> gate file's `## Custom engine additions` block is part of the checklist, and
+> its own tier reductions apply the same way; the zero-required-artifacts count
+> below includes its items. On any other engine the block is skipped with its
+> one-line note, and its items are not counted.
+>
 > **`qa.level` (Section 1) further relaxes the test items independently of the
 > tier:** at `qa.level: minimal` the test-evidence / unit-test items become
 > non-required at every workflow tier (so even `workflow: full` does not require

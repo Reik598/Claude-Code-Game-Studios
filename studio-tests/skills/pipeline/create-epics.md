@@ -292,6 +292,70 @@ Fixture defaults.
 
 ---
 
+### Case 8: Custom engine — module specs stand in for GDDs
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard` (pinned: the module route is the `standard`/`full` branch)
+- `design/gdd/` holds no system GDD; `docs/architecture/modules/audio.md` and `docs/architecture/modules/renderer.md` exist, laid out as `.claude/docs/templates/engine-module-spec.md`
+- `docs/architecture/architecture.md` exists and places both modules in its layer map
+- Variant (Godot): `engine.name: Godot`, same files
+
+**Input:** `/create-epics`
+
+**Expected behavior:**
+1. Custom: N counts 0 system GDDs plus 2 module specs, so the run does not stop
+2. One epic per module spec, slugged `engine-audio` and `engine-renderer`; each header names `**Module**: docs/architecture/modules/<module>.md` in place of `**GDD**:`, with the layer `architecture.md` gives it
+3. Each spec is read by section ("1. Purpose", "10. Test Plan and Acceptance Criteria"), never whole
+4. With no module spec and no GDD, the stop names both `/design-system` and the module-spec template
+5. Godot variant: the module specs are not counted; the stop reads "No system GDDs found in `design/gdd/` — run `/design-system` first." exactly as before
+
+**Assertions:**
+- [ ] Custom: two epics are proposed, one per spec, each asked about on its own
+- [ ] No epic names both a GDD and a module spec; one that would is reported to the user
+- [ ] Godot: the stop text is unchanged and no module epic is proposed
+
+---
+
+### Case 9: Custom engine — a game system and a module of the same name are two epics
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard` (pinned: the module route is the `standard`/`full` branch)
+- `design/gdd/audio.md` (the game's audio system) and `docs/architecture/modules/audio.md` (the engine's audio module) both exist
+- `production/epics/audio/EPIC.md` already exists for the game system; `docs/architecture/architecture.md` places both
+
+**Input:** `/create-epics`
+
+**Expected behavior:**
+1. The game system keeps its epic at `production/epics/audio/`; the module's epic is proposed at `production/epics/engine-audio/EPIC.md`
+2. The existing `audio` epic gets Phase 5's "already exists" handling for the game system only; the module epic is a new file, not an "Update in place" of the game epic
+3. Neither epic names both the GDD and the module spec
+
+**Assertions:**
+- [ ] Two epics: `audio` (game, `**GDD**:`) and `engine-audio` (module, `**Module**:`)
+- [ ] No overwrite prompt offers to turn the game epic into the module epic
+
+---
+
+### Case 10: Custom engine at `minimal` — the module route stops with a pointer
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, no `modes` keys (pinned: unset resolves to `workflow: minimal`, the tier under test)
+- `docs/architecture/modules/audio.md` exists; `design/game-brief.md` exists
+- Variant (no module spec): the same project without `docs/architecture/modules/`
+
+**Input:** `/create-epics`
+
+**Expected behavior:**
+1. The `minimal` branch stops before reading the brief: "The engine module route needs workflow standard or full: run `/project-settings modes.workflow=standard`, then `/create-epics` again. At `minimal` only the brief's epics exist, and no module spec becomes an epic."
+2. No epic is written
+3. Variant: with no module spec, the `minimal` branch reads the brief as on any other engine
+
+**Assertions:**
+- [ ] The stop names `/project-settings` and the `standard` tier
+- [ ] The module spec is never silently ignored at `minimal`
+
+---
+
 ## Protocol Compliance
 
 - [ ] Epic definitions shown to user before any "May I write" ask

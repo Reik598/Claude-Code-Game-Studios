@@ -271,6 +271,170 @@ Fixture defaults.
 
 ---
 
+### Case 7: Engine Mode on Custom — six sections, domain lead, CEA-ADR beside TD-ADR
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.review_mode: full`, `performance.frame_budget_ms: 8.33`
+- `docs/engine-reference/custom/VERSION.md` exists; it does not record the Vulkan driver limit the decision depends on
+- `.claude/docs/director-gates/cea-adr.md` exists
+- The user approves every prompt
+
+**Input:** `/architecture-decision Job system: work-stealing with continuations`
+
+**Expected behavior:**
+1. Before Step 1: `Engine mode: on (engine.name: Custom)`; `references/engine-mode.md` is read
+2. Step 1 reads `docs/engine-reference/custom/`, not a vendor reference; the domain is Jobs
+3. Step 4's confirm/adjust prompt includes the frame budget (8.33 ms, from `performance.frame_budget_ms`) and the threads/queues the decision runs on
+4. The ADR has `## Memory`, `## Threading`, `## Latency & Frame Budget`, `## ABI / API Stability`, `## Determinism` and `## Platform / Graphics-API Matrix` directly after `## Performance Implications`, in that order — each filled or `N/A — <why>`; an unknown value is `UNKNOWN — …` and listed under Validation Criteria
+5. The driver limit is written `NOT SOURCEABLE — … is not covered by docs/engine-reference/custom/` and added to Validation Criteria
+6. Step 5.5 spawns `core-systems-lead` (the Jobs domain lead), not a vendor engine specialist
+7. Step 5.6 spawns TD-ADR and CEA-ADR together (both `Agent` calls before waiting); the CEA-ADR prompt tells `chief-engine-architect` to read `.claude/docs/director-gates/cea-adr.md` first; the stricter verdict decides
+8. Status is `Proposed`; "May I write" once for the ADR
+
+**Assertions:**
+- [ ] All six sections present, in order, none silently omitted
+- [ ] Step 5.5's helper is `core-systems-lead`
+- [ ] Both TD-ADR and CEA-ADR run in full mode, issued in parallel
+- [ ] The CEA-ADR call passes every field `cea-adr.md` lists: the draft content (no file is written yet), `engine.name` and the stack, `frame_budget_ms` and `target_framerate`, the `VERSION.md` path, the `memory-invariants.md` path or "none", and related ADRs — so the gate never returns NOT ASSESSED for an input the skill had
+- [ ] The written ADR carries `CEA-ADR: <verdict> (<date>)` under `## Status`, the verdict being the one the run ended on
+- [ ] The NOT SOURCEABLE line names the path; no driver value from memory
+- [ ] Status `Proposed`
+
+---
+
+### Case 8: Engine Mode — budget unset, Solo mode, no VERSION.md
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.review_mode: solo`, no `performance` block
+- No `docs/engine-reference/custom/VERSION.md`
+
+**Input:** `/architecture-decision Render graph transient aliasing`
+
+**Expected behavior:**
+1. Step 1 says `Engine reference: NOT SOURCEABLE — docs/engine-reference/custom/VERSION.md not found`, writes Knowledge Risk `HIGH — no pinned reference`, and continues — it does not send the user to `/setup-engine`
+2. Step 4 states the budget as `NOT ASSESSED — unset`; no 8.33 or 16.6 ms is guessed
+3. The Latency & Frame Budget section's budget line is `NOT ASSESSED — performance.frame_budget_ms unset`; no percentage share is written; the Step 5.7 summary repeats `Frame budget: NOT ASSESSED — performance.frame_budget_ms unset`
+4. Step 5.5 spawns `rendering-lead` (Renderer domain)
+5. Output notes `TD-ADR skipped — Solo mode.` and `CEA-ADR skipped — Solo mode.`
+
+**Assertions:**
+- [ ] No guessed budget and no "% of budget" values
+- [ ] Both skip notes appear
+- [ ] `/setup-engine` is not recommended while `engine.name` is set
+
+**Variant — `--engine-internal` on Godot:** see Case 10.
+
+---
+
+### Case 9: Non-Custom engine without the flag — engine mode stays off
+
+**Fixture:** As Case 1 (Godot, full mode).
+
+**Input:** As Case 1.
+
+**Expected behavior:** No `Engine mode:` line; none of the six engine-mode sections in the ADR; Step 5.5 spawns `godot-specialist`; only TD-ADR runs — CEA-ADR is neither spawned nor mentioned.
+
+**Assertions:**
+- [ ] Case 1's assertions all still hold
+- [ ] No engine-mode section, no CEA-ADR, no `chief-engine-architect` spawn
+
+---
+
+### Case 10: `--engine-internal` on a non-Custom engine — sections only, vendor review, no CEA-ADR
+
+**Fixture:**
+- `project.yaml`: `engine.name: Godot`, `modes.review_mode: full`, `performance.frame_budget_ms: 16.6`
+- `docs/engine-reference/godot/VERSION.md` exists; `.claude/docs/director-gates/cea-adr.md` exists
+
+**Input:** `/architecture-decision GDExtension pathfinding memory --engine-internal`
+
+**Expected behavior:**
+1. Before Step 1: `Engine mode: sections only (--engine-internal on Godot) — vendor reference, Godot specialist, no CEA-ADR`; the flag is stripped from the title
+2. Step 1 reads `docs/engine-reference/godot/` — not `docs/engine-reference/custom/`; the domains are Godot's, not the Custom engine's modules
+3. Step 4 asks the two extra assumptions (frame budget 16.6 ms, threads or queues)
+4. The ADR carries the six engine-mode sections after `## Performance Implications`; its Summary says it is engine-internal on a Godot project
+5. Step 5.5 spawns `godot-specialist` — not `core-systems-lead`, `rendering-lead` or any Custom engine agent
+6. Step 5.6 runs TD-ADR only and prints `CEA-ADR not run — engine.name is Godot, not Custom`; `chief-engine-architect` is not spawned
+7. An unsourced fact is written `NOT SOURCEABLE — <what> is not covered by docs/engine-reference/godot/`
+
+**Assertions:**
+- [ ] No Custom engine agent and no `chief-engine-architect` spawn
+- [ ] `docs/engine-reference/custom/` is not read
+- [ ] The six sections are present, each filled or `N/A — <why>`
+- [ ] The CEA-ADR skip is stated by name with its reason
+
+**Variant — `modes.review_mode: solo`:** the same input on the same Godot fixture.
+Output notes `TD-ADR skipped — Solo mode.` and prints `CEA-ADR not run — engine.name is Godot, not Custom`;
+it never prints `CEA-ADR skipped — Solo mode.`, which is the full engine mode note (Custom only).
+- [ ] The not-run line appears at `solo` too, and no CEA-ADR skip note does
+
+---
+
+### Case 11: Engine Mode on Custom — an Assets ADR goes to the layout's Lead
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.review_mode: lean`, `performance.frame_budget_ms: 16.6`
+- `.claude/docs/custom-engine-layout.md` as shipped: `engine/assets/` has Owner `world-streaming-engineer` and Lead `core-systems-lead`
+
+**Input:** `/architecture-decision Runtime asset format and load path`
+
+**Expected behavior:**
+1. Step 1 resolves the decision's module through `.claude/docs/custom-engine-layout.md`: `engine/assets/`
+2. Step 5.5 spawns `core-systems-lead`, the row's Lead — not `chief-engine-architect`, and no vendor engine specialist
+3. Output notes `TD-ADR skipped — Lean mode.` and `CEA-ADR skipped — Lean mode.`
+
+**Assertions:**
+- [ ] Step 5.5 spawns `core-systems-lead`
+- [ ] `chief-engine-architect` is not spawned for Step 5.5 of a single-module decision
+- [ ] The lead is read from the layout's row, not from a list kept in `references/engine-mode.md`
+
+---
+
+### Case 12: Engine Mode on Custom — a Cinematics ADR goes to the layout's Lead
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.review_mode: lean`
+- `.claude/docs/custom-engine-layout.md` as shipped: `engine/cinematics/` has Owner `cinematics-sequencer-engineer` and Lead `editor-architect`
+
+**Input:** `/architecture-decision Cinematics track evaluation order`
+
+**Expected behavior:**
+1. Step 1 resolves the module `engine/cinematics/` through the layout; it is not reported as an unknown domain
+2. Step 5.5 spawns `editor-architect`, the row's Lead
+3. A decision spanning `engine/cinematics/` and `engine/renderer/` would go to `chief-engine-architect` instead (the layout's boundary owner)
+
+**Assertions:**
+- [ ] Step 5.5 spawns `editor-architect`
+- [ ] No Step 5.5 is skipped for want of a domain: every module with a layout row has a lead
+
+---
+
+### Case 13: Engine Mode on Custom — the module spec stands in for the GDD
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.review_mode: solo`
+- `docs/architecture/modules/jobs.md` exists; its section 10 has two criteria, registered in
+  `docs/architecture/tr-registry.yaml` as `TR-jobs-001` and `TR-jobs-002` (`system: jobs`,
+  `gdd: docs/architecture/modules/jobs.md`)
+- `design/gdd/jobs.md` is a game GDD for the player's professions, a different system with the
+  same slug; its criterion is registered as `TR-jobs-003` (`system: jobs`, `gdd: design/gdd/jobs.md`)
+- No `design/gdd/` file names the job system
+
+**Input:** `/architecture-decision Job system: work-stealing with continuations`
+
+**Expected behavior:**
+1. Step 3 reads section 10 of `docs/architecture/modules/jobs.md` with `md-section.sh extract` and the two registry entries whose `gdd:` is the module spec, not `TR-jobs-003`
+2. The ADR's `## GDD Requirements Addressed` table names `docs/architecture/modules/jobs.md` in its first column and `TR-jobs-001` and `TR-jobs-002` in the Requirement column
+3. Step 5.7's sync check compares the ADR against the module spec and prints its one-line result, not `NOT ASSESSED` for want of a GDD
+
+**Assertions:**
+- [ ] The table lists `TR-jobs-001` and `TR-jobs-002` against the module spec
+- [ ] The table does not list `TR-jobs-003`, the same-slug game GDD's entry
+- [ ] The table is not the "Foundational — no GDD requirement" line while the module spec exists
+- [ ] The GDD sync line counts the module spec
+
+---
+
 ## Protocol Compliance
 
 - [ ] Engine context (`VERSION.md`) is loaded first and stamped into the Engine Compatibility table

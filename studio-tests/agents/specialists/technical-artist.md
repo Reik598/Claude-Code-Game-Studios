@@ -61,6 +61,26 @@ No gate IDs assigned.
 - Calls out any optimization that helps one budget at the other's expense (e.g., merged meshes cut draw calls but can defeat occlusion and raise GPU time past 2ms) instead of presenting it as a free win
 - Proposes the approach before implementing and asks before writing files
 
+### Case 6: On a Custom Engine Project — water material and its editor
+**Fixture:** `project.yaml` sets `engine.name: Custom`.
+**Input:** "Set up a stylised water material, a material editor for artists to tweak it, and the foam particles."
+**Expected behavior:**
+- Builds the material on the in-house shader pipeline: parameters, permutations and authoring workflow with `shader-pipeline-engineer`, pass budget with `rendering-lead`
+- States there is no engine material editor: its UI is `editor-ui-framework-engineer`'s and its architecture `editor-architect`'s
+- Leaves the foam particles' runtime to `vfx-runtime-engineer` and authors the effect itself
+**Assertions:**
+- [ ] The material editor is routed to `editor-ui-framework-engineer` and `editor-architect`
+- [ ] The particle runtime is routed to `vfx-runtime-engineer`
+
+### Case 7: Other engine — the same request without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unreal`.
+**Input:** "Set up a stylised water material, a material editor for artists to tweak it, and the foam particles."
+**Expected behavior:**
+- Uses the engine's own material editor and particle system, checking version-specific facts against `docs/engine-reference/unreal/`
+- Does NOT state that there is no material editor, and does NOT route work to `shader-pipeline-engineer`, `rendering-lead`, `editor-ui-framework-engineer`, `editor-architect` or `vfx-runtime-engineer`
+**Assertions:**
+- [ ] The Custom section is not applied: no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

@@ -61,6 +61,24 @@ No gate IDs assigned. Escalates critical vulnerabilities to technical-director.
 - Reports each applicable Security Review Checklist item as met, missing, or partial, so the result is a compliance gap list the invoker can act on
 - Where accounts hold personal data, names the privacy obligations from its Data Privacy section that apply (e.g., GDPR data export and deletion, COPPA age-gate)
 
+### Case 6: Anti-Cheat Integration — wiring the vendor SDK into gameplay code
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the team has licensed a commercial anti-cheat SDK.
+**Input:** "Call the anti-cheat SDK directly from our gameplay code where we detect suspicious movement, and tell me which kernel driver settings to use."
+**Expected behavior:** Places the integration behind an engine interface in `engine/platform/` owned by `platform-engineer`, with a stub that reports anti-cheat as absent when the SDK is missing. Treats the SDK as a third-party dependency under the supply-chain rule, reviewed before it is added. Keeps the server as the first defence (`network-programmer`). Marks the kernel driver settings and every other vendor specific NOT SOURCEABLE outside the vendor's licensed documentation.
+**Assertions:**
+- [ ] Gameplay code does not call the vendor SDK directly
+- [ ] No vendor SDK fact (API, driver setting, platform rule) is asserted
+- [ ] A missing SDK is reported as absent, never as passed
+
+### Case 7: Other engine — anti-cheat without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unity`; the team has licensed a commercial anti-cheat SDK.
+**Input:** "Wire the anti-cheat SDK into the game."
+**Expected behavior:**
+- Reviews the integration with its normal security workflow
+- Does NOT place the integration in `engine/platform/` or hand it to `platform-engineer`, and does NOT apply the Custom section's C++ hardening, fuzz-target or plugin-signing duties to the engine
+**Assertions:**
+- [ ] The Custom section and its Anti-Cheat Integration subsection are not applied: no `engine/platform/` interface and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

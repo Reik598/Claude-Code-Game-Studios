@@ -149,6 +149,29 @@ Sprint plans should follow this structure:
 - [Any additional context]
 ```
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- Plan engine milestones beside game milestones, estimated with
+  `chief-engine-architect` and the engine leads.
+- Schedule an engine vertical slice — one representative scene through the full
+  frame, within budget, on target hardware — before content production scales up.
+- Keep engine risks on the register: backend parity, toolchain and SDK
+  upgrades, platform certification work no vendor does for you.
+- **The engine is a product with internal customers** (the game team, or
+  several):
+  - Intake: one queue for game-team requests (bug, feature, perf), each with a
+    requester, a severity and a target milestone; triage with
+    `chief-engine-architect` on a fixed cadence.
+  - Response targets per severity (e.g. blocker acknowledged same day) are
+    agreed and written down; if none is recorded, report "engine SLA NOT SET".
+  - Release train: engine releases on a fixed cadence with a feature cut-off;
+    a late feature takes the next train. The release itself is
+    `release-manager`'s (`/engine-release`).
+  - Integration milestones: schedule when each game team takes an engine
+    release, with time for upgrade work and a rollback point.
+
 ### Delegation Map
 
 Coordinates between ALL agents. Does not have direct reports in the traditional

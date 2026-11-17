@@ -23,9 +23,10 @@ engine has a native way.
 
 1. **Launch windowed** at a fixed resolution — `1280x720` unless the project
    says otherwise — using `commands.run` from `project.yaml`. Never the
-   headless / batch / null-RHI flag: those exist to *skip* rendering. The one
-   exception is a browser game: headless Chrome and Edge render real frames
-   (the Web row below).
+   headless / batch / null-RHI flag: those exist to *skip* rendering. The
+   exceptions are a browser game — headless Chrome and Edge render real frames
+   (the Web row below) — and a Custom engine whose headless mode still renders
+   off-screen (the Custom row).
 2. **Launch straight into the scene or map the story touched.** A feature that
    is only reachable through the main menu and three clicks is a feature the
    run will not reach. Stories should be written so their surface is reachable
@@ -56,6 +57,7 @@ engine has a native way.
 | Unity 6 | built player `.exe -screen-width 1280 -screen-height 720 -screen-fullscreen 0 --scene <Name>` | `ScreenCapture.CaptureScreenshot(<abs path>)` from a bootstrap script | the absolute path you pass | `-batchmode`, `-nographics` | one MonoBehaviour |
 | Unreal 5 | `MSYS_NO_PATHCONV=1 "<UE root>/Engine/Binaries/Win64/UnrealEditor.exe" "$(pwd -W 2>/dev/null || pwd)/<Game>.uproject" <MapURL> -game -windowed -ResX=1280 -ResY=720` | `HighResShot 1280x720 filename=<abs path>` console command | the path you pass (else `Saved/Screenshots/WindowsEditor/`) | `-nullrhi`, `-unattended` alone | one actor or `-ExecCmds` |
 | Web (a browser game) | `bash .claude/scripts/page-shot.sh <page>.html <path>.png --query <state>`; a web project's page is `dist-single/index.html`, after `npm run build:single` | the same command: headless Chrome, Edge or Chromium | the path you pass | `commands.run` (a dev server) | **none** |
+| Custom (your own engine) | `commands.run` from `project.yaml` with a frame cap — windowed, or headless only if the engine renders off-screen on a real GPU device | the engine's own frame capture, or a RenderDoc / PIX capture (windowed or off-screen) | `production/qa/evidence/[story-slug]/` | a headless mode that skips rendering | whatever your engine needs — none is shipped |
 
 ### Web — headless Chrome or Edge
 
@@ -210,6 +212,30 @@ frame, before the file is written, and leaves nothing on disk. `-ExecCmds` has
 no delay, so let `timeout` end the launch (exit 124 is expected) and check the
 file exists; a dev actor can instead wait a second, then `quit`. The Blueprint node `Take High Res Screenshot` is editor-only and
 does not work in a `-game` launch.
+
+### Custom — your engine's own capture
+
+A Custom engine (`engine.name: Custom`) has no shipped launch line: the command
+is `commands.run`, which you set in `project.yaml` once a game executable exists:
+`/setup-engine custom` writes `commands.build`, `test` and `smoke` and leaves it
+unset. While it is unset, report
+`Run result: NOT VERIFIED — commands.run is not set`. Run it with
+a frame cap, so it renders real frames and exits on its own (for example a
+`--frames 120` flag your engine reads), under `timeout`. Headless — rendering
+off-screen, no window — only when the engine supports off-screen rendering
+(a real GPU device rendering to an offscreen target); otherwise run it
+windowed. Capture the last frame with the engine's own screenshot path (read
+back the final render target and write a PNG), or take a RenderDoc or PIX
+capture of that frame, windowed or not, and export the image. Write it to
+`production/qa/evidence/[story-slug]/`, then `Read` it as for any engine.
+
+A headless mode that skips the GPU work (a null RHI) renders nothing to look at:
+it is the "never use" column, not a capture. If the engine has no capture path
+yet — no screenshot write and no RenderDoc/PIX on the machine — the visual
+evidence is **NOT ASSESSED**: report
+`Run result: NOT VERIFIED — no capture path in the engine (visual evidence NOT ASSESSED)`,
+never `N/A`. Adding a frame-capture path early is cheaper than leaving every
+visual story blocked.
 
 ### Any engine — OS capture fallback
 

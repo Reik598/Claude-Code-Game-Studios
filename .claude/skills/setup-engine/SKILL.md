@@ -1,9 +1,9 @@
 ---
 name: setup-engine
-description: "Sets up and pins the engine version: web for a new project unless Godot, Unity or Unreal is named. Use to choose or upgrade it."
-argument-hint: "[engine] | [engine version] | refresh | upgrade [old-version] [new-version] | no args for guided selection"
+description: "Sets up and pins the engine version: web for a new project unless Godot, Unity, Unreal or a custom engine of your own is named. Use to choose or upgrade it."
+argument-hint: "[engine] | [engine version] | custom | refresh | upgrade [old-version] [new-version] | no args for guided selection"
 user-invocable: true
-allowed-tools: Read, Glob, Grep, Write, Edit, WebSearch, WebFetch, Agent, AskUserQuestion, Bash(bash "*/.claude/skills/setup-engine/../../hooks/yaml-helper.sh" resolve_config *), Bash(godot --version), Bash(godot --headless --path . --import), Bash(command -v godot), Bash(uname -s), Bash(bash .claude/scripts/project-coherence.sh*), Bash(node --version), Bash(npm ci*), Bash(npm run build*), Bash(bash .claude/scripts/web-scaffold.sh*), Bash(bash .claude/scripts/web-detect.sh*), Bash(pnpm install --frozen-lockfile*), Bash(yarn install --frozen-lockfile*), Bash(yarn install --immutable*), Bash(bun install --frozen-lockfile*), Bash(pnpm run build*), Bash(yarn run build*), Bash(bun run build*), Bash(bash .claude/scripts/test-run.sh web*), Bash(bash .claude/scripts/page-shot.sh *)
+allowed-tools: Read, Glob, Grep, Write, Edit, WebSearch, WebFetch, Agent, AskUserQuestion, Bash(bash "*/.claude/skills/setup-engine/../../hooks/yaml-helper.sh" resolve_config *), Bash(godot --version), Bash(godot --headless --path . --import), Bash(command -v godot), Bash(uname -s), Bash(bash .claude/scripts/project-coherence.sh*), Bash(node --version), Bash(npm ci*), Bash(npm run build*), Bash(bash .claude/scripts/web-scaffold.sh*), Bash(bash .claude/scripts/web-detect.sh*), Bash(pnpm install --frozen-lockfile*), Bash(yarn install --frozen-lockfile*), Bash(yarn install --immutable*), Bash(bun install --frozen-lockfile*), Bash(pnpm run build*), Bash(yarn run build*), Bash(bun run build*), Bash(bash .claude/scripts/test-run.sh web*), Bash(bash .claude/scripts/page-shot.sh *), Bash(cmake --version), Bash(ctest --version), Bash(cargo --version), Bash(rustc --version), Bash(clang++ --version), Bash(g++ --version), Bash(bash .claude/scripts/test-run.sh custom --no-build), Bash(bash .claude/scripts/test-scaffold.sh custom*)
 model: sonnet
 ---
 
@@ -38,10 +38,16 @@ Modes:
   recorded as it is. **Read `references/web.md` now and follow it**:
   it replaces Sections 3, 6, 7 and 7.5 for Web and gives the values Sections 4, 5
   and 5.5 write
+- **Custom**: `/setup-engine custom` — build your own engine: C++23 with CMake
+  (default) or Rust with Cargo, Vulkan 1.4 / Direct3D 12 / Metal, HLSL or
+  Slang, or an existing engine repo (a `CMakeLists.txt` or `Cargo.toml`),
+  recorded as it is. The framework ships no engine code. **Read
+  `references/custom.md` now and follow it**: it replaces Sections 3, 6, 7 and
+  7.5 for Custom and gives the values Sections 4, 5 and 5.5 write
 - **No args**: `/setup-engine` — guided mode: an existing project keeps its engine;
   a new one is offered web first (Section 2)
 - **Refresh**: `/setup-engine refresh` — update reference docs (see Section 10)
-- **Upgrade**: `/setup-engine upgrade [old-version] [new-version]` — migrate to a new engine version (see Section 11)
+- **Upgrade**: `/setup-engine upgrade [old-version] [new-version]` — migrate to a new engine version (see Section 11); on Custom it does not apply and stops with a pointer (Section 11)
 
 ---
 
@@ -86,6 +92,11 @@ Modes:
 On Web there is no engine specialist agent: skip this section and say so
 (`references/web.md`, W7).
 
+On Custom the specialist agents are the 25 custom-engine agents listed in
+`references/custom.md`, C7 (the one list; it is not repeated here), and their
+Version Awareness section points to
+`docs/engine-reference/custom/VERSION.md` (`references/custom.md`, C7).
+
 Ask: "May I add a Version Awareness section to the engine specialist agent files?" before making any edits.
 
 For the chosen engine's specialist agents, verify they have a
@@ -103,6 +114,10 @@ The section should instruct the agent to:
 ## 10. Refresh Subcommand
 
 If invoked as `/setup-engine refresh`:
+
+On Custom there is no engine release to search for: re-run the probes in
+`references/custom.md` (C4) and update `docs/engine-reference/custom/VERSION.md`
+with what changed, asking first.
 
 1. Read the existing `docs/engine-reference/<engine>/VERSION.md` to get
    the current engine and version

@@ -142,6 +142,15 @@ other entries to the user rather than fixing them unasked. If the script is
 missing or prints nothing, say the registry check did not run, then re-read the
 entries you wrote against the rules in the file's header.
 
+**Custom engine** (`engine.name: Custom`): module requirements
+(`TR-[module]-NNN`, numbered in Phase 2) are appended the same way and under
+the same rules, with `system: <module>`, the criterion's text as
+`requirement`, and `gdd: docs/architecture/modules/<module>.md`: the spec's
+path stands in the `gdd:` field, which `registry.sh validate` checks exists. A
+criterion removed from section 10 is marked `deprecated`, never deleted. The
+receipt's hash list above gains `docs/architecture/modules/*.md` after
+`design/gdd/*.md`, the same as Phase 1a's check.
+
 This ensures all future story files can reference stable TR-IDs that persist
 across every subsequent architecture review.
 

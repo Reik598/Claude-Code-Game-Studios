@@ -61,6 +61,25 @@ No gate IDs assigned.
 - Does NOT recommend a design that contradicts the stated player mental model without explicit justification
 - The WHY behind the recommendation cites the playtest finding and names it as the players' mental model
 
+### Case 6: On a Custom Engine Project — content browser flow
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the editor is in-house.
+**Input:** "Design the UX flow for the editor's content browser."
+**Expected behavior:**
+- Designs the flow with `editor-architect`
+- Hands the build to `editor-ui-framework-engineer`, not `ui-programmer`
+**Assertions:**
+- [ ] The flow is designed with `editor-architect`
+- [ ] Implementation is routed to `editor-ui-framework-engineer`
+
+### Case 7: Other engine — an editor tool flow without the Custom sentence
+**Fixture:** `project.yaml` sets `engine.name: Unity`.
+**Input:** "Design the UX flow for the in-editor level-placement tool our designers use."
+**Expected behavior:**
+- Designs the flow with its normal workflow
+- Does NOT name `editor-architect` or `editor-ui-framework-engineer`: that coordination line applies only on a Custom engine project
+**Assertions:**
+- [ ] The Custom sentence is not applied: no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

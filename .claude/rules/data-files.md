@@ -4,12 +4,13 @@ paths:
   - "data/**/*.json"
   - "Assets/**/{Data,data}/**/*.json"
   - "Content/**/{Data,data}/**/*.json"
+  - "game/data/**/*.json"
 ---
 
 # Data File Rules
 
 - All JSON files must be valid JSON — broken JSON blocks the entire build pipeline
-- File naming (Godot and Web data): lowercase with underscores only, following `[system]_[name].json` pattern.
+- File naming (Godot, Web and Custom `game/data/`): lowercase with underscores only, following `[system]_[name].json` pattern.
   Unity and Unreal data keep the engine's PascalCase; `validate-assets.sh` checks names only in `assets/`.
   On Web, `data/config.json` keeps its name: the game and its tweak panel read that file, and
   each tuning value in it is an object of `value`, `min`, `max` and `step`
@@ -31,6 +32,17 @@ paths:
 - No orphaned data entries — every entry must be referenced by code or another data file
 - Version data files when making breaking schema changes
 - Include sensible defaults for all optional fields
+
+## On a Custom engine (`game/data/`)
+
+- Files follow the Godot, Web and Custom convention: lowercase `[system]_[name].json`
+  with `snake_case` keys. `validate-assets.sh` checks names only in `assets/`,
+  so `game/data/` names are checked in review
+- The game reads these files through the engine's asset or config loader,
+  which validates them as untrusted input (`streaming-io-code.md`): a malformed
+  or out-of-range value is a reported load error, not a crash
+- A cooked or binary form of the data is a build output, never edited by hand;
+  the JSON is the source
 
 ## Examples
 

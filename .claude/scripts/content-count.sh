@@ -23,7 +23,7 @@
 #                   registry.sh, deprecated ones left out
 #   found [--engine E] [--files]
 #                   content files on disk for the engine (godot, unity,
-#                   unreal or web; default: engine.name as project-state.sh reads it)
+#                   unreal, web or custom; default: engine.name as project-state.sh reads it)
 #   band FOUND SPECIFIED
 #                   the percentage and status band of one pair
 #   gap             rows `system<TAB>type<TAB>specified<TAB>found` on stdin:
@@ -304,10 +304,11 @@ case "$LOW" in
   unity) ENG=unity ;;
   unreal*) ENG=unreal ;;
   web) ENG=web ;;
+  custom) ENG=custom ;;
   *)
-    if [ "$ESRC" = flag ]; then usage "--engine takes godot, unity, unreal or web, got $RAW"; fi
+    if [ "$ESRC" = flag ]; then usage "--engine takes godot, unity, unreal, web or custom, got $RAW"; fi
     printf 'engine\t%s\t%s\n' "$RAW" "$ESRC"
-    echo "content-count: engine $RAW has no content rules here (godot, unity, unreal or web)" >&2
+    echo "content-count: engine $RAW has no content rules here (godot, unity, unreal, web or custom)" >&2
     exit 3 ;;
 esac
 # The roots, from the engine table: assets/, then the engine's asset root
@@ -316,6 +317,8 @@ esac
 AROOT=$(cell asset_root); CROOT=$(cell code_root)
 if [ "$AROOT" = assets ]; then ROOTS="assets $CROOT"; else ROOTS="assets $AROOT"; fi
 [ "$ENG" = web ] && ROOTS="assets data $CROOT"
+# Custom: the engine's own code is not content; the game's is under game/.
+[ "$ENG" = custom ] && ROOTS="assets game"
 printf 'engine\t%s\t%s\n' "$ENG" "$ESRC"
 
 PRESENT=""; NPRES=0
@@ -371,8 +374,8 @@ printf '%s\n' "$LIST" | ENG="$ENG" SHOWFILES="$SHOWFILES" awk '
     srcroot = (eng == "godot" && root == "src")
     for (gi = 1; gi <= ng; gi++) {
       g = G[gi]; hit = 0; nh = 0
-      # Web has no scene files: its levels are data files in a levels/ folder.
-      if (g == "levels" && eng != "web") {
+      # Web and Custom have no scene files: their levels are data files in a levels/ folder.
+      if (g == "levels" && eng != "web" && eng != "custom") {
         sceneext = (eng == "godot") ? "tscn" : ((eng == "unity") ? "unity" : "umap")
         if (ext != sceneext) continue
         hit = 1

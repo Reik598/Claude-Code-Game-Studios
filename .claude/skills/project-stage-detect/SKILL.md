@@ -60,7 +60,9 @@ With no `--phase` it reports every phase, so a single call covers the whole
 project: per step, `PRESENT` / `ABSENT` / `SHORT` (with `count=` and `min=`) /
 `PATTERN_MISS` / `NO_CHECK`. Use it instead of hand-globbing each artifact
 below, and treat its `NO_CHECK` total as the honest bound on what existence
-checks can tell you.
+checks can tell you. A step marked `engine: <name>` in the catalog (the Custom
+engine's steps) reads `ENGINE_SKIPPED` on any other engine — it does not apply,
+so it is never a gap; name the `ENGINE_SKIPPED:` count once in the report.
 
 It reports observations only — this skill still decides what stage those
 observations imply, and the tier still governs which absences are gaps at all
@@ -79,10 +81,21 @@ track, and the judgement calls.
 - Count narrative docs in `design/narrative/`
 - Count level designs in `design/levels/`
 
-**Source Code** (the code root — `src/` Godot and Web, `Assets/` Unity, `Source/` Unreal; resolve per `.claude/docs/code-root-resolution.md`):
+**Source Code** (the code root — `src/` Godot and Web, `Assets/` Unity, `Source/` Unreal, `.` Custom; resolve per `.claude/docs/code-root-resolution.md`):
 - Count source files (language-agnostic)
 - Identify major systems (directories with 5+ files)
 - Check for core/, gameplay/, ai/, networking/, ui/ directories
+- **Custom** (a project that builds its own engine, code root `.`): count the
+  engine and the game apart — `engine/` per module (`core/`, `memory/`,
+  `jobs/`, `ecs/`, `math/`, `platform/`, `rhi/`, `renderer/`, `shaders/`,
+  `physics/`, `assets/`, `tools/`; list the modules that exist and the ones
+  that do not) and `game/src/` — and never count `.claude/`, `docs/`,
+  `production/`, build output (`build/`, `target/`, `out/`) or vendored code
+  (`third_party/`, `external/`, `vendor/`) as source. Do count `tools/`, with the
+  editor in `tools/editor/`: on Custom it is the project's own code. Look for
+  `tests/benchmarks/` beside the unit and integration tests. Report the layout
+  as `engine/ + game/` when both exist; only one of them is worth saying
+  (an engine with no game yet, or game code with no engine)
 - Estimate lines of code (rough scale)
 - An unresolved root means none of these ran: report
   `NOT ASSESSED — code root unresolved`, never zero source files — zero files

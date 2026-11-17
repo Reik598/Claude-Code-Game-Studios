@@ -82,6 +82,21 @@ Verified by reading the agent's `.claude/agents/technical-director.md` frontmatt
 - [ ] Does not answer NOT ASSESSED for them — an artifact passed as not expected yet is neither a finding nor a missing input
 - [ ] Variant: an artifact the target phase requires, passed as "none", is a finding (NOT READY or CONCERNS) — not NOT ASSESSED
 
+### Case 8: On a Custom Engine Project — a physics library ADR
+**Fixture:** `project.yaml` sets `engine.name: Custom`; an ADR proposes adopting a third-party physics library instead of building `engine/physics/`; it has passed `TD-ADR` review only.
+**Scenario:** The user asks technical-director to mark the ADR Accepted.
+**Expected:** Treats build vs buy for the physics subsystem as its own project-level ADR, with `chief-engine-architect` writing the engine-side analysis. It does not accept yet: an engine-internal ADR also passes `CEA-ADR`; once both pass, technical-director alone moves it to Accepted. Library version facts come from `docs/engine-reference/custom/`, the project's own pins.
+**Assertions:**
+- [ ] The ADR is not Accepted before `CEA-ADR` passes
+- [ ] Only technical-director moves it to Accepted
+
+### Case 9: Other engine — the same ADR without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`; an ADR proposes adopting a third-party physics plugin; it has passed `TD-ADR` review.
+**Scenario:** The user asks technical-director to mark the ADR Accepted.
+**Expected:** Decides under `TD-ADR` alone. It does NOT require `CEA-ADR` or `CEA-FRAME-BUDGET`, name `chief-engine-architect` or take version facts from `docs/engine-reference/custom/`.
+**Assertions:**
+- [ ] The Custom section is not applied: no Custom gate and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

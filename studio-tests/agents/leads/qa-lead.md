@@ -80,6 +80,22 @@ Verified by reading the agent's `.claude/agents/qa-lead.md` frontmatter:
 - [ ] States that `qa.level: minimal` waives test evidence
 - [ ] Still requires the UI story's retained screenshots — the look is never waived
 
+### Case 8: On a Custom Engine Project — renderer test strategy
+**Fixture:** `project.yaml` sets `engine.name: Custom`; a golden-image test fails by a few pixels and an engineer proposes raising its tolerance.
+**Scenario:** The user asks qa-lead for the renderer milestone's test strategy and whether to raise the tolerance.
+**Expected:** Builds the strategy from the engine test categories (unit, determinism replay, golden-image, validation-clean, leak and soak, benchmarks) with their evidence and locations, run by `bash .claude/scripts/test-run.sh custom`, where zero tests or a build failure is never a pass. It refuses to raise the tolerance to make the test pass — that is weakening it; re-baselining needs a stated reason and the owner's sign-off. The GPU and golden-image harness is `rendering-lead`'s and its runner and CI job `asset-build-tooling-engineer`'s with `devops-engineer`; a gating GPU/driver cell with no runner is NOT ASSESSED.
+**Assertions:**
+- [ ] The tolerance is not raised to pass the test
+- [ ] The runner is `test-run.sh custom` and zero tests is not a pass
+- [ ] Harness ownership is routed to `rendering-lead` and `asset-build-tooling-engineer`
+
+### Case 9: Other engine — the same strategy without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unity`.
+**Scenario:** The user asks qa-lead for the rendering milestone's test strategy.
+**Expected:** Uses the evidence table of `coding-standards.md` (Visual/Feel: retained screenshot and lead sign-off). It does NOT require validation-clean runs, per-vendor golden images or a GPU/driver matrix as engine product tests, does NOT run `test-run.sh custom`, and does NOT name `rendering-lead` or `asset-build-tooling-engineer`.
+**Assertions:**
+- [ ] The Custom section is not applied: no engine test categories and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

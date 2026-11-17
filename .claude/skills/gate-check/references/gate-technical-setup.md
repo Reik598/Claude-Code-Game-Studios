@@ -36,3 +36,12 @@ only thing that adds one.
 > applies on user confirmation. Do NOT flag absent GDDs as blockers. This is the
 > named exception to Section 2b's rule that a gate with no required artifacts left
 > may not PASS; the director panel does not run for it.
+
+## Custom engine additions
+
+None at this gate. On a project whose `engine` line reads `Custom`, print
+`Custom engine additions: none at this gate — engine items start at Technical
+Setup → Pre-Production` so the report shows the block was considered; on any
+other engine print nothing for it. The engine's design record — module specs,
+engine ADRs, `frame-budget.md`, `memory-invariants.md` — is Technical Setup
+work, checked by `gate-pre-production.md`.

@@ -87,6 +87,12 @@ falling back to the defaults above when it is absent.
 - Platform-specific rendering (test on target hardware, not headlessly)
 - Full gameplay sessions (covered by playtesting, not automation)
 
+On a **Custom** engine (`engine.name: Custom`), shader and rendering output is
+automated where a GPU runner exists: a golden-image comparison against versioned
+reference images with a stated tolerance. Hosted CPU-only CI skips those tests
+by name and reports them not run. The list above stands unchanged for every
+other engine.
+
 ## CI/CD Rules
 
 - Automated test suite runs on every push to main and every PR
@@ -96,3 +102,6 @@ falling back to the defaults above when it is absent.
   - **Godot**: `godot --headless -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests --ignoreHeadlessMode`
   - **Unity**: `game-ci/unity-test-runner@v4` (GitHub Actions)
   - **Unreal**: headless runner with `-nullrhi` flag
+  - **Custom**: `bash .claude/scripts/test-run.sh custom`, after the project's
+    build command; CI passes only on a `custom:ctest-pass` or `custom:cargo-pass`
+    rule row, never on the helper's exit code

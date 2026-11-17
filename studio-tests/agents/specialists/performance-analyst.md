@@ -61,6 +61,31 @@ No gate IDs assigned.
 - Labels each metric's Status as OK or OVER based on the provided numbers
 - Does NOT use different budget numbers than those provided in the context
 
+### Case 6: On a Custom Engine Project — a benchmark regression
+**Fixture:** `project.yaml` sets `engine.name: Custom`; a benchmark in `tests/benchmarks/` failed its threshold on last night's CI run; no regression response time is recorded; the bisect lands on a commit that changes only files under `engine/ui/`.
+**Input:** "The frame got slower after last week's merges. Find out why and who fixes it."
+**Expected behavior:**
+- Confirms first: re-runs on the same machine, preset and GPU/driver; one noisy run is not a regression
+- Bisects over CI build artifacts, then commits in the last good–bad range (`git bisect run` with the benchmark and its threshold)
+- Attributes through `.claude/docs/custom-engine-layout.md`: the Lead of each changed path's row (the Owner where the Lead is `chief-engine-architect` or `none`; paths whose rows name different leads go to `chief-engine-architect`), so the `engine/ui/` commit goes to `lead-programmer`, the Lead of the `engine/ui/` row
+- Does NOT pick the lead from a fixed list of engine leads that leaves out `lead-programmer`
+- Hands over with the `/benchmark-report` before/after (P50/P95/P99, CPU and GPU separately), the commit and the budget slice it breaks
+- Says "regression SLA NOT SET" rather than assuming a response time
+**Assertions:**
+- [ ] The regression is confirmed before it is bisected
+- [ ] The regression goes to `lead-programmer`, the layout's Lead for `engine/ui/`
+- [ ] "regression SLA NOT SET" is reported
+
+### Case 7: Other engine — the same regression without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`; a frame-time capture got slower after last week's merges.
+**Input:** "The frame got slower after last week's merges. Find out why and who fixes it."
+**Expected behavior:**
+- Profiles and reports with its normal workflow
+- Does NOT attribute the regression to `core-systems-lead`, `rendering-lead`, `simulation-systems-lead`, `editor-architect` or `chief-engine-architect`, and does NOT route a budget change through `CEA-FRAME-BUDGET`
+- Does NOT report "regression SLA NOT SET" as a Custom triage step
+**Assertions:**
+- [ ] The Custom section is not applied: no Custom engine lead, gate or Custom-only agent named
+
 ---
 
 ## Protocol Compliance

@@ -7,6 +7,11 @@
 3. **Conflict Resolution**: When two agents disagree, escalate to the shared
    parent. If no shared parent, escalate to `creative-director` for design
    conflicts or `technical-director` for technical conflicts.
+   **Custom engine** (`engine.name: Custom`): `chief-engine-architect` decides
+   technical conflicts inside the engine (subsystem boundaries, engine APIs,
+   frame budgets); `technical-director` keeps the project-wide technical call.
+   A conflict between the two, or one that spans engine and game, escalates to
+   `technical-director`.
 4. **Change Propagation**: When a design change affects multiple domains, the
    `producer` agent coordinates the propagation.
 5. **No Unilateral Cross-Domain Changes**: An agent must never modify files

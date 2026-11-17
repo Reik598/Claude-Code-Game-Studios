@@ -59,6 +59,29 @@ No gate IDs assigned.
 - Checks the engine version reference (4.6) for any Control node API changes from 4.4/4.5 before using specific APIs
 - Produces GDScript or C# code consistent with the project's configured language
 
+### Case 6: On a Custom Engine Project — localized main menu
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the runtime UI framework does not exist yet.
+**Input:** "Build the main menu, with localized text including Arabic."
+**Expected behavior:**
+- Treats the runtime UI framework as its own to build: retained-mode or immediate-mode is an ADR
+- Plans text shaping (e.g. HarfBuzz) with rasterization to a glyph atlas, bidirectional text and line breaking, with the library choices in an ADR
+- Keeps that text stack in `engine/ui/` as its own; the editor (`editor-ui-framework-engineer`) consumes it through the interface an ADR records
+- Draws the UI in a pass whose slot and budget come from `rendering-lead`, with UI shaders through `shader-pipeline-engineer`
+- Works out localization with `localization-lead` and accessibility with `accessibility-specialist`; the UI reads game state through events, never by mutating ECS data
+**Assertions:**
+- [ ] The framework approach and libraries are ADRs
+- [ ] The UI pass budget comes from `rendering-lead`
+- [ ] The text stack is planned in `engine/ui/` as `ui-programmer`'s, with the editor consuming it
+
+### Case 7: Other engine — the same menu without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`.
+**Input:** "Build the main menu, with localized text including Arabic."
+**Expected behavior:**
+- Builds the menu with the engine's own UI system, checking version-specific API against `docs/engine-reference/godot/`
+- Does NOT plan a runtime UI framework, a shaping-library ADR or a UI render pass, and does NOT name `rendering-lead` or `shader-pipeline-engineer`
+**Assertions:**
+- [ ] The Custom section is not applied: no in-house UI framework and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

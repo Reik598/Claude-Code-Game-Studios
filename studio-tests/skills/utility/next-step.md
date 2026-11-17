@@ -367,6 +367,69 @@ Fixture defaults.
 
 ---
 
+### Case 11: Custom engine, Technical Setup — engine steps are real steps; a no-skill step names its template and owner
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: full` (pinned:
+  the Custom steps sit on the phase ladder, which `minimal` replaces with its
+  own path, and `standard` makes the module map recommended — see the
+  variant), `project.stage: technical-setup`
+- Every Technical Setup step before `engine-module-map` reads PRESENT or
+  MANUAL-answered done; `engine-module-map` (no `command`), `engine-adrs`,
+  `frame-budget`, `memory-invariants` and `test-setup-custom` read ABSENT
+- `artifact-check.sh` prints `ENGINE: Custom (project.yaml)` and
+  `ENGINE_SKIPPED: 0`
+
+**Input:** `/next-step`
+
+**Expected behavior:**
+1. One `artifact-check.sh` call; the `engine=Custom` steps are read as required
+   steps of Technical Setup, not as optional extras
+2. `→ Next up` is the engine module map: since it has no skill, it names the
+   template `.claude/docs/templates/engine-module-spec.md` and the owning agent
+   (the module's specialist, reviewed by its lead and chief-engine-architect)
+   instead of a slash command
+3. "Coming up after that" lists the remaining Custom steps — `/architecture-decision`
+   in engine mode, the frame budget (`.claude/docs/templates/frame-budget.md`,
+   chief-engine-architect), the memory invariants
+   (`.claude/docs/templates/memory-invariants.md`, memory-allocator-specialist)
+   and `/test-setup` (custom)
+4. Verdict is COMPLETE
+
+**Assertions:**
+- [ ] `→ Next up` names a template path and an agent, not an invented command such as `/engine-module-map`
+- [ ] The Custom steps are not reported as "not applicable" on a Custom project
+- [ ] Exactly one `→ Next up`; no file written; verdict COMPLETE
+- [ ] Variant — `modes.workflow: standard`: `artifact-check.sh` still prints `required=true` for `engine-module-map` and `memory-invariants`, but the skill applies `gate-pre-production.md`'s `Tier reductions (Custom)`: both are listed as optional opportunities, never as `→ Next up`, under `Next up (REQUIRED)` or as a blocker; `→ Next up` is `/architecture-decision` in engine mode; one line says `workflow: standard` made them recommended; `frame-budget` and `test-setup-custom` stay required
+
+---
+
+### Case 12: Non-Custom engine — Custom steps are ENGINE_SKIPPED, never next up
+
+**Fixture:**
+- `project.yaml`: `engine.name: Godot`, `modes.workflow: standard`,
+  `project.stage: technical-setup`
+- Same artifacts as Case 11; `artifact-check.sh` prints `ENGINE: Godot` and
+  `ENGINE_SKIPPED: 5` (the five Technical Setup Custom steps) — plus the two
+  Pre-Production ones when that phase is listed
+
+**Input:** `/next-step`
+
+**Expected behavior:**
+1. The five `engine=Custom` steps map to **Not applicable**
+2. The `ENGINE_SKIPPED:` count is mentioned once, in one line
+3. `→ Next up` is the first game step that is not done, exactly as before the
+   Custom steps existed — never `engine-module-map`, the frame budget or the
+   memory invariants
+4. No Custom step is listed as a blocker for the Technical Setup gate
+
+**Assertions:**
+- [ ] No Custom step appears as `→ Next up`, in "Coming up after that", or as a blocker
+- [ ] The skipped count appears exactly once; the steps are not silently dropped
+- [ ] The recommendation equals the one the same fixture gives without the Custom steps in the catalog
+
+---
+
 ## Protocol Compliance
 
 - [ ] Uses the injected config block for `project.stage` and `workflow` instead of re-reading them

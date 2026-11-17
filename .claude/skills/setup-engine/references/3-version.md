@@ -6,7 +6,8 @@
 ## 3. Look Up Current Version
 
 **Web:** no lookup and no editor probe: `references/web.md`, W2 (Node and the
-pinned versions).
+pinned versions). **Custom:** no engine release to look up: the toolchain is
+probed in `references/custom.md`, C4.
 
 Once the engine is chosen:
 

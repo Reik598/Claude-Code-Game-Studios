@@ -171,6 +171,21 @@ if [ -n "$ENGINE" ] && [ -f "$HERE/engine-row.awk" ] && [ -f "$HERE/../engines/e
 fi
 # Unset or unknown: the three roots, so no rule is skipped for want of one.
 [ -n "$ROOTS" ] || ROOTS="src Assets Source"
+# A code root of `.` (the engine table's Custom row: engine/ and game/ side by
+# side) is the project root itself: its code folders are the layout's code
+# folders that exist on disk (custom-engine-layout.md: engine/, game/, crates/
+# and the editor's tools/editor/). Every other top-level folder (assets/,
+# third_party/, cmake/, build output) is not code a prototype can cross into.
+# `.` itself would match every path, and as a regex every character.
+CUSTOM_CODE_FOLDERS="engine game crates tools/editor"
+if [ "$ROOTS" = "." ]; then
+  ROOTS=""
+  for _d in $CUSTOM_CODE_FOLDERS; do
+    [ -d "$_d" ] && ROOTS="${ROOTS:+$ROOTS }$_d"
+  done
+  # No code folder yet: nothing on disk to cross into.
+  [ -n "$ROOTS" ] || ROOTS="engine game src"
+fi
 
 APPLIED=""
 applied() { APPLIED="${APPLIED:+$APPLIED,}$1"; }
@@ -202,7 +217,7 @@ rule_overwrite() {
       return 0
     fi
     _engines="$ENGINE"
-    case "$_engines" in godot|unity|unreal|web) ;; *) _engines="godot unity unreal web" ;; esac
+    case "$_engines" in godot|unity|unreal|web|custom) ;; *) _engines="godot unity unreal web custom" ;; esac
     for _e in $_engines; do
       if bash "$HERE/test-scaffold.sh" --root . "$_e" --list 2>/dev/null | grep -qxF "$1"; then
         _w="/test-setup only creates the files that are missing"; break

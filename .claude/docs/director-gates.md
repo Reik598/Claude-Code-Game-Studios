@@ -7,7 +7,9 @@ lives in its own file under `.claude/docs/director-gates/`, named after the gate
 ID in lowercase.
 
 **Scope**: All 7 production stages (Concept → Release), all 3 Tier 1 directors,
-all key Tier 2 leads. Any skill, team orchestrator, or workflow may invoke these gates.
+all key Tier 2 leads, and `chief-engine-architect` — whose `CEA-` gates apply
+only when `engine.name` is `Custom`. Any skill, team orchestrator, or workflow
+may invoke these gates.
 
 **When a skill spawns a director for a gate, it must NOT read the gate definition
 file itself. Include the gate definition file path in the `Agent` prompt and instruct
@@ -21,7 +23,8 @@ context window.**
 
 Agent by prefix: `CD-` creative-director · `TD-` technical-director ·
 `PR-` producer · `AD-` art-director · `LP-` lead-programmer · `QL-` qa-lead ·
-`ND-` narrative-director. Definition files below are in
+`ND-` narrative-director · `CEA-` chief-engine-architect (Custom engine only).
+Definition files below are in
 `.claude/docs/director-gates/`; each one's header names its agent's model tier.
 
 | Gate ID | Purpose | Definition file |
@@ -54,6 +57,8 @@ Agent by prefix: `CD-` creative-director · `TD-` technical-director ·
 | QL-TEST-COVERAGE | Test coverage review for one story before it closes (`/story-done`) | ql-test-coverage.md |
 | ND-CONSISTENCY | Narrative consistency of writer deliverables | nd-consistency.md |
 | AD-VISUAL | Visual consistency of art/tech-art decisions | ad-visual.md |
+| CEA-ADR | Engine-internal ADR review (memory, threading, frame budget, ABI, determinism, platform / graphics-API matrix) before Accepted — Custom engine only | cea-adr.md |
+| CEA-FRAME-BUDGET | Main tick or frame-graph change stays within `performance.frame_budget_ms` per subsystem, from `/benchmark-report` evidence — Custom engine only | cea-frame-budget.md |
 
 ---
 
@@ -196,8 +201,8 @@ Collect every verdict from the directors that ran, then apply escalation rules:
 |-------|---------------|----------------|
 | **Concept** | CD-PILLARS, AD-CONCEPT-VISUAL | TD-FEASIBILITY, PR-SCOPE |
 | **Systems Design** | TD-SYSTEM-BOUNDARY, CD-SYSTEMS, PR-SCOPE, CD-GDD-ALIGN (per GDD) | ND-CONSISTENCY, AD-VISUAL, TD-CHANGE-IMPACT (on GDD revision) |
-| **Technical Setup** | TD-ARCHITECTURE, TD-ADR (per ADR), TD-MANIFEST, LP-FEASIBILITY, AD-ART-BIBLE | TD-ENGINE-RISK |
+| **Technical Setup** | TD-ARCHITECTURE, TD-ADR (per ADR), TD-MANIFEST, LP-FEASIBILITY, AD-ART-BIBLE, CEA-ADR (per engine-internal ADR, Custom engine only) | TD-ENGINE-RISK |
 | **Pre-Production** | PR-EPIC, QL-STORY-READY (per story), PR-SPRINT, the PHASE-GATE panel (via gate-check — PR at `minimal`, TD + PR at `standard`, all four at `full`) | CD-PLAYTEST |
-| **Production** | LP-CODE-REVIEW (per story), QL-STORY-READY, PR-SPRINT (per sprint), QL-TEST-COVERAGE (per story, via `/story-done`) | PR-MILESTONE, AD-VISUAL, TD-CHANGE-IMPACT (on GDD revision) |
+| **Production** | LP-CODE-REVIEW (per story), QL-STORY-READY, PR-SPRINT (per sprint), QL-TEST-COVERAGE (per story, via `/story-done`), CEA-FRAME-BUDGET (per main tick or frame-graph change, Custom engine only) | PR-MILESTONE, AD-VISUAL, TD-CHANGE-IMPACT (on GDD revision) |
 | **Polish** | CD-PLAYTEST, PR-MILESTONE | AD-VISUAL |
 | **Release** | The PHASE-GATE panel (via gate-check — PR at `minimal`, TD + PR at `standard`, all four at `full`) | — |

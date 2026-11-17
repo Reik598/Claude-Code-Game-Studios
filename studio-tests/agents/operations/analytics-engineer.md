@@ -73,6 +73,30 @@
 - Proposes resolution options: (a) run the tests one after the other, (b) split the population into exclusive segments (e.g. 50% in Test A, 50% in Test B, none in both), or (c) a factorial design if the interaction itself matters (needs a larger sample)
 - Does NOT recommend continuing both tests on overlapping populations
 
+### Case 7: On a Custom Engine Project — crash bucket triage
+**Fixture**: `project.yaml` sets `engine.name: Custom`; this week's crash reports from the latest build are in, symbolicated by the capture pipeline; some stacks did not resolve.
+**Input**: "Triage this week's crashes and tell us what to fix first."
+**Expected behavior**:
+- Groups crashes by symbolicated top frames, normalized (no addresses, no inlined noise)
+- Ranks buckets by affected players and sessions, per build, platform and GPU/driver
+- Gives every bucket an owning engine lead from the faulting module (`core-systems-lead`, `rendering-lead`, `simulation-systems-lead`, `editor-architect`)
+- Reports the unresolved crashes as unsymbolicated, never folded into "other"
+- Does not build capture, symbolication or upload — those are `platform-engineer`'s and `online-services-engineer`'s
+**Assertions**:
+- [ ] Every bucket names an owning engine lead from its faulting module
+- [ ] Unsymbolicated crashes are reported as such
+- [ ] Capture and upload are left to their owners
+
+### Case 8: Other engine — crash triage without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Unreal`; this week's crash reports from the latest build are in.
+**Input**: "Triage this week's crashes and tell us what to fix first."
+**Expected behavior**:
+- Does NOT assign buckets to `core-systems-lead`, `rendering-lead`, `simulation-systems-lead` or `editor-architect`, which lead engine modules only on a Custom project
+- Does NOT name `platform-engineer` or `online-services-engineer` as the builders of crash capture and upload
+- Does NOT report Custom engine-health metrics (GPU device-lost rate, per-hardware-cell frame-time percentiles) as its own engine telemetry duty
+**Assertions**:
+- [ ] The Custom section is not applied: no Custom engine lead or Custom-only agent is named
+
 ---
 
 ## Protocol Compliance

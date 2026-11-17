@@ -85,7 +85,9 @@ fi
 
 if [ -z "$PATHS" ]; then
   [ -f "$HERE/project-state.sh" ] || { echo "code-markers: $HERE/project-state.sh is missing; pass a PATH" >&2; exit 1; }
-  CRROW=$(bash "$HERE/project-state.sh" --root . | awk -F'\t' '$1 == "code_root" { print $2 "\t" $3 }')
+  STATE=$(bash "$HERE/project-state.sh" --root .)
+  CRROW=$(printf '%s\n' "$STATE" | awk -F'\t' '$1 == "code_root" { print $2 "\t" $3 }')
+  ENGINE=$(printf '%s\n' "$STATE" | awk -F'\t' '$1 == "engine" { print $2 }')
   CR=$(printf '%s' "$CRROW" | cut -f1)
   case "$(printf '%s' "$CRROW" | cut -f2)" in
     invalid:*)
@@ -100,8 +102,20 @@ if [ -z "$PATHS" ]; then
   fi
   PATHS="$CR$NL"
   # A root of `.` (a flat web game) leaves out the framework's own folders, and
-  # find does not enter them. The same list as CODE_ROOT_SKIP in yaml-helper.sh.
+  # find does not enter them. The same lists as CODE_ROOT_SKIP,
+  # CODE_ROOT_SKIP_CUSTOM and CODE_ROOT_SCAN_CUSTOM in yaml-helper.sh; the last
+  # two only on Custom.
   CODE_ROOT_SKIP=".claude .git production design docs tests studio-tests prototypes tools node_modules dist"
+  CODE_ROOT_SKIP_CUSTOM="build target out third_party external vendor"
+  CODE_ROOT_SCAN_CUSTOM="tools"
+  case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
+    custom)
+      _skip=""
+      for _d in $CODE_ROOT_SKIP; do
+        case " $CODE_ROOT_SCAN_CUSTOM " in *" $_d "*) ;; *) _skip="${_skip:+$_skip }$_d" ;; esac
+      done
+      CODE_ROOT_SKIP="$_skip $CODE_ROOT_SKIP_CUSTOM" ;;
+  esac
   [ "$CR" = "." ] && SKIP_TOP="$CODE_ROOT_SKIP"
 fi
 

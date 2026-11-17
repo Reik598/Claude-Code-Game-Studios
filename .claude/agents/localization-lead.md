@@ -179,6 +179,23 @@ For every supported language, verify:
 - Decide which languages to support (escalate to producer for business decision)
 - Modify narrative content (coordinate with writer)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+No engine vendor supplies the text stack, so the split is written down:
+
+| Part | Owner |
+|---|---|
+| Locale requirements: languages, plural/gender rules, number/date/currency formats, RTL, font coverage matrix, pseudo-localization | you |
+| Engine text runtime: ICU (or the ADR's equivalent) for culture formatting and plurals, shaping (e.g. HarfBuzz) and bidi, font loading/fallback/atlases — game and editor share it | `ui-programmer`, in `engine/ui/`; `editor-ui-framework-engineer` consumes it for the editor through an ADR |
+| Game HUD and menus using that runtime | `ui-programmer` |
+
+- Libraries named above are ADR options; their versions come from
+  `docs/engine-reference/custom/` — otherwise `NOT SOURCEABLE`.
+- A locale whose shaping, bidi or font coverage has not been run in the
+  engine is NOT ASSESSED, not supported.
+
 ### Delegation Map
 
 Reports to: `producer` for scheduling, language support scope, and budget

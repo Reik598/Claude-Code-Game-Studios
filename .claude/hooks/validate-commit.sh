@@ -516,6 +516,16 @@ trap '[ -n "$TMP_DESIGN" ] && rm -f "$TMP_DESIGN"' EXIT
 # roots so an editor's JSON-with-comments (.vscode/settings.json) never blocks.
 # ---------------------------------------------------------------------------
 DATA_FILES=$(echo "$STAGED" | grep -E '^(assets|Assets|Content)/(.*/)?[Dd]ata/.*\.[Jj][Ss][Oo][Nn]$')
+# Custom (a project building its own engine) keeps its game data in game/data/
+# (.claude/rules/data-files.md). Only there: on any other engine game/ is not a
+# data root, and the check stays as it was. yaml-helper.sh is sourced further
+# down, so the engine is read here with yaml-get.awk, as detect-gaps.sh does.
+if [ -f project.yaml ] && [ -f .claude/scripts/yaml-get.awk ]; then
+    _VC_DATA_EN=$(YG_PATH=engine.name awk -f .claude/scripts/yaml-get.awk project.yaml 2>/dev/null | tr -d '\r' | tr 'A-Z' 'a-z')
+    if [ "$_VC_DATA_EN" = custom ]; then
+        DATA_FILES=$(printf '%s\n%s\n' "$DATA_FILES" "$(echo "$STAGED" | grep -E '^game/data/.*\.[Jj][Ss][Oo][Nn]$')" | grep -v '^$')
+    fi
+fi
 if [ -n "$DATA_FILES" ]; then
     PYTHON_CMD="$_VC_PY"
     if [ -n "$PYTHON_CMD" ]; then
@@ -810,7 +820,20 @@ CODE_FILES=""
     | code_root_filter "$CODE_ROOT" \
     | grep -iE '\.(gd|cs|cpp|cc|hpp|h|c|py|js|ts|rs|java|kt|lua)$')
 if [ -n "$CODE_FILES" ]; then
-    HARDCODED=$(printf '%s\n' "$CODE_FILES" | tr '\n' '\0' \
+    # Custom (a project building its own engine, code root `.`): gameplay values
+    # live in game/, so only game/ is scanned. Engine code legitimately holds
+    # numbers such as `sample_rate = 48000` or a solver's iteration count; scanning
+    # it would flag most engine commits, and a hook that cries wolf gets muted.
+    HC_FILES="$CODE_FILES"
+    if [ "$CODE_ROOT" = . ] && [ -f project.yaml ] && [ -f .claude/scripts/yaml-get.awk ]; then
+        _VC_EN=$(YG_PATH=engine.name awk -f .claude/scripts/yaml-get.awk project.yaml 2>/dev/null | tr -d '\r' | tr 'A-Z' 'a-z')
+        if [ "$_VC_EN" = custom ]; then
+            HC_FILES=$(printf '%s\n' "$CODE_FILES" | grep -E '^game/' || true)
+        fi
+    fi
+fi
+if [ -n "$CODE_FILES" ] && [ -n "$HC_FILES" ]; then
+    HARDCODED=$(printf '%s\n' "$HC_FILES" | tr '\n' '\0' \
         | xargs -0 grep -lE '(damage|health|speed|rate|chance|cost|duration)[[:space:]]*[:=][[:space:]]*[0-9]+' 2>/dev/null || true)
     if [ -n "$HARDCODED" ]; then
         while IFS= read -r file; do

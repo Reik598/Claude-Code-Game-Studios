@@ -3,11 +3,12 @@
 ## What Is This?
 
 This is a complete Claude Code agent architecture for game development. It
-organizes 49 specialized AI agents into a studio hierarchy that mirrors
+organizes 74 specialized AI agents into a studio hierarchy that mirrors
 real game development teams, with defined responsibilities, delegation
 rules, and coordination protocols. It includes engine-specialist agents
 for Godot, Unity, and Unreal — each with dedicated sub-specialists for
-major engine subsystems. All design agents and templates are grounded in
+major engine subsystems, and a set for a Custom engine you build yourself
+(`engine.name: Custom`, led by `chief-engine-architect`). All design agents and templates are grounded in
 established game design theory (MDA Framework, Self-Determination Theory,
 Flow State, Bartle Player Types). Use whichever engine set matches your project.
 
@@ -26,7 +27,7 @@ The main path starts with a game, not an engine:
    stories (`/create-stories`, then `/dev-story` and `/story-done`) only when you
    ask for them, or in studio mode; `/next-step` knows this route
 
-`/setup-engine` is for an engine other than web (Godot, Unity, Unreal), or for later; with
+`/setup-engine` is for an engine other than web (Godot, Unity, Unreal, or `custom` for an engine you build), or for later; with
 an engine set, `/prototype` builds a throwaway prototype in it instead. `/prototype --spike`
 is the quick test of one mechanic. `/brainstorm` helps when you have no idea yet.
 
@@ -55,10 +56,19 @@ There are three tiers of agents:
   - `game-designer`, `lead-programmer`, `art-director`, `audio-director`,
     `narrative-director`, `qa-lead`, `release-manager`, `localization-lead`
 
+- **Custom engine only** (`engine.name: Custom`): `chief-engine-architect`
+  (director, Opus; owns engine internals beside `technical-director`),
+  four leads — `core-systems-lead` (core, platform, streaming, online, build),
+  `rendering-lead` (RHI, render graph, shaders, graphics features, VFX),
+  `simulation-systems-lead` (physics, animation, scripting runtime, audio
+  engine) and `editor-architect` (level editor, editor UI, cameras and
+  cinematics) — and twenty engine specialists, one of them
+  `engine-technical-writer`
+
 - **Tier 3 — Specialists** who execute within their domain
   - Designers, programmers, artists, writers, testers, engineers
 
-The tiers are seniority of role. Most agents run on your session's model; the
+The tiers are seniority of role. Thirty of the 74 agents run on your session's model; the
 agent file's own `model:` line says which do not
 (`.claude/docs/model-tiers.md`).
 
@@ -101,6 +111,12 @@ Ask yourself: "What department would handle this in a real studio?"
 | Write Godot C# code | `godot-csharp-specialist` |
 | Create Godot shaders | `godot-shader-specialist` |
 | Build GDExtension modules | `godot-gdextension-specialist` |
+| Decide an engine subsystem boundary or frame budget (Custom engine) | `chief-engine-architect` |
+| Write an allocator or job-system change (Custom engine) | `core-systems-lead` |
+| Change the RHI, render graph or shader pipeline (Custom engine) | `rendering-lead` |
+| Build the engine's editor: undo/redo, reflection, play-in-editor, the UI-framework ADR (Custom engine) | `editor-architect` |
+| Physics or animation in the fixed step, scripting runtime, or audio engine (Custom engine) | `simulation-systems-lead` |
+| Write the engine's API reference or a migration guide (Custom engine) | `engine-technical-writer` |
 | Plan live events and seasons | `live-ops-designer` |
 | Write patch notes for players | `community-manager` |
 | Brainstorm a new game idea | Use `/brainstorm` skill |
@@ -143,6 +159,10 @@ Ask yourself: "What department would handle this in a real studio?"
 | `/content-audit` | GDD-specified content vs. implemented — find gaps |
 | `/scope-check` | Detect scope creep against plan |
 | `/perf-profile` | Performance profiling and bottleneck ID |
+| `/benchmark-report` | Any engine (Custom-oriented): frame-time P50/P95/P99 and CPU vs GPU bound from a profiler capture or benchmark output; NOT ASSESSED with no capture |
+| `/memory-audit` | Any engine (Custom-oriented): allocators, alignment padding, leaks, use-after-free risks from sanitizer or Miri output; NOT ASSESSED with no run |
+| `/perf-regression-triage` | Any engine (Custom-oriented): confirm, bisect and attribute a `/benchmark-report` regression, then open the bug |
+| `/api-review` | Custom engine: review a change to the engine's public surface (C++ headers, Rust `pub` API, C ABI) |
 | `/tech-debt` | Scan, track, and prioritize tech debt |
 | `/gate-check` | Validate phase readiness (PASS/CONCERNS/NOT ASSESSED/FAIL) |
 | `/consistency-check` | Scan all GDDs for cross-document inconsistencies (conflicting stats, names, rules) |
@@ -160,6 +180,7 @@ Ask yourself: "What department would handle this in a real studio?"
 | `/patch-notes` | Generate player-facing patch notes |
 | `/hotfix` | Emergency fix with audit trail |
 | `/day-one-patch` | Prepare a focused day-one patch for known issues discovered after gold master |
+| `/engine-release` | Custom engine: cut an engine version for the game teams (semver plan, changelog, migration guide, sign-off) |
 | `/prototype` | A few questions, a one-page brief, then a playable browser game you'd build on, or a throwaway engine prototype when an engine is set (Phase 1) |
 | `/vertical-slice` | Production-quality end-to-end build — validate full game loop (Phase 4) |
 | `/localize` | Localization scan, extract, validate |
@@ -172,6 +193,7 @@ Ask yourself: "What department would handle this in a real studio?"
 | `/team-level` | Orchestrate full level creation pipeline |
 | `/team-live-ops` | Orchestrate live-ops team for seasons, events, and post-launch content |
 | `/team-qa` | Orchestrate full QA team cycle — test plan, test cases, smoke check, sign-off |
+| `/team-frame-pipeline` | Custom engine: orchestrate a change to the main tick or frame graph under `chief-engine-architect` |
 | `/qa-plan` | Generate a QA test plan for a sprint or feature |
 | `/bug-triage` | Re-prioritize open bugs, assign to sprints, surface systemic trends |
 | `/smoke-check` | Run critical path smoke test gate before QA hand-off (PASS/FAIL) |
@@ -311,10 +333,10 @@ CLAUDE.md                          -- Master config (read this first, ~80 lines)
 project.yaml                       -- Machine-readable project config (engine, modes, stage) — source of truth
 .claude/
   settings.json                    -- Claude Code hooks and project settings
-  agents/                          -- 49 agent definitions (YAML frontmatter)
-  skills/                          -- 75 slash command definitions (YAML frontmatter)
+  agents/                          -- 74 agent definitions (YAML frontmatter)
+  skills/                          -- 81 slash command definitions (YAML frontmatter)
   hooks/                           -- 15 event hooks (.sh, wired by settings.json) + yaml-helper.sh, update-check.sh
-  rules/                           -- 14 path-specific rule files
+  rules/                           -- 25 path-specific rule files
   docs/
     quick-start.md                 -- This file
     technical-preferences.md       -- Legacy fallback for project.yaml config (mirror; see project.yaml at repo root)
@@ -326,5 +348,5 @@ project.yaml                       -- Machine-readable project config (engine, m
     setup-requirements.md          -- System prerequisites (Git Bash, jq, Python)
     settings-local-template.md     -- Personal settings.local.json guide
     CLAUDE-local-template.md       -- Personal CLAUDE.local.md guide (gitignored overrides)
-    templates/                     -- 62 document templates (+ per-section guidance)
+    templates/                     -- 65 document templates (+ per-section guidance)
 ```

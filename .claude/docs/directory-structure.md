@@ -21,7 +21,7 @@
 
 ## The code root is engine-specific
 
-**Two of the four supported engines will not build a project whose code sits in
+**Two of the five supported engines will not build a project whose code sits in
 `src/`.** This is not a style preference — it is a hard constraint of the engine's
 own toolchain:
 
@@ -31,6 +31,7 @@ own toolchain:
 | **Unity** | `Assets/` | Unity compiles **only** `Assets/` and `Packages/`. Code outside them is invisible to the compiler. |
 | **Unreal** | `Source/<Module>/` | UnrealBuildTool discovers modules under `Source/`; content lives in `Content/`. A module elsewhere is not built. |
 | **Web** | `src/` | No constraint — Vite builds what `index.html` imports. |
+| **Custom** | `.` — `engine/` (the engine, one module per folder) and `game/` (the game on it) | No constraint — your own CMake or Cargo build decides what is compiled. `.` means the project root minus the framework's folders. |
 
 **Resolve the code root from `engine.name` before writing any source file.** A
 path shown as `src/…` alone is a Godot example: read it as *"the code root"* and
@@ -44,8 +45,16 @@ substitute the row above. `src/` is the table's Godot row, not a universal path.
 | **Unity** | `Assets/Tests/EditMode/`, `Assets/Tests/PlayMode/` | not compiled: "0 tests, Passed" |
 | **Unreal** | `Source/<Module>/Private/Tests/` | not built: "No automation tests matched" |
 | **Web** | `tests/unit/` (Vitest), `tests/integration/` (Playwright) | — |
+| **Custom** | `tests/unit/`, `tests/integration/`, `tests/benchmarks/` (CTest or `cargo test`) | only what your CMake or Cargo config registers is run |
 
 The rows are the engine table, `.claude/engines/engines.tsv`; `engine.code_root`
 and `engine.test_root` override them.
+
+### Custom: the engine's modules
+
+On `Custom` the engine sits in `engine/`, one folder per module, beside the game
+in `game/`. Rust workspaces may place modules under `crates/<module>/`;
+the same scoped rules and owners apply. The module names the path rules match are listed in
+`.claude/docs/custom-engine-layout.md` — read it before creating an engine module.
 
 Read `tests/unit/[system]/` (or `integration/`) anywhere as the test root plus `[System]/`.

@@ -179,7 +179,51 @@ Fixture defaults.
 
 ---
 
+### Case 6: Custom Engine — scaffolded by `test-scaffold.sh custom`, NEEDS rows reported
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `commands.build` set, `commands.test` unset
+- `CMakeLists.txt` at the root; no `tests/`; no CI workflow
+- `test-scaffold.sh custom --dry-run` lists `tests/README.md`, `production/qa/evidence/.gitkeep`, `tests/unit/.gitkeep`, `tests/integration/.gitkeep`, `tests/benchmarks/.gitkeep`, `.github/workflows/tests.yml`, `tests/smoke/critical-paths.md`, and a `NEEDS test_command` row
+- The user approves the plan
+
+**Input:** `/test-setup`
+
+**Expected behavior:**
+1. Phase 1 reports Engine: Custom and the build file found
+2. Phase 2 shows the plan from `bash .claude/scripts/test-scaffold.sh custom --dry-run` — `tests/unit/`, `tests/integration/`, `tests/benchmarks/`, README, evidence folder, CI, smoke list — and asks before creating
+3. Phase 3 runs `bash .claude/scripts/test-scaffold.sh custom`; no file is written by hand; existing files are left (`EXISTS`)
+4. The `NEEDS test_command` row is reported: the README and CI keep a `[TEST COMMAND]` placeholder until `/setup-engine custom` or `commands.test` sets it
+5. CI is the helper's Linux and Windows matrix running `commands.build` then `commands.test`; compiler and SDK pins are `NOT SOURCEABLE` here unless `docs/engine-reference/custom/` records them — no version is written from memory
+6. Phase 6 summary names `tests/unit/`, `tests/integration/`, `tests/benchmarks/`, says to run tests with `bash .claude/scripts/test-run.sh custom`, and that zero tests (`custom:ctest-zero` / `custom:cargo-zero`) are not a pass; next step 1 is to set `commands.test`
+7. Verdict COMPLETE
+
+**Assertions:**
+- [ ] The helper writes the files; no hand-written CI or README for Custom
+- [ ] The `NEEDS` row is reported, not hidden
+- [ ] No compiler, Vulkan SDK or shader-compiler version is pinned from memory
+- [ ] Approval asked before any file is created
+
+---
+
+### Case 7: Godot project unchanged by the Custom path
+
+**Fixture:** As Case 1.
+
+**Input:** `/test-setup`
+
+**Expected behavior:** Identical to Case 1: no `tests/benchmarks/`, no `test-scaffold.sh custom` call, the GdUnit4 CI workflow.
+
+**Assertions:**
+- [ ] Case 1's assertions all still hold
+- [ ] No `tests/benchmarks/` and no `test-scaffold.sh custom` call
+
+---
+
 ## Protocol Compliance
+
+- [ ] Generated Custom CI fails on a zero-test CTest/Cargo run or an unrecognized result, despite helper exit 0; nonempty successful CTest/Cargo runs pass
+- [ ] Generated Custom CI reads test-run.sh's rule row, not its exit code alone; a missing or duplicate rule cannot pass
 
 - [ ] Reads the engine (`project.yaml`, then `technical-preferences.md`) before generating any scaffold
 - [ ] Generates engine-appropriate test runner config and CI workflow (not generic)

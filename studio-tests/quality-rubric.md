@@ -32,7 +32,7 @@ auto-advancing stage and must respect the three review modes.
 
 ### `review`
 
-**Skills**: design-review, architecture-review, review-all-gdds
+**Skills**: design-review, architecture-review, review-all-gdds, api-review
 
 Review skills read documents and produce structured verdicts. They are primarily
 read-only and must not trigger director gates during the analysis phase.
@@ -41,12 +41,13 @@ read-only and must not trigger director gates during the analysis phase.
 |---|---|
 | **R1 — Read-only enforcement** | Skill does not modify the reviewed document without explicit user approval; any write operations (review logs, index updates) are gated behind "May I write" |
 | **R2 — 8-section check** | Skill evaluates all 8 required GDD sections (or equivalent architectural sections) explicitly |
-| **R3 — Correct verdict vocabulary** | Verdict is exactly one of: APPROVED / NEEDS REVISION / MAJOR REVISION NEEDED / NOT ASSESSED (design-review, ux-review) or PASS / CONCERNS / FAIL / NOT ASSESSED (architecture-review, review-all-gdds) |
+| **R3 — Correct verdict vocabulary** | Verdict is exactly one of: APPROVED / NEEDS REVISION / MAJOR REVISION NEEDED / NOT ASSESSED (design-review, ux-review), PASS / CONCERNS / FAIL / NOT ASSESSED (architecture-review, review-all-gdds), or APPROVED / NEEDS REVISION / REJECTED / NOT ASSESSED (api-review) |
 | **R4 — No director gates during analysis** | Skill does not spawn director gates during its analysis phases; post-analysis director review is acceptable when the skill's scope and stakes warrant it |
 | **R5 — Structured findings** | Output contains a per-section status table or checklist before the final verdict |
 
 > **Exceptions:**
 > - `design-review`: Has `Write, Edit` in allowed-tools to support an optional "Revise now" path (all writes gated behind user approval) and to write review logs. R1 is satisfied because the reviewed document is never silently modified.
+> - `api-review`: reviews a diff of the engine's public surface, not a document. R2 reads as "every changed public item is classified, and each deprecation, removal, migration-note and boundary check is reported or `NOT ASSESSED`". Its `chief-engine-architect` and lead sign-offs run after the analysis (R4) and are not director gates.
 
 ---
 
@@ -109,7 +110,8 @@ with correct schema, respect layer/priority ordering, and gate before writing.
 ### `analysis`
 
 **Skills**: consistency-check, balance-check, content-audit, code-review, tech-debt,
-scope-check, estimate, perf-profile, asset-audit, security-audit, test-evidence-review, test-flakiness
+scope-check, estimate, perf-profile, benchmark-report, memory-audit, perf-regression-triage, asset-audit, security-audit,
+test-evidence-review, test-flakiness
 
 Analysis skills scan the project and surface findings. They are read-only during
 analysis and must ask before recommending any file writes.
@@ -126,7 +128,7 @@ analysis and must ask before recommending any file writes.
 ### `team`
 
 **Skills**: team-combat, team-narrative, team-audio, team-level, team-ui, team-qa,
-team-release, team-polish, team-live-ops
+team-release, team-polish, team-live-ops, team-frame-pipeline
 
 Team skills orchestrate multiple specialist agents for a department. They must
 spawn the right agents, run independent ones in parallel, and surface blocks immediately.
@@ -163,7 +165,7 @@ They have a PR-SPRINT or PR-MILESTONE gate at specific mode thresholds.
 launch-checklist, release-checklist, smoke-check, soak-test, test-setup, test-helpers,
 regression-suite, qa-plan, bug-triage, bug-report, playtest-report, asset-spec,
 reverse-document, project-stage-detect, setup-engine, skill-test, skill-improve,
-day-one-patch, cut, and any other skills not in categories above
+day-one-patch, cut, engine-release, and any other skills not in categories above
 
 Utility skills pass the 7 standard static checks. If they happen to spawn director
 gates, the gate mode logic must also be correct.
@@ -185,23 +187,23 @@ and its spec in `agents/` asserts that alias; see `.claude/docs/model-tiers.md`.
 
 ### `director`
 
-**Agents**: creative-director, technical-director, art-director, producer
+**Agents**: creative-director, technical-director, art-director, producer, chief-engine-architect
 
 | Metric | PASS criteria |
 |---|---|
 | **D1 — Correct verdict vocabulary** | Returns `[GATE-ID]: [word]` as its first line, the word taken from the invoked gate's **Verdicts** line — or `NOT ASSESSED`, naming the missing input, when an input the gate names was not given |
 | **D2 — Domain boundary respected** | Does not make binding decisions outside its declared domain |
-| **D3 — Conflict escalation** | When two departments conflict, escalates to correct parent (creative-director or technical-director) rather than unilaterally deciding |
+| **D3 — Conflict escalation** | When two departments conflict, escalates to correct parent (creative-director or technical-director) rather than unilaterally deciding. chief-engine-architect resolves engine-internal conflicts between core-systems-lead, rendering-lead, simulation-systems-lead and editor-architect, and takes whole-project technical calls to technical-director |
 
 ### `lead`
 
 **Agents**: lead-programmer, qa-lead, narrative-director, audio-director, game-designer,
-systems-designer, level-designer
+systems-designer, level-designer, core-systems-lead, rendering-lead, simulation-systems-lead, editor-architect
 
 | Metric | PASS criteria |
 |---|---|
 | **L1 — Gate verdict or findings** | A lead invoked for a gate (lead-programmer's LP-, qa-lead's QL-, narrative-director's ND- gates) returns that gate's **Verdicts** words — or `NOT ASSESSED`, naming a missing input; a lead without a gate returns findings and leaves the verdict to the calling skill |
-| **L2 — Escalates to shared parent** | Out-of-domain conflicts escalate to creative-director (design) or technical-director (tech) |
+| **L2 — Escalates to shared parent** | Out-of-domain conflicts escalate to creative-director (design) or technical-director (tech); the Custom engine leads (core-systems-lead, rendering-lead, simulation-systems-lead, editor-architect) escalate engine-internal conflicts to chief-engine-architect |
 
 ### `specialist`
 
@@ -222,12 +224,18 @@ writer, world-builder
 godot-shader-specialist, godot-gdextension-specialist, unity-specialist, unity-ui-specialist,
 unity-shader-specialist, unity-dots-specialist, unity-addressables-specialist,
 unreal-specialist, ue-blueprint-specialist, ue-gas-specialist, ue-umg-specialist,
-ue-replication-specialist
+ue-replication-specialist, memory-allocator-specialist, concurrency-job-system-engineer,
+ecs-dod-architect, physics-simulation-engineer, rhi-backend-engineer, render-graph-specialist,
+shader-pipeline-engineer, asset-build-tooling-engineer, level-editor-engineer,
+editor-ui-framework-engineer, platform-engineer, world-streaming-engineer,
+online-services-engineer, graphics-features-engineer, vfx-runtime-engineer,
+animation-systems-engineer, scripting-runtime-engineer, audio-engine-engineer,
+cinematics-sequencer-engineer, engine-technical-writer
 
 | Metric | PASS criteria |
 |---|---|
-| **E1 — Version-aware** | References engine version from `docs/engine-reference/` before suggesting API calls; flags post-cutoff risk |
-| **E2 — File routing** | Routes file types to the correct sub-specialist (e.g., `.gdshader` → godot-shader-specialist, not godot-gdscript-specialist) |
+| **E1 — Version-aware** | References engine version from `docs/engine-reference/` before suggesting API calls; flags post-cutoff risk. For `engine.name: Custom` that is the project's pinned toolchain in `docs/engine-reference/custom/VERSION.md`, and an uncovered fact is written `NOT SOURCEABLE — … not covered by docs/engine-reference/custom/` |
+| **E2 — File routing** | Routes file types to the correct sub-specialist (e.g., `.gdshader` → godot-shader-specialist, not godot-gdscript-specialist; `engine/rhi/**` → rhi-backend-engineer, not render-graph-specialist) |
 | **E3 — Engine-specific patterns** | Enforces engine-specific idioms (e.g., GDScript static typing, C# attribute exports, Blueprint function libraries) |
 
 ### `qa`

@@ -544,7 +544,7 @@ team.size::individual|small|studio
 performance.enforce::warn|block|off
 platform.cert_tier::none|itch|steam|console
 accessibility.target::none|standard|aaa
-engine.name::Godot|Unity|Unreal|Web
+engine.name::Godot|Unity|Unreal|Web|Custom
 project.stage::Concept|Systems Design|Technical Setup|Pre-Production|Production|Polish|Release
 project.goal::jam|learn|hobby|portfolio|sell|early_access|publisher|mobile|other
 testing.strict.logic::true|false
@@ -1417,9 +1417,18 @@ resolve_setting() {
 }
 
 # The folders a code root of `.` (the project root itself: a flat web game) never
-# scans -- the framework's own, throwaway work, and build output. The same line
-# is in project-state.sh and code-markers.sh; keep the three the same.
+# scans -- the framework's own, throwaway work, and build output. The same lines
+# are in project-state.sh and code-markers.sh; keep the three the same.
 CODE_ROOT_SKIP=".claude .git production design docs tests studio-tests prototypes tools node_modules dist"
+# Added to CODE_ROOT_SKIP only when the engine is Custom, whose CMake and Cargo
+# builds write there under root `.`, and whose vendored libraries sit there
+# (third-party.md: someone else's code, never edited in place). On any other
+# engine these folders can hold the game's own source, and the base release
+# counts them.
+CODE_ROOT_SKIP_CUSTOM="build target out third_party external vendor"
+# Taken out of CODE_ROOT_SKIP only when the engine is Custom: tools/editor/ is
+# the engine's editor (custom-engine-layout.md), so tools/ is the project's code.
+CODE_ROOT_SCAN_CUSTOM="tools"
 # The folders engine.code_root may not name: the framework's own or throwaway.
 CODE_ROOT_DENY=".claude .git production design docs tests studio-tests prototypes"
 
@@ -1485,12 +1494,36 @@ _yh_code_root_check() {
   printf '%s' "$out"
 }
 
+# _yh_code_root_skip -- the folders a code root of `.` skips: CODE_ROOT_SKIP, less
+# CODE_ROOT_SCAN_CUSTOM and plus CODE_ROOT_SKIP_CUSTOM when engine.name (project.local.yaml, then project.yaml,
+# the order _yh_engine_name reads) is Custom. Read with yaml-get.awk, as
+# detect-gaps.sh does: no Python for a file count, and statusline.sh calls this.
+_yh_code_root_skip() {
+  local f en="" awkf="$_YH_DIR/../scripts/yaml-get.awk"
+  _yaml_helper_set_root
+  if [ -f "$awkf" ]; then
+    for f in "$_YH_ROOT/project.local.yaml" "$_YH_ROOT/project.yaml"; do
+      [ -f "$f" ] || continue
+      en=$(YG_PATH=engine.name LC_ALL=C awk -f "$awkf" "$f" 2>/dev/null | tr -d '\r')
+      [ -n "$en" ] && break
+    done
+  fi
+  case "$(printf '%s' "$en" | tr '[:upper:]' '[:lower:]')" in
+    custom)
+      for f in $CODE_ROOT_SKIP; do
+        case " $CODE_ROOT_SCAN_CUSTOM " in *" $f "*) ;; *) printf '%s ' "$f" ;; esac
+      done
+      printf '%s' "$CODE_ROOT_SKIP_CUSTOM" ;;
+    *) printf '%s' "$CODE_ROOT_SKIP" ;;
+  esac
+}
+
 # code_root_filter ROOT -- repo-relative paths on stdin, those under ROOT on
 # stdout (a leading ./ removed). For ROOT `.`, every path outside the
 # CODE_ROOT_SKIP folders. Callers use it in place of `grep "^$ROOT/"`, which
 # for `.` would read as the regex `^./` and match the wrong files.
 code_root_filter() {
-  awk -v root="${1%/}" -v skip="$CODE_ROOT_SKIP" '
+  awk -v root="${1%/}" -v skip="$(_yh_code_root_skip)" '
     BEGIN { n = split(skip, s, " ") }
     { p = $0; sub(/\r$/, "", p); sub(/^\.\//, "", p); if (p == "") next }
     root != "." { if (index(p, root "/") == 1) print p; next }
@@ -1505,7 +1538,7 @@ code_root_find() {
   local root="${1%/}" d; shift
   if [ "$root" != "." ]; then find "$root" "$@" 2>/dev/null; return 0; fi
   set -- \) -prune -o \( "$@" \) -print
-  for d in $CODE_ROOT_SKIP; do set -- -o -path "./$d" "$@"; done
+  for d in $(_yh_code_root_skip); do set -- -o -path "./$d" "$@"; done
   shift   # the first -o
   find . \( "$@" 2>/dev/null
 }
@@ -2106,6 +2139,9 @@ EOF
       # No web specialist: engine work on Web goes to lead-programmer,
       # against docs/engine-reference/web/.
       web)     sp_primary="lead-programmer" ;;
+      # A project that builds its own engine: engine work starts at the
+      # architect, who routes to core-systems-lead and rendering-lead.
+      custom)  sp_primary="chief-engine-architect" ;;
       *)       sp_primary="" ;;
     esac
     sp_psrc="engine.name"

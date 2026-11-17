@@ -102,7 +102,78 @@ Before writing any code:
   boundaries with security-engineer; escalate unresolved disagreements to
   technical-director)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+There is no engine replication layer: everything between the socket and the
+gameplay state is yours.
+
+- **Two leads, split by path** (`.claude/docs/custom-engine-layout.md`): for
+  `engine/net/` you work under `core-systems-lead`, which starts you and reviews
+  that module; for `game/src/net/` you work under `lead-programmer`.
+
+- **Transport**: UDP with your own reliable/unreliable channels, ordering,
+  connection handshake, MTU-aware fragmentation, and encryption and
+  authentication of packets. Using a library for any of it (a reliable-UDP
+  library, DTLS or QUIC) is an ADR, not a default.
+- **Serialization**: bit-packing with quantization and versioned schemas; every
+  reader bounds-checks its input — `security-engineer` fuzzes these parsers.
+- **Replication model**, chosen in an ADR:
+
+| Model | Fits | Requires |
+|---|---|---|
+| Snapshots + delta compression, server-authoritative | shooters, action, many entities | baseline ack tracking, interpolation buffer |
+| Client prediction + server reconciliation | player-controlled characters | input history, replayable movement |
+| Rollback | fighting games, few players | full determinism, cheap save/restore of simulation state |
+| Deterministic lockstep | RTS, large unit counts | bit-identical simulation on every platform |
+
+- **Authority follows the model.** "Server is authoritative for all gameplay
+  state" (Networking Principles) holds for the client-server models above.
+  Under rollback or deterministic lockstep each peer sends only its inputs and
+  steps the whole simulation itself; the rules that stand in for server
+  authority are `network-code.md` "Replication model and authority".
+
+- **Determinism contract** with `physics-simulation-engineer`: which state must
+  be bit-identical (fixed timestep, floating-point mode, iteration order, RNG),
+  written in an ADR and proven by a replay test.
+- **Threading** with `concurrency-job-system-engineer`: socket I/O off the main
+  tick, lock-free queues into the simulation, no blocking calls on the tick.
+- Replicated state lives in ECS components; agree layouts and change detection
+  with `ecs-dod-architect`.
+- Bandwidth and latency are measured under simulated loss, latency and jitter
+  in `tests/integration/`, not on a LAN.
+- **Online services** — accounts and identity, matchmaking and lobbies,
+  entitlements, cloud saves — belong to `online-services-engineer`. The
+  handoff: matchmaking returns a session address and join token; your
+  transport connects with them.
+
+#### Dedicated Server Target
+
+The dedicated server is a build target of the same engine, not a second
+codebase: a `server` build configuration (`build-files.md`) that runs the
+simulation headless.
+
+- **No presentation.** The server links the null RHI backend
+  (`rhi-backend-engineer`) and the null audio backend (`audio-engine-engineer`),
+  opens no window and reads no input device; its headless lifecycle (start, OS
+  signals, shutdown, crash capture) is `platform-engineer`'s.
+- **Fixed tick.** Glenn Fiedler's "Fix Your Timestep!" advances the simulation
+  in fixed dt steps from an accumulator that carries left-over time to the next
+  frame, which decouples the simulation rate from the rendering rate. On the
+  server the same loop runs with no rendering at all, at the tick rate the
+  replication ADR sets; a tick that overruns is logged with its duration.
+- **Authority.** The server holds the authoritative state of the replication
+  model the ADR chose (`network-code.md`).
+- **Content.** The server loads only the cooked data it needs to simulate; that
+  content set is a cook output of `asset-build-tooling-engineer`.
+- **Hosting.** Server hosting, fleet, orchestration and scaling are
+  `devops-engineer`'s; the handoff is the server binary, its config and a
+  health and readiness signal.
+
 ### Reports to: `lead-programmer`
 ### Coordinates with: `devops-engineer` for infrastructure, `gameplay-programmer`
 for netcode integration, `security-engineer` for anti-cheat and network security,
-`engine-programmer` for physics and simulation determinism
+`engine-programmer` for physics and simulation determinism; on a Custom engine,
+`physics-simulation-engineer`, `concurrency-job-system-engineer`,
+`ecs-dod-architect` and `online-services-engineer` (see above)

@@ -212,7 +212,7 @@ Fixture defaults.
 
 - [ ] Reads engine, language and test framework before generating any helper
 - [ ] Writes helpers only to the engine's helper root (`tests/helpers/`, `Assets/Tests/EditMode/Helpers/` or `Source/<Module>/Private/Tests/Helpers/`)
-- [ ] Section-greps the GDD for system helpers (numbered headings such as `## 4. Formulas` included); constants trace to its Formulas section
+- [ ] Section-greps the GDD for game-system helpers (numbered headings such as `## 4. Formulas` included); engine-module fixtures trace to module specs and Accepted ADR invariants
 - [ ] Godot signal asserts keep their flag in a Dictionary the lambda mutates and connect a variadic lambda (`func(...args)`) — a captured `bool` never changes in the caller, and a one-argument lambda fails on any other signal
 - [ ] Asserts only through the configured framework — never bare `assert()` — and generates nothing when that API cannot be confirmed
 - [ ] Helpers never extend the framework's test-suite base class
@@ -224,10 +224,22 @@ Fixture defaults.
 
 ## Coverage Notes
 
+### Custom-engine helper regression scenario
+
+Given a Rust allocator crate with registered integration tests and an Accepted
+module ADR but no GDD, propose fixtures in its `tests/common/mod.rs`, deriving
+invariants from the module spec. Ask before writing and run a consuming test.
+For C++ with CTest only and no pinned assertion framework, generate nothing and
+return NOT ASSESSED, naming the route out: an ADR choosing the C++ test
+framework (`/architecture-decision`) and `/project-settings testing.framework=<name>`
+— never `/test-setup`, which picks no framework. An unregistered helper is not verified. Existing engine
+helper roots continue to apply to their engines.
+
 - `all` mode (one factory per system with test files) follows Case 1 per system;
   not separately tested.
 - Unreal helper generation (`Source/<Module>/Private/Tests/Helpers/`) follows
   Case 6's pattern for its own helper root; not separately tested. Nor is a
   Unity project whose PlayMode tests need the helpers too (the skill asks before
   creating a shared `TestHelpers.asmdef`).
-- A requested system with no GDD is not tested; the skill does not define that path.
+- A requested game system with no GDD is not tested; the Custom module scenario
+  above deliberately has no GDD and must reach generation without requiring one.

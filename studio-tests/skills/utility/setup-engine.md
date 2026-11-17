@@ -21,7 +21,10 @@ or Both) before showing the Technology Stack. It then:
   back with `project-coherence.sh`
 
 On a re-run it edits existing `project.yaml` blocks in place rather than
-duplicating them. No director gates apply. The verdict is COMPLETE when the
+duplicating them. For `/setup-engine custom` (`references/custom.md`) it writes
+`engine.name: "Custom"`, creates `docs/engine-reference/custom/VERSION.md` from
+probes (`NOT DETERMINED` where a probe fails or is declined), and scaffolds
+nothing. No director gates apply. The verdict is COMPLETE when the
 engine is configured.
 
 ---
@@ -366,6 +369,95 @@ Fixture defaults.
 - [ ] No engine question is asked and web is not offered
 - [ ] `project.yaml`'s `engine.name` is Godot after the run
 - [ ] The output names what told it the engine (`project.yaml` or `project.godot`)
+
+---
+
+### Case 12: `/setup-engine custom` on an empty repo — no scaffold, NOT DETERMINED pins, commands written
+
+**Fixture:**
+- New project: no `engine` block, no `CMakeLists.txt`, no `Cargo.toml`, no `docs/engine-reference/custom/`
+- C2 answers: C++23 + CMake (recommended), both exceptions and RTTI off, Vulkan 1.4, HLSL via DXC, Windows, 120 fps, snake_case
+- Probes: `cmake --version` and `ctest --version` succeed; `clang++` not installed; the user declines `vulkaninfo --summary`; DXC version not given
+- The user approves every write
+
+**Input:** `/setup-engine custom`
+
+**Expected behavior:**
+1. Reads `references/custom.md`; asks the C2 questions once, together, defaults first
+2. Writes `CLAUDE.md` with the import line `@docs/engine-reference/custom/VERSION.md` after asking
+3. `project.yaml`: `engine.name: "Custom"` (capital C), `language: "C++"`, `rendering: "Vulkan 1.4"`, `physics: "in-house"`; `specialists.code: "core-systems-lead"`, `shader: "shader-pipeline-engineer"`; `commands.build: "cmake --preset debug && cmake --build --preset debug"`, `commands.test: "ctest --preset debug --output-on-failure"`, `commands.smoke` the `-L smoke` form; `run` left unset and the summary says `/dev-story`'s run-and-observe step is NOT ASSESSED until it is set; `performance.target_framerate: 120`, `performance.frame_budget_ms: 8.33`; no `engine.version` (none declared) and it says so
+4. The exceptions/RTTI answer is an ADR candidate, not a compiler flag
+5. Creates `docs/engine-reference/custom/VERSION.md` after asking: CMake/CTest rows with their probe output; the compiler row `NOT DETERMINED`; Vulkan SDK `NOT DETERMINED — not probed (declined)`; shader compiler `NOT DETERMINED`; Engine Version `NOT DETERMINED — no version declared yet`; Risk Level HIGH
+6. C5: says plainly that no engine code, `CMakeLists.txt`, `Cargo.toml` or `CMakePresets.json` is shipped, and writes none of them and no folder; recommends the first ADRs via `/architecture-decision` (engine mode), then `/test-setup`
+7. C6: `Build/Test: NOT ASSESSED — no engine code yet (no CMakeLists.txt or Cargo.toml)`; nothing run
+8. C7: checks the 25 Custom agents for a "Version Awareness" section reading `docs/engine-reference/custom/VERSION.md`; any missing file reported by name
+
+**Assertions:**
+- [ ] `engine.name` is exactly `"Custom"`, never `custom`
+- [ ] No engine source, build file or folder is created; the no-scaffold statement is shown
+- [ ] Every unprobed or declined value is `NOT DETERMINED`, never a version from memory
+- [ ] `commands.build`/`test`/`smoke` written as above; `commands.run` unset; no `engine.version: 0.1.0`
+- [ ] Build/Test is NOT ASSESSED, not a pass
+- [ ] "May I write"/"May I create" precedes each write
+
+---
+
+### Case 13: `/setup-engine custom` on an existing Cargo workspace — recorded as it is
+
+**Fixture:**
+- `Cargo.toml` at the root with `[workspace] members = ["engine/*", "game"]`, `version` not set; `rust-toolchain.toml` present; no `project.godot`, `*.uproject` or Unity project
+- `cargo --version` and `rustc --version` succeed; no test functions exist yet
+
+**Input:** `/setup-engine custom`
+
+**Expected behavior:**
+1. C1: an engine is already here — reads `Cargo.toml` and `rust-toolchain.toml` with Glob/Read only; skips the language question; changes no file of it
+2. Commands from what is there: `cargo build --workspace`, `cargo test --workspace`; says `commands.test` will read zero tests, which `test-run.sh` never counts as a pass (`custom:cargo-zero`)
+3. Shows the record in one block before writing; `engine.version` left out (none declared)
+4. C6: engine code present → runs `commands.build`, reports exit code and last error line, then `bash .claude/scripts/test-run.sh custom --no-build`; `custom:cargo-zero` → `NOT ASSESSED — zero tests`
+5. Offers `/test-setup` with `test-scaffold.sh custom --dry-run`
+
+**Assertions:**
+- [ ] No existing engine file edited
+- [ ] Zero tests reported as NOT ASSESSED, never as a pass
+- [ ] Commands match the workspace, not C3's C++ defaults
+
+---
+
+### Case 14: Ownership survives generated settings
+
+**Fixture:** Custom project with runtime loading under `engine/assets/`, cookers
+under `engine/tools/`, and Rust aliases for both in the module map.
+
+**Input:** `/setup-engine custom`
+
+**Expected behavior:** The emitted Engine Specialists routing assigns runtime
+assets to world-streaming-engineer and cookers/build tools to
+asset-build-tooling-engineer, matching `custom-engine-layout.md`. The coverage
+pointer remains inside that section. The generated settings state that mapped
+`crates/<module>/` paths use those same owners; unknown layouts require mapping.
+
+**Assertions:**
+- [ ] Runtime assets and cooking/build tools retain their respective owners
+- [ ] Crate aliases route through the module map
+
+---
+
+### Case 15: `/setup-engine upgrade` on Custom — stops with a pointer
+
+**Fixture:** `project.yaml` `engine.name: Custom`; `docs/engine-reference/custom/VERSION.md` exists.
+
+**Input:** `/setup-engine upgrade 0.7 0.8`
+
+**Expected behavior:** Section 11 stops before Step 1: it says upgrade does not
+apply to an engine this project versions itself, and names `/engine-release`
+(engine version) and `/setup-engine refresh` (toolchain probes, C4). No web
+search, no audit, no question, no write.
+
+**Assertions:**
+- [ ] No WebSearch or WebFetch call; `VERSION.md` unchanged
+- [ ] The message names `/engine-release` and `/setup-engine refresh`
+- [ ] Variant — `engine.name: Godot`: Steps 1–6 run as before
 
 ---
 

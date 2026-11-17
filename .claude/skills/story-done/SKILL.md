@@ -70,6 +70,8 @@ Out of Scope.
 `GDD:` path (`design/gdd/<stem>.md` → `<stem>`; the `[system]` of its TR-ID only
 when there is no GDD path): that system's `system_overrides` row if there is one,
 else the project value.
+On Custom (`engine.name: Custom`), a story whose source is
+`**Module**: docs/architecture/modules/<module>.md` is keyed on `<module>`.
 
 **What `qa.level` requires** (the evidence rows of `.claude/docs/coding-standards.md`).
 Take the value from the `qa.level` line above, never from `workflow` or `rigor`: the
@@ -105,6 +107,11 @@ By the tier. Read every document by section, never whole.
 - **`standard`:** the same GDD sections; the ADR sections only for a critical ADR
   (`adr-status.sh`'s layer column reads Foundation, or has no layer).
 - **`minimal`:** none. The story's criteria are the spec.
+- **Custom, a story with a `Module:` path** (`engine.name: Custom`): the module
+  spec, `docs/architecture/modules/<module>.md`, stands in for the GDD at `full`
+  and `standard`: its `"10. Test Plan and Acceptance Criteria"` and
+  `"6. Performance Budget"` sections, with `md-section.sh extract`. A story that
+  names both a GDD and a module spec is reported, never guessed at.
 
 At every tier, when `docs/architecture/control-manifest.md` exists, note its
 `Manifest Version` line.
@@ -168,6 +175,19 @@ say so: `Test evidence: waived at qa.level minimal`.
 - **Config/Data:** a `production/qa/smoke-*.md` report; none: "No smoke check
   report found. Run `/smoke-check`."
 - **No Type:** advisory: "Story Type not declared. Add `Type:` to the story header."
+- **Custom, perf evidence for an engine story** (`engine.name: Custom`, a story
+  with a `Module:` path in `docs/architecture/modules/`), whatever its type. Read
+  its `Frame pipeline:` line. `yes`: the change is on the frame pipeline and needs
+  the perf evidence `/dev-story` demands for it, a `/team-frame-pipeline` record
+  under `production/engine/` or a `/benchmark-report` report under
+  `production/qa/benchmarks/` whose `Story:` header line names this story's
+  file or whose `Module:` line names its module spec (`/benchmark-report` writes
+  them from `--story` and `--module`; `/team-frame-pipeline` writes `Story:`
+  from `--story` and `Module:` from the modules it changed); none found:
+  `NOT ASSESSED — no perf evidence`. `no`: no perf evidence needed; say so. No
+  `Frame pipeline:` line: `NOT ASSESSED — frame-pipeline scope not stated`, never
+  read as `no` (`/create-stories` writes the line). Either NOT ASSESSED line keeps
+  the verdict at best NOT ASSESSED (Phase 7) and names what would settle it.
 
 A missing item is a gap at the gate level: BLOCKING stops COMPLETE, ADVISORY goes
 in the notes. Name what is missing and where it goes. An evidence doc with no image
@@ -303,6 +323,8 @@ exists yet.
    or ADR a deviation would be judged against is missing, or the own calls could
    not be read. Name each one and what
    would settle it. It outranks the two passes and never hides a failure.
+   On Custom, a Phase 4 `NOT ASSESSED — no perf evidence` or
+   `NOT ASSESSED — frame-pipeline scope not stated` line is one of these.
 3. **COMPLETE WITH NOTES:** every criterion passes or is DEFERRED, with advisory
    items listed. Information lines are not advisory items: the evidence-stamp
    lines, an absent sprint file and the run result never turn COMPLETE into COMPLETE

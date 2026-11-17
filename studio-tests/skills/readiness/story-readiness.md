@@ -325,6 +325,51 @@ Fixture defaults.
 
 ---
 
+### Case 10: Custom engine — a story traced to its module spec
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard`
+- Story A: `**Module**: docs/architecture/modules/audio.md`, quoting a criterion from the spec's section 10; the spec exists
+- Story B: `**Module**: docs/architecture/modules/net.md`; that file does not exist
+- Neither A nor B names a `design/gdd/` file
+- Story C, a game story: `GDD: design/gdd/combat.md`, quoting a rule from it; the GDD exists; no `**Module**:` line
+
+**Input:** `/story-readiness production/epics/engine-audio/story-001-mixer.md production/epics/engine-net/story-001-transport.md production/epics/combat/story-001-hit.md`
+
+**Expected behavior:**
+1. A: "Requirement traced" is met by the module spec and its quoted section-10 criterion; the missing GDD is not a gap
+2. B: "Requirement traced" is not met: NOT ASSESSED, naming the missing spec, as for a missing GDD
+3. A story naming both a GDD and a module spec is reported, never resolved by guess
+4. C is judged exactly as on another engine: "Requirement traced" is met by its GDD and quoted rule; no module spec is asked for
+
+**Assertions:**
+- [ ] A is not marked NEEDS WORK for lacking a `design/gdd/` file
+- [ ] B's verdict is not READY, and the report names `docs/architecture/modules/net.md`
+- [ ] C is not marked NEEDS WORK or NOT ASSESSED for lacking a module spec
+
+---
+
+### Case 11: Custom engine — a module criterion not registered
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard`
+- Story A: `**Module**: docs/architecture/modules/audio.md`, quoting a criterion from the spec's section 10; requirement `TR-audio-???` with the line `NOT ASSESSED — criterion not registered; run /architecture-review` (as `/create-stories` writes it before `/architecture-review` has run); its ADR is `Accepted`; every other item passes
+- No `docs/architecture/tr-registry.yaml`
+
+**Input:** `/story-readiness production/epics/engine-audio/story-001-mixer.md`
+
+**Expected behavior:**
+1. The missing registry is noted once, but the TR-ID item is NOT ASSESSED for A: its criterion is not registered, whether or not a registry exists
+2. A's verdict is NOT ASSESSED, naming the unregistered criterion, with the Fix "run `/architecture-review`, then point the story at the registered `TR-audio-NNN`"
+
+**Assertions:**
+- [ ] A is not READY: a `TR-audio-???` story never passes the TR-ID item because the registry is absent
+- [ ] A is reported NOT ASSESSED, not BLOCKED or NEEDS WORK
+- [ ] Variant — the registry exists and has no audio entry: the same NOT ASSESSED for A
+- [ ] Variant — `engine.name: Godot`, a game story with `TR-combat-001` and no registry: the TR-ID item passes as before
+
+---
+
 ## Protocol Compliance
 
 - [ ] Does NOT use Write or Edit tools; any help filling gaps is drafted in conversation only

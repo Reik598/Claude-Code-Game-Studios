@@ -290,6 +290,51 @@ Fixture defaults.
 
 ---
 
+### Case 8: Absent engine-reference files — named NOT SOURCEABLE, on any engine
+
+**Fixture (Custom):**
+- `project.yaml`: `engine.name: Custom`; `docs/engine-reference/custom/VERSION.md` is the only file there (what `/setup-engine custom` writes)
+- Design context as Case 1
+
+**Fixture (Godot):**
+- As Case 1, but `docs/engine-reference/godot/deprecated-apis.md` is absent
+
+**Input:** `/create-architecture`
+
+**Expected behavior:**
+1. Custom: Phase 0a reads `VERSION.md` and names `NOT SOURCEABLE — breaking-changes.md is not present`, `NOT SOURCEABLE — deprecated-apis.md is not present` and `NOT SOURCEABLE — current-best-practices.md is not present` in its output
+2. Godot: only `NOT SOURCEABLE — deprecated-apis.md is not present` is named; the other two files are read as in Case 1
+3. Phase 0d's knowledge-gap inventory carries each line
+4. No deprecated API, breaking change or best practice is written from training data in place of an absent file
+
+**Assertions:**
+- [ ] Each absent file is named with the literal `NOT SOURCEABLE — <file> is not present`, on Custom and on Godot
+- [ ] The run does not stop for an absent file; it announces it and goes on
+- [ ] No "avoid" or "prefer" item in the document is attributed to a file that was not read
+
+---
+
+### Case 9: Custom engine — engine modules are layered from their module specs
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`; design context as Case 1
+- `docs/architecture/modules/memory.md` and `docs/architecture/modules/renderer.md` exist; `renderer.md`'s section 3 names `memory` as a dependency
+- Variant: no `docs/architecture/modules/` folder
+
+**Input:** `/create-architecture`
+
+**Expected behavior:**
+1. Phase 0b reads each module spec by heading ("1. Purpose", "3. Dependencies", "6. Performance Budget", "10. Test Plan and Acceptance Criteria")
+2. Phase 1's layer map holds both modules beside the systems from `systems-index.md`
+3. Module requirements are numbered `TR-memory-…` and `TR-renderer-…` by the registry rule
+4. Variant: the output says there is no module spec; no layer is invented for an engine module
+
+**Assertions:**
+- [ ] Both modules appear in the layer map
+- [ ] Variant: no engine module is given a layer without a spec
+
+---
+
 ## Protocol Compliance
 
 - [ ] Stops before authoring when the engine is missing, or on a `standard`/`full` project when the systems index or game concept is missing; at `minimal` it proceeds from `design/game-brief.md` and stops only when that is absent too

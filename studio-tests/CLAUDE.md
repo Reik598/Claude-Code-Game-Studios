@@ -7,7 +7,7 @@ framework. It is self-contained and separate from any game project.
 
 | File | Purpose |
 |------|---------|
-| `catalog.yaml` | Master registry for all 75 skills and 49 agents. Contains category, spec path, and last-test tracking fields. Always read this first when running any test command. |
+| `catalog.yaml` | Master registry for all 81 skills and 74 agents. Contains category, spec path, and last-test tracking fields. Always read this first when running any test command. |
 | `quality-rubric.md` | Category-specific pass/fail metrics. Read the matching `###` section for the skill's category when running `/skill-test category`. |
 | `skills/[category]/[name].md` | Behavioral spec for a skill — 5 or more test cases + protocol compliance assertions. |
 | `agents/[tier]/[name].md` | Behavioral spec for an agent — 5 or more test cases + protocol compliance assertions. |
@@ -29,7 +29,7 @@ Always read it rather than guessing the path.
 
 ```
 gate        → gate-check
-review      → design-review, architecture-review, review-all-gdds
+review      → design-review, architecture-review, review-all-gdds, api-review
 authoring   → design-system, quick-design, architecture-decision, art-bible,
               create-architecture, ux-design, ux-review
 readiness   → story-readiness, story-done
@@ -37,9 +37,11 @@ pipeline    → create-epics, create-stories, dev-story, create-control-manifest
               propagate-design-change, map-systems, vertical-slice
 analysis    → consistency-check, balance-check, content-audit, code-review,
               tech-debt, scope-check, estimate, perf-profile, asset-audit,
-              security-audit, test-evidence-review, test-flakiness
+              security-audit, test-evidence-review, test-flakiness,
+              benchmark-report, memory-audit, perf-regression-triage
 team        → team-combat, team-narrative, team-audio, team-level, team-ui,
-              team-qa, team-release, team-polish, team-live-ops
+              team-qa, team-release, team-polish, team-live-ops,
+              team-frame-pipeline
 sprint      → sprint-plan, sprint-status, milestone-review, retrospective,
               write-changelog, patch-notes
 utility     → all remaining skills
@@ -61,6 +63,18 @@ engine/unity   → unity-specialist, unity-ui-specialist, unity-shader-specialis
                  unity-dots-specialist, unity-addressables-specialist
 engine/unreal  → unreal-specialist, ue-gas-specialist, ue-replication-specialist,
                  ue-umg-specialist, ue-blueprint-specialist
+engine/custom  → chief-engine-architect, core-systems-lead, rendering-lead,
+                 simulation-systems-lead, editor-architect,
+                 memory-allocator-specialist, concurrency-job-system-engineer,
+                 ecs-dod-architect, platform-engineer, world-streaming-engineer,
+                 online-services-engineer, asset-build-tooling-engineer,
+                 rhi-backend-engineer, render-graph-specialist,
+                 shader-pipeline-engineer, graphics-features-engineer,
+                 vfx-runtime-engineer, physics-simulation-engineer,
+                 animation-systems-engineer, scripting-runtime-engineer,
+                 audio-engine-engineer, level-editor-engineer,
+                 editor-ui-framework-engineer, cinematics-sequencer-engineer,
+                 engine-technical-writer
 operations     → devops-engineer, release-manager, live-ops-designer,
                  community-manager, analytics-engineer, economy-designer,
                  localization-lead

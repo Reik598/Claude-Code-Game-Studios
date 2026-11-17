@@ -144,6 +144,30 @@ against the working tree and reports one line per step. Map its statuses:
 | `SHORT` | **Incomplete** — say how far short (`count=`/`min=` are given) |
 | `PATTERN_MISS` | **Incomplete** — the file exists but lacks its marker; say so, since "missing" would send the user to recreate a file they already have |
 | `NO_CHECK` | **MANUAL** if the step carries a `note=`, else **UNKNOWN** — completion is not trackable (e.g. repeatable implementation work) |
+| `ENGINE_SKIPPED` | **Not applicable** — the step is for another engine (`engine=` names it, e.g. the Custom engine's steps on a Godot project). Never a blocker and never "next up"; mention the `ENGINE_SKIPPED:` count once, in one line, so the skip is visible |
+
+On a **Custom** engine (the `ENGINE:` header line reads `Custom`), the
+`engine=Custom` steps are real steps of the phase, held to the same tier rules
+as the game's own:
+the engine module map, the core engine ADRs (`/architecture-decision` in engine
+mode), `frame-budget.md`, `memory-invariants.md` and the engine test setup in
+Technical Setup; the `/benchmark-report` baseline and `/memory-audit` in
+Pre-Production. Three of them have no skill — the module specs, the frame
+budget and the memory invariants are filled from the templates their
+descriptions name — so for those, `→ Next up` names the template path and the
+owning agent instead of a command.
+
+**Tier reductions.** The script's `required=` is the step's status at
+`workflow: full`; it does not know the tier. Apply the matching gate file's
+`Tier reductions (Custom)` block
+(`.claude/skills/gate-check/references/gate-pre-production.md` for Technical
+Setup's steps, `gate-production.md` for Pre-Production's): at `standard`, the
+engine module map and `memory-invariants.md` are **recommended** — list them as
+optional opportunities (Step 5), never as the current blocker or under
+`Next up (REQUIRED)`, and say once that `workflow: standard` made them
+recommended. Read the step's `required=` as-is at `full`. Never relax a step the
+gate file keeps required (`frame-budget.md`, the Foundation-layer engine ADRs,
+the engine test setup at `standard`).
 
 Do not re-derive any of this by searching the files yourself. `any_of` in particular is a list of
 **alternatives** — one match is enough — and hand-evaluating it risks a false

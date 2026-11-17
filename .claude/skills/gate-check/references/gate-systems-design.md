@@ -31,3 +31,12 @@ only thing that adds one.
 - **`full`** — game-concept.md + pillars + Visual Identity Anchor all required
 - **`standard`** — pillars + Visual Identity Anchor → recommended; `game-concept.md` stays required
 - **`minimal`** — gate target is **`design/game-brief.md`** (not `game-concept.md`); the GDD / pillars / Visual Identity Anchor checks **drop** (a brief with content = PASS). `/brainstorm` writes `design/game-brief.md` at this tier (Option A); `game-concept.md` remains the `standard`/`full` concept doc.
+
+## Custom engine additions
+
+None at this gate. On a project whose `engine` line reads `Custom`, print
+`Custom engine additions: none at this gate — engine items start at Technical
+Setup → Pre-Production` so the report shows the block was considered; on any
+other engine print nothing for it. The engine's design record — module specs,
+engine ADRs, `frame-budget.md`, `memory-invariants.md` — is Technical Setup
+work, checked by `gate-pre-production.md`.

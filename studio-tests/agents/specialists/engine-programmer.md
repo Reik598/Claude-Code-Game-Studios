@@ -59,6 +59,27 @@ No gate IDs assigned.
 - Flags the GodotPhysics3D→Jolt differences `docs/engine-reference/godot/modules/physics.md` documents — HingeJoint3D `damp` is unsupported under Jolt, collision margins may behave differently, Jolt warns at runtime about unsupported properties — and that existing projects keep their current engine setting; says the reference lists no other API differences rather than inventing any
 - Does NOT suggest deprecated or pre-4.6 physics setup steps without noting they apply to older versions
 
+### Case 6: On a Custom Engine Project — glue versus module work
+**Fixture:** `project.yaml` sets `engine.name: Custom`; `.claude/docs/custom-engine-layout.md` maps `engine/jobs/` to `concurrency-job-system-engineer` under `core-systems-lead`.
+**Input:** "Hook the new save system into the game loop, and while you are in there rewrite the scheduler in `engine/jobs/` so saves run on a worker."
+**Expected behavior:**
+- Takes the game-facing glue: the save hook in the game loop
+- Does not rewrite the scheduler: resolves `engine/jobs/` through the Owner and Lead columns of `.claude/docs/custom-engine-layout.md` and sends the request to `concurrency-job-system-engineer` through `core-systems-lead`
+- Sends work that spans leads to `chief-engine-architect`, and blocks on a path with no layout row until the module map is agreed
+- Takes engine facts from `docs/engine-reference/custom/`
+**Assertions:**
+- [ ] The scheduler change goes to the owner and lead the layout names, not done here
+- [ ] The glue part is accepted
+
+### Case 7: Other engine — the same request without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unreal`.
+**Input:** "Hook the new save system into the game loop, and make the save run on a worker thread."
+**Expected behavior:**
+- Does NOT consult `.claude/docs/custom-engine-layout.md` or route anything to `concurrency-job-system-engineer`, `core-systems-lead` or `chief-engine-architect`
+- Takes version-specific engine facts from `docs/engine-reference/unreal/`, not `docs/engine-reference/custom/`
+**Assertions:**
+- [ ] The Custom section is not applied: no layout lookup and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

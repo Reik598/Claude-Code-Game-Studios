@@ -7,9 +7,9 @@
 
 **In this file:**
 
-- The ADR template
+- The ADR template, and the engine-mode sections
 - 5.5 Engine Specialist Validation
-- 5.6 Technical Director Strategic Review, with the review mode check
+- 5.6 Technical Director Strategic Review, with the review mode check, and CEA-ADR in engine mode
 - 5.7 GDD Sync Check: found, none found, could not check
 - Write approval
 - Update Architecture Registry, and the registry append logic
@@ -141,6 +141,16 @@ to implement it.]
 - [Links to related design documents]
 ```
 
+**Engine mode on** (`references/engine-mode.md`): insert its six required
+sections — `## Memory`, `## Threading`, `## Latency & Frame Budget`,
+`## ABI / API Stability`, `## Determinism`, `## Platform / Graphics-API Matrix`
+— directly after `## Performance Implications`, in that order, each filled or
+written `N/A — <why>`. The template file
+`.claude/docs/templates/architecture-decision-record.md` carries the same block
+inside an HTML comment, marked "Engine-internal ADRs only", so the six are not
+sections of the template that `adr-status.sh` asks of every ADR. Engine mode
+off: leave them out.
+
 **Always write the Layer row.** An ADR with no Layer row counts as critical
 (Foundation) wherever it is read, so at `standard` its advisory items become
 blockers. The value is the ADR's own layer, how early in the build it must
@@ -151,7 +161,7 @@ references the ADR, and never reuse a `Domain` value (the template's note under
 Engine Compatibility says why).
 
 5.5. **Engine Specialist Validation** — Before saving, spawn the **primary engine specialist** via `Agent` to validate the drafted ADR:
-   - Resolve the primary specialist: `<engine>-specialist` derived from `engine.name` in `project.yaml` (Godot→`godot-specialist`, Unity→`unity-specialist`, Unreal→`unreal-specialist`, Web→`lead-programmer`); if `engine.name` is absent or empty, read the Primary line of the `## Engine Specialists` section in `.claude/docs/technical-preferences.md`
+   - Resolve the primary specialist: `<engine>-specialist` derived from `engine.name` in `project.yaml` (Godot→`godot-specialist`, Unity→`unity-specialist`, Unreal→`unreal-specialist`, Web→`lead-programmer`, Custom→ the module's engine lead, resolved through `.claude/docs/custom-engine-layout.md` as `references/engine-mode.md` says; `--engine-internal` on any other engine keeps that engine's specialist); if `engine.name` is absent or empty, read the Primary line of the `## Engine Specialists` section in `.claude/docs/technical-preferences.md`
    - If no engine is configured (neither source yields an engine), skip this step **Record ``Engine validation: NOT ASSESSED — no engine configured (`engine.name` unset in `project.yaml`)`` in this run's output.** A skipped check that says nothing is indistinguishable from a check that passed; the reader cannot tell engine guidance was never sought.
    - Spawn `subagent_type: [primary specialist]` with: the ADR's Engine Compatibility section, Decision section, Key Interfaces, and the engine reference docs path. Ask them to:
      1. Confirm the proposed approach is idiomatic for the pinned engine version
@@ -160,10 +170,14 @@ Engine Compatibility says why).
    - If the specialist identifies a **blocking issue** (wrong API, deprecated approach, engine version incompatibility): revise the Decision and Engine Compatibility sections accordingly, then confirm the changes with the user before proceeding
    - If the specialist finds **minor notes** only: incorporate them into the ADR's Risks subsection
 
-**Review mode check** — apply before spawning TD-ADR:
-- `solo` → skip. Note: "TD-ADR skipped — Solo mode." Proceed to Step 5.7 (GDD sync check).
-- `lean` → skip (not a PHASE-GATE). Note: "TD-ADR skipped — Lean mode." Proceed to Step 5.7 (GDD sync check).
+**Review mode check** — apply before spawning TD-ADR (and, in full engine mode, CEA-ADR — the same rule for each):
+- `solo` → skip. Note: "TD-ADR skipped — Solo mode." (full engine mode: also "CEA-ADR skipped — Solo mode.") Proceed to Step 5.7 (GDD sync check).
+- `lean` → skip (not a PHASE-GATE). Note: "TD-ADR skipped — Lean mode." (full engine mode: also "CEA-ADR skipped — Lean mode.") Proceed to Step 5.7 (GDD sync check).
 - `full` → spawn as normal.
+- Engine sections only (`--engine-internal` on an engine other than Custom):
+  CEA-ADR never applies, so at every `review_mode` print
+  `CEA-ADR not run — engine.name is <engine>, not Custom` in place of a
+  CEA-ADR skip note; the TD-ADR rule above is unchanged.
 
 5.6. **Technical Director Strategic Review** — After the engine specialist validation, spawn `technical-director` via `Agent` using gate **TD-ADR** (`.claude/docs/director-gates/td-adr.md`):
    - Pass: the ADR file path (or draft content), engine version, domain, any existing ADRs in the same domain
@@ -171,6 +185,36 @@ Engine Compatibility says why).
    - On CONCERNS: show them to the user verbatim and ask with the standard options from `director-gates.md` — `Revise flagged items` / `Accept and proceed` / `Discuss further`. Revise the flagged Decision or Alternatives sections only on `Revise flagged items`.
    - On REJECT: show the blockers verbatim and revise the Decision or Alternatives sections before proceeding.
    - A revised draft still reaches the user through the write approval below; nothing is written before it. A `NOT ASSESSED` answer is not an approval — name the missing input (`director-gates.md`).
+
+   **Engine mode — CEA-ADR, beside TD-ADR** (full engine mode only:
+   `engine.name: Custom`; with `--engine-internal` on another engine, print
+   `CEA-ADR not run — engine.name is <engine>, not Custom` and run TD-ADR alone). Spawn `chief-engine-architect` via
+   `Agent` at the same time as TD-ADR (issue both calls before waiting for
+   either), using gate **CEA-ADR**: the `Agent` prompt instructs the agent to read
+   `.claude/docs/director-gates/cea-adr.md` FIRST — do not read it here. If that
+   file does not exist, the gate is `CEA-ADR: NOT ASSESSED — gate definition not
+   found`, reported before the write approval, never silently dropped.
+   - Pass: the ADR file path, or the draft content while nothing is written yet
+     (nothing is, before the write approval); its Engine Compatibility and
+     Decision sections and the six engine-mode sections; `engine.name` and the
+     stack (C++ + CMake or Rust + Cargo); `performance.frame_budget_ms` and
+     `performance.target_framerate` from the `perf_budgets` line, or "unset",
+     with the budget's source (or its NOT ASSESSED line); the path
+     `docs/engine-reference/custom/VERSION.md`, or "absent"; the path
+     `docs/architecture/memory-invariants.md`, or "none"; and the related ADRs
+     (existing ADRs in the same module)
+   - chief-engine-architect checks subsystem boundaries, API/ABI stability and the
+     frame-budget claim; TD-ADR keeps the whole-project call
+   - Handle its verdict exactly as TD-ADR's above (CONCERNS → the three options;
+     REJECT → revise before proceeding; NOT ASSESSED → name the missing input). With
+     both gates run, the stricter verdict by the `director-gates.md` rank decides
+   - Record it in the ADR: the approved write puts the line
+     `CEA-ADR: <verdict> (<date>[, CONCERNS accepted])` under `## Status`, on
+     the line after the status word — the last CEA-ADR verdict this run
+     received, the date it came, and `, CONCERNS accepted` when the user chose
+     `Accept and proceed` on CONCERNS. `/gate-check`'s Technical Setup →
+     Pre-Production gate reads this line; an ADR written without it (CEA-ADR
+     skipped at `solo` or `lean`) is reviewed there instead
 
 5.7. **GDD Sync Check** — Before presenting the write approval, scan all GDDs
 referenced in the "GDD Requirements Addressed" section for naming inconsistencies
@@ -186,6 +230,11 @@ immediately before the write approval — not as a footnote:
 The GDD must be updated before or alongside writing this ADR to prevent
 developers reading the GDD from implementing the wrong interface.
 ```
+
+**Custom, full engine mode:** a module spec (`docs/architecture/modules/<module>.md`)
+named in the GDD Requirements Addressed section is checked as a GDD is — the
+names in its "2. Public Interface" section against the ADR's Key Interfaces and
+Decision — and counts in the one-line result below.
 
 **This check has three outcomes, not two.** The two above are "found" and "none
 found"; the third is **could not check**, which must never take the silent

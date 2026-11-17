@@ -235,6 +235,30 @@ Fixture defaults.
 
 ---
 
+### Case 7: Custom engine — engine-side audio goes to the `engine/audio/` owner
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `team.size: studio` (pinned: so the primary engine specialist is active)
+- `design/gdd/combat.md` and `design/audio/sound-bible.md` exist; `docs/architecture/` holds an Accepted audio ADR choosing in-house mixing
+- `.claude/docs/custom-engine-layout.md` as shipped: `engine/audio/` has Owner `audio-engine-engineer`, Lead `simulation-systems-lead`
+- Variant (`team.size: small`); Variant (Godot): `engine.name: Godot`, as Case 6's Run B
+
+**Input:** `/team-audio combat`
+
+**Expected behavior:**
+1. The active-set line names `audio-engine-engineer` among the agents spawned
+2. Step 3 spawns `audio-engine-engineer` for the integration (in-house mixer, buses), the per-platform audio memory budgets and streaming, and for the engine integration check; `technical-artist` is spawned for the audio-reactive visual effects only
+3. `chief-engine-architect` is not spawned: the audio ADR is not in question
+4. Variant `small`: `audio-engine-engineer` is still in the active set and does Step 3's engine-side design; the separate integration check (studio only) is not run and the active-set line says so
+5. Variant Godot: Step 3 is as in Case 6 — `technical-artist` designs the integration and `godot-specialist` checks it; no Custom agent is named
+
+**Assertions:**
+- [ ] On Custom, `audio-engine-engineer` designs and checks the engine-side audio; `technical-artist` does not design buses, budgets or streaming
+- [ ] `chief-engine-architect` is not spawned for the integration check
+- [ ] The Godot variant's agents and text are those of the base pipeline
+
+---
+
 ## Protocol Compliance
 
 - [ ] At the default `team.size: individual`, the run opens with `Active set (team.size: individual): sound-designer.` and a `Not spawned this run:` line naming audio-director, accessibility-specialist, technical-artist, the engine specialist and gameplay-programmer, consulted through sound-designer — before any agent is spawned
