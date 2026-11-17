@@ -96,6 +96,26 @@ Verified by reading the agent's `.claude/agents/qa-lead.md` frontmatter:
 **Assertions:**
 - [ ] The Custom section is not applied: no engine test categories and no Custom-only agent named
 
+### Case 10: VR Test Evidence — flat-screen capture for a VR story
+**Fixture**: `project.yaml` sets `engine.name: Unity` and `platform.targets: [PC, XR]`; a Visual/Feel story changes how the player's hands grab objects in the headset; its only evidence is a desktop capture of the game window.
+**Input**: "Can we mark the grab story Done? The capture is in `production/qa/evidence/`."
+**Expected behavior**:
+- Does NOT accept it: a flat-screen run is not VR evidence, because it cannot show that the game responds to the player's head and hands
+- Asks for a headset run on a target headset, with the record naming the headset and runtime, the refresh-rate setting, the play space and the comfort settings in force
+- Lists the story as missing VR evidence at the gate level its type carries
+**Assertions**:
+- [ ] The flat-screen capture is not accepted as VR evidence
+- [ ] The comfort settings are required in the evidence record
+
+### Case 11: VR Test Evidence — a project without XR
+**Fixture**: `project.yaml` sets `engine.name: Godot` and `platform.targets: [PC]`.
+**Input**: "Write the QA plan for this sprint."
+**Expected behavior**:
+- Writes the plan by story type as usual
+- Adds no VR evidence item and no comfort playtest, because `platform.targets` does not contain `XR`
+**Assertions**:
+- [ ] No VR item appears in the plan
+
 ---
 
 ## Protocol Compliance

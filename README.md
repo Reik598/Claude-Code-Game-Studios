@@ -294,7 +294,7 @@ CLAUDE.md                           # Master configuration
 project.yaml                        # Project settings: engine, modes, goal
 .claude/
   settings.json                     # Hooks, permissions, safety rules
-  agents/                           # 74 agent definitions (markdown + YAML frontmatter)
+  agents/                           # 77 agent definitions (markdown + YAML frontmatter)
   skills/                           # 81 skills, plus three old names (a subdirectory each)
   hooks/                            # 18 scripts (bash) — 15 event hooks, two helpers they
                                     #   source (yaml-helper.sh, update-check.sh), and one
@@ -327,7 +327,7 @@ studio-tests/                       # QA for the skills and agents themselves �
 
 Claude Code Game Studios is a template you are meant to edit. `studio-tests/` is how
 you check that an edited or newly written skill still holds up — a catalog of all
-81 skills and 74 agents, per-category quality rubrics, behavioral specs, and
+81 skills and 77 agents, per-category quality rubrics, behavioral specs, and
 templates for writing specs of your own.
 
 ```
@@ -406,7 +406,7 @@ project adds the `engine/**` and `game/src/**` rows at the end.
 
 Everything above is the light path: one brief, a game you play, one feature a
 sitting as it grows. For a team, a long project, or a person who wants the paperwork, the
-same project also has **studio mode**: 74 specialized agents in a studio
+same project also has **studio mode**: 77 specialized agents in a studio
 hierarchy, a design document per system, architecture decisions, epics and
 sprints, phase gates, and `team-*` pipelines that coordinate several agents on
 one feature. `/next-step` suggests it once when a grown game gets big (about
@@ -416,7 +416,7 @@ nine stories or features).
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| **Agents** | 74 | Specialized subagents across design, programming, art, audio, narrative, QA, and production, plus 25 for a Custom engine |
+| **Agents** | 77 | Specialized subagents across design, programming, art, audio, narrative, QA, and production, plus 25 for a Custom engine |
 | **Skills** | 81 | Slash commands for every workflow phase (`/prototype`, `/start`, `/design-system`, `/create-epics`, `/create-stories`, `/dev-story`, `/story-done`, etc.) |
 | **Hooks** | 15 | Automated validation on commits, pushes, asset changes, design-doc reads, writes and registries, session lifecycle, agent audit trail, and gap detection |
 | **Rules** | 25 | Path-scoped coding standards enforced when editing gameplay, engine, AI, UI, network code, scene and asset files, and more |
@@ -443,7 +443,8 @@ Tier 3 — Specialists
   world-builder        ux-designer           prototyper
   performance-analyst  devops-engineer       analytics-engineer
   security-engineer    qa-tester             accessibility-specialist
-  live-ops-designer    community-manager
+  live-ops-designer    community-manager     lighting-artist
+  cinematic-designer   xr-experience-designer
 
 Custom engine projects only (engine.name: Custom)
   Tier 1  chief-engine-architect    beside technical-director; engine internals only
@@ -474,7 +475,7 @@ Custom engine projects only (engine.name: Custom)
 
 Each agent declares a model in its frontmatter: the three directors and
 `chief-engine-architect` ask for Opus, `lead-programmer`, the four engine leads
-and thirty-five specialists name Sonnet, and the remaining thirty
+and thirty-five specialists name Sonnet, and the remaining thirty-three
 **inherit your session's model**. Treat the tiers as seniority of role, not as
 a billing plan — outside the Custom-engine set, most of the studio runs on
 whatever model you are already using.

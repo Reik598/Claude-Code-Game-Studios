@@ -28,7 +28,13 @@ one per Custom step: `engine-module-map`, `engine-adrs`, `frame-budget`,
 `ENGINE_SKIPPED:` count once, in one line of their output. From the Technical
 Setup → Pre-Production gate on, the `/gate-check` report's checklist also gains
 one line, `Custom engine additions: skipped — engine is <name | unset>`; the
-Systems Design and Technical Setup gates print nothing for it.
+Systems Design and Technical Setup gates print nothing for it. "Also on every
+engine" also lists what this release adds wherever it is valid: the
+`lighting-artist`, `cinematic-designer` and `xr-experience-designer` agents and
+their reporting lines in `art-director`, `narrative-director` and
+`game-designer`; new sections in `technical-artist`, `qa-lead`,
+`release-manager` and `performance-analyst`; the `/setup-engine` XR option and
+the `platform` block it writes; and the one-shot's reworded VR card.
 
 No engine code is shipped: no scaffold and no sample engine. The framework
 supports writing one.
@@ -43,6 +49,30 @@ Also on every engine:
   (Custom)" beside the others, and in a repo with a `CMakeLists.txt` or
   `Cargo.toml` and no Godot, Unity, Unreal or Web project file it asks "Is this
   your own engine?" before going on.
+- `/setup-engine` writes a `platform` block to `project.yaml` on every engine
+  (its step 5.5.4): `targets` (`PC`, `Mobile`, `Web`, `Console`, `XR`),
+  `gamepad_support`, `touch_support` and `primary_input`, written together so
+  `input_methods` resolves as before. When Section 5's Gamepad or Touch Support
+  line and its Input Methods line disagree, the step asks once which is right
+  and writes the answer to both files. When the Input Methods line lists a
+  method the four keys cannot give (keyboard/mouse with no `PC` or `Web`
+  target, or the template's `Mixed`), it asks once: add the target that
+  carries it, drop it from the line, or, for `Mixed`, name the methods. On a
+  re-run it keeps the `platform` keys
+  already in `project.yaml`; a key changes only on the user's answer. Its
+  "May I write" question names `technical-preferences.md` when it changes lines
+  there. Guided Question 2 accepts a typed
+  `VR headset (XR)`, and its `Several` follow-up takes `XR` typed under
+  Other; the Custom Platforms question keeps its four options and takes a
+  typed `XR headset`. When no platform
+  question ran and the design artifact names no platform, the step asks guided
+  Question 2. On Godot, the project-shape question asks only 2D or 3D: web or
+  not comes from those targets, so the route asks one platform question.
+  `/ux-design` and `/ux-review` read `platform.targets` as prose and are
+  unchanged. `/security-audit` reads it the same way; its note on
+  `platform.multiplayer` and `platform.online` now says `/setup-engine` writes a
+  `platform` block but never those two keys, and its Category 2 rule is
+  unchanged.
 - `/architecture-decision --engine-internal` on another engine (opt-in) adds the
   six engine-mode ADR sections and asks Step 4's frame-budget and threads
   assumptions; that engine keeps its own specialist, and the run prints
@@ -78,6 +108,42 @@ Also on every engine:
   `tools/editor/`; or a CMake or Cargo file under `cmake/` or `game/`
   (`.claude/docs/rules-reference.md` lists each rule's paths). Each opens with
   a sentence telling Claude to ignore it unless `engine.name` is `Custom`.
+- Three new agents on every engine, each on `model: inherit`:
+  `lighting-artist` (scene lighting, exposure, tone mapping, colour grading and
+  lightmap bake settings, from the art director's lighting direction) reports
+  to `art-director`; `cinematic-designer` (shot lists, camera, previs and the
+  edit, built in the engine's own sequencer) reports to `narrative-director`;
+  `xr-experience-designer` (VR comfort and locomotion, seated, standing and
+  room-scale play, world scale, calibration and interaction) reports to
+  `game-designer`. Each of those three directors gains one line naming its new
+  report. No skill starts them: on Godot, Unity, Unreal and Web they are
+  reached through their descriptions, the roster and their directors' lines,
+  and their handoffs to the Godot, Unity and Unreal specialists are one-way.
+  The agent lists (`agent-roster.md`, `engine-development-coverage.md`,
+  `README.md`, `docs/WORKFLOW-GUIDE.md`, `studio-tests/catalog.yaml`,
+  `studio-tests/CLAUDE.md`, `studio-tests/README.md` and
+  `studio-tests/quality-rubric.md`) name them, every published agent count is
+  now 77 (`agent-check.sh` and `/skill-test` included), and `model-tiers.md`
+  counts them under `inherit`. The `docs/WORKFLOW-GUIDE.md` table "I need to
+  do X -- which agent do I use?" also gains a `Godot C# help` row for the
+  existing `godot-csharp-specialist`, which the 1.3.0 table left out.
+- `technical-artist` gains "DCC Interchange" (exchange formats per asset type,
+  and scale, units, up-axis and handedness as each format defines them,
+  extending its Key Responsibilities 4 and 6) and "Character Technology" (rigs,
+  skinning, facial rigs and blendshapes, mocap data for the runtime); both
+  apply on every project.
+- `qa-lead` gains "VR Test Evidence", `release-manager` gains "VR Store
+  Certification" (added to the block `platform.cert_tier` selects, never in its
+  place) and `performance-analyst` gains "VR Frame Budgets". These three
+  sections apply only when `platform.targets` contains `XR`; any other project
+  gets no XR question beyond the platform question's XR option, and no XR item
+  in a checklist or verdict, with no skip line. `config-resolution.md` and
+  `effects-map.md` document `platform.targets` and its `XR` value.
+- The one-shot's VR card in `.claude/genres/online-and-devices.md` no longer
+  says the framework has no route for VR: the one-shot still builds a
+  flat-screen browser game, and the card adds that a VR game starts with
+  `/setup-engine` and the target `XR`. An existing VR project sets
+  `platform.targets` with `XR` (see UPGRADING.md, After Upgrading).
 
 - **25 agents**, used only on a Custom project: `chief-engine-architect`
   (beside `technical-director`, owns engine internals and the frame budget) and
@@ -93,7 +159,7 @@ Also on every engine:
   `editor-ui-framework-engineer`, `cinematics-sequencer-engineer` (cameras and
   the cinematics runtime); the editor UI framework (own retained UI, Qt 6,
   Dear ImGui or a web UI) is an ADR choice. Docs: `engine-technical-writer`.
-  One architect, four leads, twenty specialists. 74 agents. On Custom,
+  One architect, four leads, twenty specialists. 77 agents. On Custom,
   `/team-audio` sends Step 3's engine-side audio work to
   `audio-engine-engineer`; other engines keep the 1.3.0 specialist.
 - **One layout file**: `.claude/docs/custom-engine-layout.md` is the single
@@ -242,7 +308,8 @@ Also on every engine:
   `test_engine_rules_scope.py`, `test_engine_authoring.py`,
   `test_engine_new_skills.py`, `test_engine_accuracy.py`,
   `test_engine_accuracy_gpu.py`, `test_engine_phase8.py`,
-  `test_engine_phase8b.py`, `test_engine_phase9.py`, `test_engine_records.py`,
+  `test_engine_phase8b.py`, `test_engine_phase9.py`, `test_engine_phase11.py`,
+  `test_engine_records.py`,
   `test_engine_shared_guard.py` and `test_custom_ci.py`;
   `check_audio_examples.py` compiles the audio rule's examples (needs `rustc`).
   None of it was run in a live session.

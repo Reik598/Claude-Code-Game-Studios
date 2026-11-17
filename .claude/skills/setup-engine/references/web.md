@@ -199,6 +199,8 @@ commands:
   what it uses.
 - `run` is the Vite dev server, for the person to play while they work. It never
   exits, so no check runs it.
+- Section 5.5.4 writes `platform.targets` as `[Web]`, plus any other target
+  Section 2's answers gave, and the input keys from Section 5's `Web` row.
 
 ## W4. The reference docs (Sections 6 and 7)
 

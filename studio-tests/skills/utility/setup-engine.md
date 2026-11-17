@@ -76,8 +76,9 @@ Fixture defaults.
    variables) and the A3 routing table: `.gd` → godot-gdscript-specialist,
    `.gdshader` → godot-shader-specialist, `.tscn` → godot-specialist
 5. Because Section 2 never ran and no design artifact exists, the skill asks
-   the project-shape question (2D/3D, web or not) instead of writing
-   `Forward+`/`Jolt` from the engine name
+   guided Question 2 once (5.5.4's targets, which give web or not) and the
+   project-shape question (2D or 3D) instead of writing `Forward+`/`Jolt` from
+   the engine name
 6. `commands.build` export preset is asked, never defaulted; `commands.test` is
    the gdUnit4 `GdUnitCmdTool.gd` command
 7. Skill asks "May I write the `engine`, `specialists`, `naming`, and `commands` blocks to `project.yaml`?"
@@ -458,6 +459,35 @@ search, no audit, no question, no write.
 - [ ] No WebSearch or WebFetch call; `VERSION.md` unchanged
 - [ ] The message names `/engine-release` and `/setup-engine refresh`
 - [ ] Variant — `engine.name: Godot`: Steps 1–6 run as before
+
+---
+
+### Case 16: Unity for PC and a VR headset — the `platform` block
+
+**Fixture:**
+- Placeholders only in `technical-preferences.md`; no `engine` or `platform` block in `project.yaml`
+- `design/gdd/game-concept.md` names PC and a VR headset as the platforms; it names no genre
+- The user supplies the build target, and Keyboard/Mouse as the primary input, when asked
+
+**Input:** `/setup-engine unity 6000.3.26f1`
+
+**Expected behavior:**
+1. Section 2 does not run. Section 5 maps the concept's PC target: Gamepad
+   Support `Partial`, Touch Support `None`; the primary input is asked (no genre)
+2. Section 5.5.4 takes the targets from the design artifact, `PC` and `XR`,
+   and asks no platform question
+3. It asks "May I write the `platform` block to `project.yaml`?" and writes
+   `targets: [PC, XR]`, `gamepad_support: "Partial"`, `touch_support: "None"`
+   and `primary_input: "Keyboard/Mouse"` together
+4. `resolve_config --keys input_methods` gives `keyboard/mouse, gamepad`, the
+   methods `technical-preferences.md`'s lines give
+
+**Assertions:**
+- [ ] `platform.targets` is `[PC, XR]` and the block holds all four keys
+- [ ] No platform question is asked
+- [ ] `input_methods` resolves to `keyboard/mouse, gamepad`
+- [ ] Variant — no concept: 5.5.4 asks guided Question 2 once and writes its answer
+- [ ] Verdict is COMPLETE
 
 ---
 

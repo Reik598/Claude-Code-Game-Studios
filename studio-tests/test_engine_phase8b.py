@@ -21,7 +21,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from test_engine_support import BASE_RELEASE, COUNT_NUMBER, RELEASE_NOTE_SECTIONS, ROOT, parse_count, read  # noqa: E402
+from test_engine_support import BASE_RELEASE, COUNT_NUMBER, RELEASE_NOTE_SECTIONS, ROOT, ledger, parse_count, read  # noqa: E402
 
 STUDIO_TESTS = Path(__file__).resolve().parent
 RESEARCH_DIR = "docs/research/aaa-engine-support-2026"
@@ -90,14 +90,15 @@ USER_FILE = ".claude/docs/technical-preferences.md"
 # ones the status records have used ("Phase 8 in progress", "has not yet been
 # reviewed by a critic", "its critic has not run yet", "the Phase 9 critic has
 # not checked these", "await the Phase 9 critic", "Phase 8 critic re-run
-# pending"; P9 critic F6). Wording is free prose, so the list is kept here and
+# pending"; P9 critic F6; and the claim statuses' "round 2 to check", score
+# report 5 N3). Wording is free prose, so the list is kept here and
 # a new form must be added (.claude/rules/skill-authoring.md:76-79). Each match
 # is charged to the last "Phase N" of its sentence at or before the match's
 # end, so "Phase 9 (...) addresses ...; its critic has not run yet" is Phase 9's.
 UNREVIEWED_WORDING = re.compile(
     r"\b(?:in progress|unreviewed|review pending"
     r"|has not (?:yet )?(?:been )?(?:run|reviewed|checked)|not yet (?:been )?(?:run|reviewed|checked)"
-    r"|awaits?\b[^.|]{0,40}?\bcritic|critic\b[^.|]{0,40}?\b(?:pending|not yet run))", re.I)
+    r"|awaits?\b[^.|]{0,40}?\bcritic|critic\b[^.|]{0,40}?\b(?:pending|not yet run)|round \d+ to check)", re.I)
 PHASE_MENTION = re.compile(r"\bPhase (\d+)\b")
 SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z`*(|#-])")
 # P9 critic F3: how a status record states how far the plan is implemented.
@@ -277,6 +278,18 @@ class StatusRecordsMatchTree(unittest.TestCase):
             for phase, said in unreviewed_statements(text):
                 with self.subTest(where=where, phase=phase, said=said):
                     self.assertNotIn(phase, phases, f"{where} calls reviewed Phase {phase} unreviewed: {said!r}")
+
+    def test_no_claim_status_calls_a_reviewed_phase_unreviewed(self):
+        # Score report 5 N3, AM35(b): a claims.jsonl status follows its phase's
+        # critic as the status records do. Once the review table lists the
+        # phase's findings file, no status says that critic has not run.
+        phases = reviewed_phases()
+        self.assertTrue(phases, f"{CONTINUATION} lists no reviewed phase; re-check this test")
+        for claim in ledger("claims"):
+            for phase, said in unreviewed_statements(claim["status"]):
+                with self.subTest(claim=claim["claim_id"], phase=phase, said=said):
+                    self.assertNotIn(phase, phases,
+                                     f"claims.jsonl {claim['claim_id']} calls reviewed Phase {phase} unreviewed: {said!r}")
 
     def test_status_records_name_the_plans_last_phase_as_implemented(self):
         # P9 critic F3: every "implemented through Phase N" (or "Phases 1-N

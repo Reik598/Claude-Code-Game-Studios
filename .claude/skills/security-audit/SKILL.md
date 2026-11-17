@@ -61,8 +61,9 @@ Read `project.yaml` to determine the following, falling back to `.claude/docs/te
   fallback cannot supply them.
 
   > **ABSENT DOES NOT MEAN `false`.** These keys have a reader —
-  > this skill — and **no writer in the setup flow**: neither
-  > `/setup-engine` nor `/start` emits a `platform:` block, and only `/project-settings`
+  > this skill — and **no writer in the setup flow**: `/setup-engine` writes a
+  > `platform:` block with `targets` and the input keys but never these two, `/start`
+  > writes neither, and only `/project-settings`
   > sets them, when someone runs it, so on most Claude Code Game Studios projects both keys are
   > absent. Defaulting them to `false` would skip **Category 2 (Network and
   > Multiplayer Security) on every project, genuinely multiplayer ones

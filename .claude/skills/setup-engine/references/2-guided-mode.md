@@ -80,7 +80,11 @@ before?" Options: `Web (TypeScript or JavaScript)` / `Godot` / `Unity` /
 - None or several → continue below.
 
 **Question 2 — Target platform.** Ask: "Where should the game be played?" Options:
-`Browser or PC` / `Phone` / `Console` / `Several`. Platform weighs engines before
+`Browser or PC` / `Phone` / `Console` / `Several`; a typed `VR headset (XR)` is
+an answer too (the question tool takes four options; without it, list this as
+option 5). `Several` is followed by one multi-select of `PC` / `Mobile` / `Web`
+/ `Console` whose question says `XR` can be typed under Other. Section 5.5.4
+writes the answer to `platform.targets`. Platform weighs engines before
 any other factor:
   - Browser → Web; Godot exports to the web too; Unity's web build works; Unreal has no web build
   - Mobile → Unity strongly preferred; Unreal is a poor fit; Godot is viable for simple mobile; Web needs a wrapper for the stores

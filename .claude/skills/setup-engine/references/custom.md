@@ -88,9 +88,12 @@ Take an answer the person's own words already gave and say so in one line.
 3. **Graphics API(s):** `Vulkan 1.4 (Recommended)` / `Direct3D 12` / `Metal` —
    more than one may be picked; each is a backend of the one RHI.
 4. **Shader language:** `HLSL via DXC (Recommended)` / `Slang via slangc`.
-5. **Platforms:** `Windows` / `Linux` / `macOS` / `Console` (several allowed).
-   Metal without macOS, or Direct3D 12 without Windows or console, is a
-   mismatch: name it and ask again.
+5. **Platforms:** `Windows` / `Linux` / `macOS` / `Console` (several allowed);
+   a typed `XR headset` is an answer too (the question tool takes four options;
+   without it, list this as option 5). Metal without macOS, or Direct3D 12
+   without Windows or console, is a mismatch: name it and ask again. For
+   `platform.targets` (Section 5.5.4), `Windows`, `Linux` and `macOS` are `PC`,
+   `Console` is `Console` and `XR headset` is `XR`.
 6. **Target framerate:** `120 fps — 8.33 ms frame budget (Recommended for a
    AAA target)` / `60 fps — 16.6 ms frame budget`.
 7. **C++ only — naming:** `snake_case, like the standard library

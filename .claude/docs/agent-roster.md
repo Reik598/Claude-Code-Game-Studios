@@ -1,6 +1,6 @@
 # Agent Roster
 
-The following 74 agents are available (25 of them only on a Custom engine). Each has a dedicated definition file in
+The following 77 agents are available (25 of them only on a Custom engine). Each has a dedicated definition file in
 `.claude/agents/`. Use the agent best suited to the task at hand. When a task
 spans multiple domains, the coordinating agent (usually `producer` or the
 domain lead) should delegate to specialists.
@@ -41,14 +41,17 @@ session's model.
 | `tools-programmer` | Dev tools | Editor extensions, pipeline tools, debug utilities |
 | `ui-programmer` | UI implementation | UI framework, screens, widgets, data binding |
 | `technical-artist` | Tech art | Shaders, VFX, optimization, art pipeline tools |
+| `lighting-artist` | Lighting and look-dev | Scene lighting, exposure, tone mapping, grading, bake settings |
 | `sound-designer` | Sound design | SFX design docs, audio event lists, mixing notes |
 | `writer` | Dialogue/lore | Dialogue writing, lore entries, item descriptions |
+| `cinematic-designer` | Cinematic design | Shot lists, camera, previs, the edit of cinematics |
 | `world-builder` | World/lore design | World rules, faction design, history, geography |
 | `qa-tester` | Test execution | Writing test cases, bug reports, test checklists |
 | `performance-analyst` | Performance | Profiling, optimization recs, memory analysis |
 | `devops-engineer` | Build/deploy | CI/CD, build scripts, version control workflow |
 | `analytics-engineer` | Telemetry | Event tracking, dashboards, A/B test design |
 | `ux-designer` | UX flows | User flows, wireframes, accessibility, input handling |
+| `xr-experience-designer` | VR experience design | VR comfort and locomotion options, play space, world scale, hand and controller interaction |
 | `prototyper` | Rapid prototyping | Throwaway prototypes, mechanic testing, feasibility validation |
 | `security-engineer` | Security | Anti-cheat, exploit prevention, save encryption, network security |
 | `accessibility-specialist` | Accessibility | WCAG compliance, colorblind modes, remapping, text scaling |

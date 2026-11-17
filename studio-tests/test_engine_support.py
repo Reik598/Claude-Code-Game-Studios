@@ -23,7 +23,8 @@ BASE_RELEASE = "abc0de7"
 # value. A later edit to one of these files must change its value here, in the
 # same diff, where review sees it.
 ALWAYS_LOADED_PINNED = {
-    "CLAUDE.md": "ff9c659be201cd1a7497015b4712851abecdd27bec8305962f43189f360f6815",
+    # Re-pinned at fix plan AM32, task 7.1: the agent count line, 74 -> 77.
+    "CLAUDE.md": "bb4322d7364e8d986f6e3a5302145facdd8168456eada598952b7c18bd1d24b3",
     ".claude/docs/directory-structure.md":
         "287fb123fc227b1f1538172247f933eeee544787707a96fbbc7d8d7c241e221f",
     ".claude/docs/coordination-rules.md":
@@ -518,6 +519,19 @@ TECHNICAL_SECTIONS = [
     (".claude/agents/security-engineer.md", "Anti-Cheat Integration", "GF-thin anti-cheat, fix 7d"),
     # Fix 8.9 (score report D9, open point O11).
     (".claude/agents/devops-engineer.md", "Build and CI at Scale", "O11, fix 8.9"),
+    # Phase 11 (AM32, OpenSpec add-content-and-xr-roles, design D6): the
+    # sections of the roles valid on every engine, registered before their text.
+    (".claude/agents/lighting-artist.md", "Lighting and Look-Dev", "AM32, task 3.3"),
+    (".claude/agents/cinematic-designer.md", "Shot Design and Editing", "AM32, task 4.3"),
+    (".claude/agents/xr-experience-designer.md", "Comfort and Locomotion", "AM32, task 5.3"),
+    (".claude/agents/xr-experience-designer.md", "XR Interaction", "AM32, task 5.3"),
+    (".claude/agents/qa-lead.md", "VR Test Evidence", "AM32(a), task 5.3"),
+    (".claude/agents/release-manager.md", "VR Store Certification", "AM32(a), task 5.3"),
+    (".claude/agents/performance-analyst.md", "VR Frame Budgets", "AM32(a), task 5.3"),
+    (".claude/agents/technical-artist.md", "DCC Interchange", "AM32(a), task 6.3"),
+    (".claude/agents/technical-artist.md", "Character Technology", "AM32(a), task 6.3"),
+    (".claude/agents/asset-build-tooling-engineer.md", "DCC Import", "AM32, task 6.3"),
+    (".claude/agents/animation-systems-engineer.md", "Character Data Contract", "AM32, task 6.3"),
 ]
 
 
@@ -634,6 +648,10 @@ KIND_CUSTOM_ARCHITECT = "Custom architect"
 KIND_CUSTOM_SPECIALISTS = "Custom specialists"
 KIND_NEW_SKILLS = "new skills"
 KIND_NEW_RULES = "new rules"
+# Fix plan AM32 (task 7.1): the agents added since the base release outside the
+# Custom set, i.e. the agents valid on every engine (lighting-artist,
+# cinematic-designer, xr-experience-designer at AM32).
+KIND_NEW_ALL_ENGINE_AGENTS = "new agents outside the Custom set"
 KIND_INHERIT = "agents on model: inherit"
 KIND_PINNED = "agents with a pinned model"
 KIND_OPUS = "agents on opus"
@@ -685,7 +703,9 @@ COUNT_SITES = [
     (".claude/docs/quick-start.md", r"organizes (\d+) specialized", KIND_AGENTS),
     (".claude/docs/quick-start.md", r"(\w+) leads — `core-systems-lead`", KIND_CUSTOM_LEADS),
     (".claude/docs/quick-start.md", r"and (\w+) engine\s+specialists", KIND_CUSTOM_SPECIALISTS),
-    (".claude/docs/quick-start.md", r"(\w+) of the \d+ agents run on", KIND_INHERIT),
+    # AM32 (task 7.1): a count in words can be hyphenated ("Thirty-three"),
+    # so the word sites of KIND_INHERIT capture [\w-]+.
+    (".claude/docs/quick-start.md", r"([\w-]+) of the \d+ agents run on", KIND_INHERIT),
     (".claude/docs/quick-start.md", r"of the (\d+) agents run on", KIND_AGENTS),
     (".claude/docs/quick-start.md", r"agents/\s+-- (\d+) agent definitions", KIND_AGENTS),
     (".claude/docs/quick-start.md", r"skills/\s+-- (\d+) slash command definitions", KIND_SKILLS),
@@ -735,7 +755,7 @@ COUNT_SITES = [
     ("README.md", r"\| \*\*Rules\*\* \| (\d+) \|", KIND_RULES),
     ("README.md", r"the (\w+) engine leads\s+and \S+ specialists name Sonnet", KIND_CUSTOM_LEADS),
     ("README.md", r"engine leads\s+and (\S+) specialists name Sonnet", KIND_SONNET_SPECIALISTS),
-    ("README.md", r"name Sonnet, and the remaining (\w+)", KIND_INHERIT),
+    ("README.md", r"name Sonnet, and the remaining ([\w-]+)", KIND_INHERIT),
     ("README.md", r"access all (\d+) skills", KIND_SKILLS),
     ("README.md", r"access all \d+ skills \(plus (\w+) old names", KIND_OLD_NAMES),
     # CHANGELOG.md and UPGRADING.md: searched in the Unreleased section only.
@@ -755,6 +775,9 @@ COUNT_SITES = [
     ("UPGRADING.md", r"\b(\w+) new rules\b", KIND_NEW_RULES),
     ("UPGRADING.md", r"\*\*New skills\*\* \| (\w+):", KIND_NEW_SKILLS),
     ("UPGRADING.md", r"\*\*New agents\*\* \| (\d+), used only", KIND_CUSTOM),
+    # Fix plan AM32(e): the release notes count the agents added on every engine.
+    ("UPGRADING.md", r"\b(\w+) new agents on every engine", KIND_NEW_ALL_ENGINE_AGENTS),
+    ("CHANGELOG.md", r"\b(\w+) new agents on every engine", KIND_NEW_ALL_ENGINE_AGENTS),
     ("UPGRADING.md", r"\.\s+(\d+) agents \|", KIND_AGENTS),
     ("UPGRADING.md", r"\.\s+(\d+) skills\.", KIND_SKILLS),
     ("UPGRADING.md", r"\.\s+(\d+) rules \|", KIND_RULES),
@@ -995,6 +1018,9 @@ def published_count_values():
     if base_skills is not None and base_rules is not None:
         values[KIND_NEW_SKILLS] = len(set(skill_dirs) - base_skills)
         values[KIND_NEW_RULES] = len(rules - base_rules)
+    base_agents = base_release_names(".claude/agents")
+    if base_agents is not None:
+        values[KIND_NEW_ALL_ENGINE_AGENTS] = len(set(agents) - base_agents - custom)
     return values
 
 

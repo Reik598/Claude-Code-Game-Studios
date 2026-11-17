@@ -196,6 +196,81 @@
    "class": "departure",
    "ref": "fix 8.4, AM28, section 12",
    "text": "references/custom.md (added in a base skill directory, Custom only): cookers sit under engine/tools/ with runtime loading in engine/assets/ (R138); C3 names the C++ test framework choice and `/project-settings testing.framework=<name>` (R111); C5 step 3 states the story route's prerequisites (AM28 D5) and that module specs reach epics and stories only at `workflow: standard` or `full` (AM28 D4)."
+  },
+  "xr-platform-signal": {
+   "class": "departure",
+   "ref": "AM32(c)",
+   "text": "AM32(c), the XR signal in /setup-engine on every engine. 5.5-project-yaml.md gains step 5.5.4: it resolves the target platforms in the step's existing order (Section 2's answers, the design artifact, else guided Question 2, never a second platform question) and writes the whole `platform` block (`targets` with `PC`, `Mobile`, `Web`, `Console`, `XR`; `gamepad_support`, `touch_support`, `primary_input`). 2-guided-mode.md's Question 2 accepts a typed `VR headset (XR)` and its `Several` follow-up is one multi-select; web.md gives `Web`. Godot, Unity, Unreal and Web projects now get a `platform` block in project.yaml, and `yaml-helper.sh`'s input_methods reads it, resolving to the methods technical-preferences.md gave (test_engine_phase11.py). Disclosed in UPGRADING and CHANGELOG."
+  },
+  "custom-setup-reference-am32": {
+   "class": "departure",
+   "ref": "fix 8.4, AM28, section 12, AM32(c)",
+   "text": "references/custom.md (added in a base skill directory, Custom only): cookers sit under engine/tools/ with runtime loading in engine/assets/ (R138); C3 names the C++ test framework choice and `/project-settings testing.framework=<name>` (R111); C5 step 3 states the story route's prerequisites (AM28 D5) and that module specs reach epics and stories only at `workflow: standard` or `full` (AM28 D4). AM32(c): C2's Platforms question also offers `XR headset`, and its answers map to `platform.targets` (`Windows`, `Linux` and `macOS` are `PC`, `Console` is `Console`, `XR headset` is `XR`) for Section 5.5.4. Custom only."
+  },
+  "lighting-artist-reporting-line": {
+   "class": "departure",
+   "ref": "AM32(b)",
+   "text": "AM32(b), the reporting line for lighting-artist on every engine. art-director's Key Responsibilities item 5 (Color and Lighting Direction) gains one continuation line: `lighting-artist` reports to art-director and sets each scene's lighting, exposure, grading and bake settings from that direction. Godot, Unity, Unreal and Web projects now read this line in art-director and can delegate scene lighting to the new lighting-artist agent; art-director keeps lighting direction, and no verdict, gate or routing of a base skill changes (AM32(e))."
+  },
+  "cinematic-designer-reporting-line": {
+   "class": "departure",
+   "ref": "AM32(b)",
+   "text": "AM32(b), the reporting line for cinematic-designer on every engine. narrative-director's Delegation Map gains one line under \"Delegates to\": `cinematic-designer` reports to narrative-director and takes the shots, camera and edit of cinematics. Godot, Unity, Unreal and Web projects now read this line in narrative-director and can delegate shot design to the new cinematic-designer agent; story stays with narrative-director and dialogue with writer, and no verdict, gate or routing of a base skill changes (AM32(e))."
+  },
+  "xr-experience-designer-reporting-line": {
+   "class": "departure",
+   "ref": "AM32(b)",
+   "text": "AM32(b), the reporting line for xr-experience-designer on every engine. game-designer's Delegation Map gains one item under \"Delegates to\": `xr-experience-designer` reports to game-designer and takes VR comfort, locomotion and interaction when `platform.targets` contains `XR`. Godot, Unity, Unreal and Web projects now read this line in game-designer and can delegate VR experience design to the new agent; a project without `XR` gets no VR question or output from it, and no verdict, gate or routing of a base skill changes (AM32(e))."
+  },
+  "vr-test-evidence-all-engines": {
+   "class": "departure",
+   "ref": "AM32(a)",
+   "text": "AM32(a), the all-engine section `### VR Test Evidence` in qa-lead, placed after \"Story Type -> Test Evidence Requirements\" (base line 80) and clear of the pinned Custom hunks. It opens with the XR condition (`platform.targets` contains `XR`): Godot, Unity, Unreal and Web projects that declare XR now read that VR evidence needs a run on a target headset (a flat-screen, emulator or headless run is not VR evidence), that the record names the headset, runtime, refresh-rate setting, play space and comfort settings, and that comfort playtests are run with xr-experience-designer. Projects without XR read the section as not applying; AM32(f): no XR item appears for them. No existing gate or verdict changes (AM32(e)). Claims C190-C191."
+  },
+  "vr-store-certification-all-engines": {
+   "class": "departure",
+   "ref": "AM32(a)",
+   "text": "AM32(a), the all-engine section `### VR Store Certification` in release-manager, placed after \"Platform Certification Requirements\" (base line 91) and clear of the pinned Custom hunk. It opens with the XR condition. Godot, Unity, Unreal and Web projects that declare XR now read that the VR store requirements are added to the block `platform.cert_tier` selects, never in place of it; that each store's page is read and cited with its retrieval date and no threshold is copied into agent text; the Meta Horizon Store VRCs and the Steam Frame Standalone Compatibility Review (retrieved 2026-11-17); and NOT SOURCEABLE for PC VR on Steam, console VR and any store whose page is not public. Projects without XR read the section as not applying (AM32(f)). /launch-checklist and its cert_tier blocks are unchanged (AM32(e)). Claims C192-C195."
+  },
+  "vr-frame-budgets-all-engines": {
+   "class": "departure",
+   "ref": "AM32(a)",
+   "text": "AM32(a), the all-engine section `### VR Frame Budgets` in performance-analyst, placed immediately before \"What This Agent Must NOT Do\" (base line 101), clear of the pinned hunks at 109 and 115. It opens with the XR condition. Godot, Unity, Unreal and Web projects that declare XR now read that the budget is one display period at the refresh rate the project set (`performance.target_framerate`, `performance.frame_budget_ms`; NOT ASSESSED when unset), that each missed display deadline is counted and never averaged away, and, on an OpenXR runtime, the frame-timing terms of the OpenXR specification. No refresh rate is stated as a fact. Projects without XR read the section as not applying (AM32(f)); no existing verdict changes (AM32(e)). Claims C196-C199."
+  },
+  "dcc-and-character-tech-all-engines": {
+   "class": "departure",
+   "ref": "AM32(a)",
+   "text": "AM32(a), the all-engine sections `### DCC Interchange` and `### Character Technology` in technical-artist, placed immediately before \"What This Agent Must NOT Do\" (base line 108), clear of the pinned hunks at 116 and 119-120. Godot, Unity, Unreal and Web projects now read that technical-artist owns the DCC interchange contract, extending Key Responsibilities 4 and 6 by reference: the exchange formats; scale, units, up-axis and handedness as each format defines them (glTF 2.0: right-handed, +Y up, meters; OpenUSD: `upAxis` and `metersPerUnit` stage metadata, both required to be authored; FBX: read from the file's settings and validated, no fixed convention); export validation with glTF-Validator and `usdchecker`; DCC tool and plugin versions as project settings; and that the engine's importer is set to the contract with the engine's specialist (`lead-programmer` on Web). They also read that technical-artist owns character-tech content (rigs, skinning, facial rigs and blendshapes, mocap data preparation) and builds to budgets that are the runtime owner's (on other engines the project's budgets set with `lead-programmer` and the engine's documented limits). Only the Custom clauses name `asset-build-tooling-engineer` (DCC Import) and `animation-systems-engineer` (Character Data Contract). No verdict, gate or routing of a base skill changes (AM32(e)). Claims C200-C211."
+  },
+  "skill-test-agent-counts-am32": {
+   "class": "departure",
+   "ref": "fix 5.1, R8, AM32(d)",
+   "text": "AM32(d), /skill-test's agent counts follow the disk as the roster grows to 77: its three pinned hunks that hold agent counts (base 262-263, 577-579, 589-591, all under skill-test-counts) are replaced, 74 -> 77 agents read, AGENTS (77 total), Agent specs written: 77 and Agent coverage: 77/77; the skill counts on those lines (81) are unchanged and its three skill-count hunks stay. Godot, Unity, Unreal and Web projects now read 77 in the example audit and static-check output; no engine branch, verdict or routing changes (AM32(e))."
+  },
+  "setup-platform-step-am33": {
+   "class": "departure",
+   "ref": "AM33(a), AM33(b), AM33(d)",
+   "text": "AM33(a), (b) and (d), step 5.5.4 of 5.5-project-yaml.md re-pinned after the Phase 11 critic (F1, F2, F6); it replaces the hunk pinned under xr-platform-signal (AM32(c)). (a) The `platform` keys already in project.yaml are step 0 of the targets and the input keys; a key changes only on the user's explicit answer, never from technical-preferences.md or the design artifact. (b) The written input keys give the methods of technical-preferences.md's Input Methods line; when Section 5's support lines and that line disagree, the step asks once which is right and writes the answer to both files, so input_methods resolves to the methods technical-preferences.md gives (test_engine_phase11.py, parity fixtures). (d) The approval names technical-preferences.md when the step changes lines there. On Godot, 5.5.1 runs the step's Targets resolution first (AM33(c)). Godot, Unity, Unreal and Web projects now keep their configured `platform` keys on a re-run and may get the one Input Methods question; no verdict or routing of a base skill changes. Disclosed in UPGRADING and CHANGELOG."
+  },
+  "setup-platform-step-am34": {
+   "class": "departure",
+   "ref": "AM34, AM33(a), AM33(b), AM33(d)",
+   "text": "AM34, step 5.5.4 of 5.5-project-yaml.md re-pinned after the Phase 11 critic round 2 (F10); it replaces the hunk pinned under setup-platform-step-am33 and keeps all of that text (AM33(a), (b) and (d)). New: one list item for a method of the Input Methods line that the four `platform` keys cannot give, which is keyboard/mouse with no `PC` or `Web` target and another primary input, or a value no key knows, such as the template's `Mixed`. The step shows the line beside the methods the block gives and asks once: for keyboard/mouse, add the target that carries it (`PC` or `Web`) or drop the method from the line; for a value no key knows, name the methods it means, or drop it when the line lists others. The answer is written to both files, and the step never writes a block that loses a method without that question. With AM33(b), input_methods resolves to the methods technical-preferences.md gives unless the user changes them by an explicit answer (test_engine_phase11.py, parity fixtures 'Console, Input Methods Gamepad, Keyboard/Mouse, Gamepad Full, primary Gamepad' and 'PC, Input Methods Mixed, Gamepad Partial'). Godot, Unity, Unreal and Web projects whose Input Methods line lists such a method get this one question; other projects see no change. No verdict or routing of a base skill changes. Disclosed in UPGRADING and CHANGELOG."
+  },
+  "setup-shape-reads-targets-am33": {
+   "class": "departure",
+   "ref": "AM33(c)",
+   "text": "AM33(c), 5.5.1's Godot project shape (critic F3). The target platform half of the shape comes from 5.5.4's Targets resolution, run before the shape table: a web row when the targets hold `Web`, alone or with others. 5.5.1's own question asks only 2D or 3D (options `2D` / `3D`, plus Leave as [TO BE CONFIGURED]) and no longer asks \"does it ship to web?\", so a route asks one platform question. Godot projects set up without Section 2 now answer guided Question 2 and a 2D-or-3D question instead of one four-way shape question; Unity, Unreal and Web never reach this branch. The rendering and physics table is unchanged."
+  },
+  "security-audit-platform-writer-am33": {
+   "class": "departure",
+   "ref": "AM33(e)",
+   "text": "AM33(e), /security-audit's note under `platform.multiplayer` and `platform.online` (critic F8). It said neither /setup-engine nor /start emits a `platform:` block; since AM32(c) /setup-engine writes one on every engine, with `targets` and the input keys but never `multiplayer` or `online`. The corrected sentence says so. Both keys still have no writer in the setup flow, so the rule that an absent key is not `false` and Category 2 is not skipped is unchanged on every engine; no verdict or routing changes."
+  },
+  "custom-setup-reference-am35": {
+   "class": "departure",
+   "ref": "fix 8.4, AM28, section 12, AM32(c), AM35(a)",
+   "text": "references/custom.md (added in a base skill directory, Custom only): cookers sit under engine/tools/ with runtime loading in engine/assets/ (R138); C3 names the C++ test framework choice and `/project-settings testing.framework=<name>` (R111); C5 step 3 states the story route's prerequisites (AM28 D5) and that module specs reach epics and stories only at `workflow: standard` or `full` (AM28 D4). AM32(c): C2's Platforms answers map to `platform.targets` (`Windows`, `Linux` and `macOS` are `PC`, `Console` is `Console`, `XR headset` is `XR`) for Section 5.5.4. AM35(a): C2's Platforms question keeps four options, the question tool's limit (C168), and takes `XR headset` as a typed answer, as guided Question 2 takes `VR headset (XR)`. Custom only."
   }
  },
  "files": {
@@ -347,6 +422,23 @@
       ""
      ],
      "reason": "custom-addition"
+    }
+   ]
+  },
+  ".claude/agents/art-director.md": {
+   "hunks": [
+    {
+     "id": "3945bbd982b86429",
+     "base": [
+      83,
+      83
+     ],
+     "old": [],
+     "new": [
+      "   `lighting-artist` reports to you and sets each scene's lighting, exposure,",
+      "   grading and bake settings from this direction."
+     ],
+     "reason": "lighting-artist-reporting-line"
     }
    ]
   },
@@ -594,6 +686,23 @@
     }
    ]
   },
+  ".claude/agents/game-designer.md": {
+   "hunks": [
+    {
+     "id": "ef9d54d9f351d40c",
+     "base": [
+      239,
+      239
+     ],
+     "old": [],
+     "new": [
+      "- `xr-experience-designer`, who reports to you, for VR comfort, locomotion and",
+      "  interaction when `platform.targets` contains `XR`"
+     ],
+     "reason": "xr-experience-designer-reporting-line"
+    }
+   ]
+  },
   ".claude/agents/gameplay-programmer.md": {
    "hunks": [
     {
@@ -681,6 +790,22 @@
       ""
      ],
      "reason": "custom-addition"
+    }
+   ]
+  },
+  ".claude/agents/narrative-director.md": {
+   "hunks": [
+    {
+     "id": "18d332577b3a30b1",
+     "base": [
+      121,
+      121
+     ],
+     "old": [],
+     "new": [
+      "- `cinematic-designer`, who reports to you, for the shots, camera and edit of cinematics"
+     ],
+     "reason": "cinematic-designer-reporting-line"
     }
    ]
   },
@@ -786,6 +911,48 @@
   },
   ".claude/agents/performance-analyst.md": {
    "hunks": [
+    {
+     "id": "c882b375c7b6a9d1",
+     "base": [
+      100,
+      100
+     ],
+     "old": [],
+     "new": [
+      "### VR Frame Budgets",
+      "",
+      "Applies only when `platform.targets` in `project.yaml` contains `XR` (matched",
+      "without regard to case); on any other project, ignore this section.",
+      "",
+      "- **The budget is one display period.** A headset shows a frame on every",
+      "  refresh of its display, so the frame budget is the display period at the",
+      "  refresh rate the project chose. Read the rate from",
+      "  `performance.target_framerate` and the budget from",
+      "  `performance.frame_budget_ms` (the `perf_budgets` line of `resolve_config`);",
+      "  if either is unset, or the two disagree, report the budget NOT ASSESSED and",
+      "  ask. The rate is the project's setting or ADR option, never a figure assumed",
+      "  for a headset.",
+      "- **OpenXR runtimes.** When the project's XR runtime is OpenXR, `xrWaitFrame`",
+      "  paces the frame loop to the display, and its frame state carries",
+      "  `predictedDisplayPeriod`, the display period of the next frame. Compare",
+      "  against that reported period: the runtime may report one that differs from",
+      "  the hardware's refresh cycle. Where the runtime offers",
+      "  `XR_FB_display_refresh_rate`, the rates a session supports come from",
+      "  `xrEnumerateDisplayRefreshRatesFB`; the project picks one of them.",
+      "- **Count misses, never average them.** A frame not ready when the display",
+      "  needs it is a missed display deadline, which the player sees. Report the",
+      "  number of missed display deadlines in the capture, and when they occur,",
+      "  beside P50/P95/P99 frame times; a capture whose average is under budget but",
+      "  holds missed display deadlines does not pass on its average. OpenXR's",
+      "  `XR_EXT_performance_settings` describes a layer regularly late to the",
+      "  compositor as a degraded user experience.",
+      "- **Captures.** Profile on the target headset with the project's refresh-rate",
+      "  setting; a capture without per-frame times, or from a flat-screen run, is",
+      "  NOT ASSESSED for VR, not a pass.",
+      ""
+     ],
+     "reason": "vr-frame-budgets-all-engines"
+    },
     {
      "id": "19c408a5470e85c4",
      "base": [
@@ -936,6 +1103,40 @@
   ".claude/agents/qa-lead.md": {
    "hunks": [
     {
+     "id": "be706f4ea1b650c4",
+     "base": [
+      80,
+      80
+     ],
+     "old": [],
+     "new": [
+      "### VR Test Evidence",
+      "",
+      "Applies only when `platform.targets` in `project.yaml` contains `XR` (matched",
+      "without regard to case); on any other project, ignore this section.",
+      "",
+      "- **Headset in the loop.** Evidence for a story that changes what the player",
+      "  sees, hears or does in VR comes from a run on a target headset, worn, with",
+      "  tracking live. A flat-screen, emulator or headless run is not VR evidence:",
+      "  it cannot show that the game responds to the player's head, and a store",
+      "  check such as Meta's requires the app to respond to positional tracking as",
+      "  well as orientation. Logic stories keep their automated tests.",
+      "- **What the record holds.** The headset and runtime, the refresh-rate setting",
+      "  in force, the play space (seated, standing or room-scale) and the comfort",
+      "  settings in force (locomotion, turning, vignette), beside the capture the",
+      "  story type asks for in `production/qa/evidence/`.",
+      "- **Comfort playtests.** Comfort is judged by playtesters in the headset, not",
+      "  by a capture. Run the comfort playtests `xr-experience-designer` defines,",
+      "  with diverse users, as players differ in what makes them uncomfortable;",
+      "  record each session's comfort settings and what each player reported, and",
+      "  send the findings to `xr-experience-designer`.",
+      "- **Missing evidence.** A VR story with no headset run is not Done; list it",
+      "  as missing VR evidence, at the gate level its story type carries.",
+      ""
+     ],
+     "reason": "vr-test-evidence-all-engines"
+    },
+    {
      "id": "fc84b0e8f88293e2",
      "base": [
       149,
@@ -1045,6 +1246,58 @@
   },
   ".claude/agents/release-manager.md": {
    "hunks": [
+    {
+     "id": "3bbf703b99d95f5d",
+     "base": [
+      91,
+      91
+     ],
+     "old": [],
+     "new": [
+      "### VR Store Certification",
+      "",
+      "Applies only when `platform.targets` in `project.yaml` contains `XR` (matched",
+      "without regard to case); on any other project, ignore this section. This `XR`",
+      "is the target value, not the \"XR\" in the console tier's TRC / XR / Lotcheck",
+      "list (`/launch-checklist`).",
+      "",
+      "- **Added, never instead.** The VR store requirements are added to the block",
+      "  `platform.cert_tier` selects, never in place of it: a `steam` project that",
+      "  targets XR carries the Steamworks block and the VR store's requirements. At",
+      "  `none` there is no store and no VR block; unset, ask which stores are in",
+      "  scope, as for `cert_tier`.",
+      "- **Which store.** `cert_tier` names no VR store, so ask the user which VR",
+      "  stores the game ships on and record them in the release checklist.",
+      "- **Read the store's own page.** For each VR store, read its current",
+      "  requirement page, cite it with the date you read it and the page's own",
+      "  updated date, and track every requirement by its ID with",
+      "  pass/fail/not-applicable status, as for console requirements. Copy no",
+      "  threshold into this file or into memory: values such as refresh rates and",
+      "  launch times change, so the checklist quotes the page read for this release.",
+      "- **Meta Horizon Store (Quest).** Apps must meet its Virtual Reality Check",
+      "  (VRC) guidelines to be considered for distribution; a plus sign marks a",
+      "  recommended VRC, not a required one. VRC.Quest.Performance.1 requires the",
+      "  app to run at the refresh rates it specifies: take them from that page.",
+      "  Meta notes that its downloadable test plans are slightly out of date, so",
+      "  work from the VRC pages, not the test plans. Retrieved 2026-11-17:",
+      "  `https://developers.meta.com/horizon/resources/publish-quest-req/`.",
+      "- **Steam.** The Steam Frame Standalone Compatibility Review rates games run",
+      "  on the headset itself; its result changes how the game is presented, not",
+      "  whether it is available, and its criteria are the same for VR and non-VR",
+      "  titles. Retrieved 2026-11-17:",
+      "  `https://partner.steamgames.com/doc/steamhardware/steamframe/compat`.",
+      "  NOT SOURCEABLE — a Steamworks requirement list specific to PC VR; none was",
+      "  found in the Steamworks documentation on 2026-11-17, so the `steam` block",
+      "  applies as it stands.",
+      "- **Console VR and other stores.** NOT SOURCEABLE — a console holder's VR",
+      "  requirements are not public; take them from the platform holder's developer",
+      "  site under the project's agreement. Any other VR store: cite its page with",
+      "  the date read, or write `NOT SOURCEABLE — <store> requirements`, which keeps",
+      "  that store's certification item NOT ASSESSED.",
+      ""
+     ],
+     "reason": "vr-store-certification-all-engines"
+    },
     {
      "id": "e7ae15a7420099a3",
      "base": [
@@ -1215,6 +1468,88 @@
   },
   ".claude/agents/technical-artist.md": {
    "hunks": [
+    {
+     "id": "6076f655b6a85d87",
+     "base": [
+      107,
+      107
+     ],
+     "old": [],
+     "new": [
+      "### DCC Interchange",
+      "",
+      "This extends Key Responsibilities 4 (Art Pipeline) and 6 (Art Standards",
+      "Enforcement) to the hand-off from the DCC tools to the engine, and does not",
+      "repeat them. You own the interchange contract on every engine and write it",
+      "down with the pipeline:",
+      "",
+      "- **Exchange formats.** The formats the project accepts from the DCC tools,",
+      "  per asset type (for example glTF 2.0 for meshes and skinned characters,",
+      "  OpenUSD for scenes and layouts, FBX where a tool writes nothing else), and",
+      "  the exporter that writes each one.",
+      "- **Scale, units, up-axis and handedness, as each format defines them.**",
+      "  - glTF 2.0 fixes them: a right-handed coordinate system with +Y up and +Z",
+      "    forward, and linear distances in meters.",
+      "  - OpenUSD declares them per stage: `upAxis` (`Y` or `Z`) and `metersPerUnit`",
+      "    are stage metadata, and UsdGeom stipulates a right-handed coordinate",
+      "    system. OpenUSD asks exporters to always author `upAxis`, and a stage with",
+      "    no authored `metersPerUnit` falls back to centimeters, so the contract",
+      "    requires both to be authored.",
+      "  - FBX has no public file-format specification and no fixed convention: read",
+      "    the axis system (`FbxAxisSystem`, which includes the handedness) and the",
+      "    unit from the file's settings, and validate them against the contract.",
+      "  - The contract also states the engine's own convention and which side",
+      "    converts to it.",
+      "- **Export validation.** Every export is checked before it is committed: the",
+      "  Khronos glTF-Validator for glTF, which writes a report of the issues it",
+      "  finds, and `usdchecker` for USD; then the contract's own checks: up-axis,",
+      "  unit, a reference object at its known size, and names per item 6. A failure",
+      "  is fixed in the export and exported again, never corrected by hand in the",
+      "  engine.",
+      "- **DCC tool and plugin versions.** The DCC tools, their exporter plugins and",
+      "  the versions in use are project settings, recorded in the contract, so every",
+      "  artist exports with the same ones. Before artists move to a new version,",
+      "  export and validate a reference asset with it.",
+      "- **The import side.** On Godot, Unity, Unreal and Web you set the engine's",
+      "  importer to the contract, with the engine's specialist (`lead-programmer` on",
+      "  Web). On a Custom engine (`engine.name: Custom`) the import side is",
+      "  `asset-build-tooling-engineer`'s DCC Import, which rejects an asset that",
+      "  breaks the contract: a fault in the export is yours, a fault in the import",
+      "  is theirs.",
+      "",
+      "### Character Technology",
+      "",
+      "You own character-tech content on every engine: rigs, skinning, facial rigs",
+      "and blendshapes, and mocap data prepared for the runtime. Its budgets are not",
+      "yours: they are the runtime owner's, and you build to them.",
+      "",
+      "- **Rigs.** The skeleton (joint hierarchy, rest pose, joint names per item 6)",
+      "  and its controls in the DCC tool. A glTF skin lists the joints that pose it,",
+      "  with optional inverse bind matrices whose order must match that joint list;",
+      "  check the order on export.",
+      "- **Skinning.** Vertex weights per joint. glTF 2.0 stores four joint",
+      "  influences per set (`JOINTS_0` with `WEIGHTS_0`) and puts more in further",
+      "  sets; how many the runtime reads is a budget, not a DCC setting.",
+      "- **Facial rigs and blendshapes.** Blendshapes are exported as glTF morph",
+      "  targets (a set of difference values for a primitive's vertex attributes) or",
+      "  as OpenUSD UsdSkel `BlendShape` prims, which may carry inbetween shapes.",
+      "  Facial controls drive blendshape weights and joints within the runtime's",
+      "  budget.",
+      "- **Mocap data preparation.** Clean the capture (gaps, foot contacts, noise),",
+      "  retarget it to the project skeleton in the DCC tool, and export the clips in",
+      "  the formats of the DCC Interchange contract and the retarget format the",
+      "  runtime owner states.",
+      "- **Budgets are the runtime owner's.** Joint counts, influences per vertex,",
+      "  blendshape counts and the retarget format come from the runtime side: on a",
+      "  Custom engine (`engine.name: Custom`) from `animation-systems-engineer`'s",
+      "  Character Data Contract; on Godot, Unity, Unreal and Web from the project's",
+      "  budgets, set with `lead-programmer`, and the engine's documented limits. A",
+      "  rig over budget comes back to you to fit; the runtime is not changed to fit",
+      "  the rig.",
+      ""
+     ],
+     "reason": "dcc-and-character-tech-all-engines"
+    },
     {
      "id": "c43bd5bb34ec2ab1",
      "base": [
@@ -3330,6 +3665,23 @@
   ".claude/skills/security-audit/SKILL.md": {
    "hunks": [
     {
+     "id": "d75e7308b429212b",
+     "base": [
+      63,
+      65
+     ],
+     "old": [
+      "  > this skill — and **no writer in the setup flow**: neither",
+      "  > `/setup-engine` nor `/start` emits a `platform:` block, and only `/project-settings`"
+     ],
+     "new": [
+      "  > this skill — and **no writer in the setup flow**: `/setup-engine` writes a",
+      "  > `platform:` block with `targets` and the input keys but never these two, `/start`",
+      "  > writes neither, and only `/project-settings`"
+     ],
+     "reason": "security-audit-platform-writer-am33"
+    },
+    {
      "id": "3ef69a695a2e9e6a",
      "base": [
       133,
@@ -3739,6 +4091,24 @@
      "reason": "custom-addition"
     },
     {
+     "id": "011aaf9880942edd",
+     "base": [
+      75,
+      76
+     ],
+     "old": [
+      "`Browser or PC` / `Phone` / `Console` / `Several`. Platform weighs engines before"
+     ],
+     "new": [
+      "`Browser or PC` / `Phone` / `Console` / `Several`; a typed `VR headset (XR)` is",
+      "an answer too (the question tool takes four options; without it, list this as",
+      "option 5). `Several` is followed by one multi-select of `PC` / `Mobile` / `Web`",
+      "/ `Console` whose question says `XR` can be typed under Other. Section 5.5.4",
+      "writes the answer to `platform.targets`. Platform weighs engines before"
+     ],
+     "reason": "xr-platform-signal"
+    },
+    {
      "id": "6e9e816b86270dfc",
      "base": [
       119,
@@ -3826,6 +4196,18 @@
   ".claude/skills/setup-engine/references/5.5-project-yaml.md": {
    "hunks": [
     {
+     "id": "2381860fee908e4c",
+     "base": [
+      12,
+      12
+     ],
+     "old": [],
+     "new": [
+      "- 5.5.4 Resolve and write the `platform` block"
+     ],
+     "reason": "xr-platform-signal"
+    },
+    {
      "id": "661f15e36795f6fb",
      "base": [
       25,
@@ -3839,6 +4221,140 @@
       "with `performance`, are in `references/custom.md` (C3). The tables below are"
      ],
      "reason": "setup-5.5-sentence-split"
+    },
+    {
+     "id": "ac1e7f82981aeb82",
+     "base": [
+      88,
+      89
+     ],
+     "old": [
+      "> Resolve each input in this order and stop at the first that answers:"
+     ],
+     "new": [
+      "> **The target platform comes from 5.5.4.** Run 5.5.4's **Targets** resolution",
+      "> now, before this table: it holds the route's one platform question, and this",
+      "> step asks none of its own. Use a web row when the targets hold `Web`, alone or",
+      "> with others, and a non-web row otherwise.",
+      ">",
+      "> Resolve 2D-vs-3D in this order and stop at the first that answers:"
+     ],
+     "reason": "setup-shape-reads-targets-am33"
+    },
+    {
+     "id": "29120294f429d2b4",
+     "base": [
+      96,
+      98
+     ],
+     "old": [
+      ">      hasn't been established yet. Is this 2D or 3D, and does it ship to web?\"",
+      ">    - Options: `2D · non-web` / `2D · web` / `3D · non-web` / `3D · web`, plus"
+     ],
+     "new": [
+      ">      hasn't been established yet. Is this 2D or 3D?\"",
+      ">    - Options: `2D` / `3D`, plus"
+     ],
+     "reason": "setup-shape-reads-targets-am33"
+    },
+    {
+     "id": "0378c21ccec0a9d6",
+     "base": [
+      520,
+      520
+     ],
+     "old": [],
+     "new": [
+      "### 5.5.4 Resolve and write the `platform` block",
+      "",
+      "Every entry path writes this block, Web and Custom included. It records where",
+      "the game ships, and VR guidance applies only to a project whose targets hold",
+      "`XR`.",
+      "",
+      "**Targets.** Resolve them in this order and stop at the first that answers. On",
+      "Godot, 5.5.1 runs this resolution before its shape table; reuse its result.",
+      "",
+      "0. **The `platform.targets` already in `project.yaml`**, on a re-run or after",
+      "   `/project-settings`. Keep them. When this run's own platform answer gives",
+      "   other targets, show the old and the new and ask which to keep.",
+      "1. **Section 2's answers**, if a platform question ran: the guided platform",
+      "   question, on Custom the Platforms question (`references/custom.md` C2), on",
+      "   Web the value `references/web.md` W3 gives.",
+      "2. **The design artifact** that 5.5.1 reads, where it names the platforms.",
+      "3. **Ask** guided Question 2 (`references/2-guided-mode.md`) as written there,",
+      "   with its `Several` follow-up. It is the one platform question: a route that",
+      "   answered it, or Custom's, is never asked again.",
+      "",
+      "- `platform.targets` takes the values `PC`, `Mobile`, `Web`, `Console` and",
+      "  `XR`, several allowed: `Browser or PC` is `PC` or `Web`, as answered;",
+      "  `Phone` is `Mobile`; `Console` is `Console`; the XR option is `XR`;",
+      "  `Several` is the values its follow-up chose. Custom's answers arrive mapped",
+      "  by `references/custom.md` C2. Readers match the values without regard to case.",
+      "",
+      "**Input keys.** A key the block already holds is kept, as in step 0; when its",
+      "`technical-preferences.md` line differs, show both and ask which to keep. Take",
+      "the others from the Input & Platform lines Section 5 recorded in",
+      "`technical-preferences.md`: Gamepad Support is `gamepad_support`, Touch Support",
+      "is `touch_support`, Primary Input is `primary_input`. Write all four keys",
+      "together: once the block has any key, `input_methods` is read from the block",
+      "alone (`.claude/docs/config-resolution.md`, \"Derived lines\"), so a block with",
+      "`targets` only would drop touch and gamepad.",
+      "",
+      "- The keys written must give the methods the Input Methods line lists:",
+      "  keyboard/mouse for a `PC` or `Web` target, gamepad and touch for a support",
+      "  value of `Full` or `Partial`, and the primary input's method. When the",
+      "  support lines and the Input Methods line disagree, for example Gamepad",
+      "  Support `Partial` while Input Methods omits Gamepad, show both and ask once",
+      "  which is right, naming what each answer writes. The Input Methods line: a",
+      "  support value whose method it omits becomes `None`, and one it lists becomes",
+      "  `Full` or `Partial`, as the user picks. The support lines: the Input Methods",
+      "  line becomes the methods they give. Write the answer to both files, so they",
+      "  agree. No support value removes keyboard/mouse on a `PC` or `Web` target, or",
+      "  the primary input's method: when the line omits one of those, say so, and",
+      "  the answers are the support lines or another primary input.",
+      "- The keys cannot give every method. Keyboard/mouse comes only from a `PC` or",
+      "  `Web` target or a Keyboard/Mouse primary input, and a value no key knows,",
+      "  such as the template's `Mixed`, comes from none. When the Input Methods line",
+      "  lists a method the keys cannot give, show the line beside the methods the",
+      "  block gives and ask once, naming what each answer writes. For keyboard/mouse:",
+      "  add the target that carries it (`PC` or `Web`, for example `PC` beside",
+      "  `Console`), or drop the method from the line. For a value no key knows: name",
+      "  the methods it means, which replace it on the line and are checked as above,",
+      "  or drop the method when the line lists others. Write the answer to both",
+      "  files, so they agree. Never write a block that loses a method without this",
+      "  question.",
+      "- Section 5 had no platform to map when the targets were asked here, or when",
+      "  the route left Input & Platform out. Derive the two support values from",
+      "  Section 5's platform table (`references/5-technical-preferences.md`) and the",
+      "  primary input as Section 5 does, then write the same values, and the Input",
+      "  Methods line they give, to `technical-preferences.md`, so the two files agree.",
+      "- `XR` has no row in that table: map the other targets. With `XR` alone, ask",
+      "  for each of the three values and offer `Leave as [TO BE CONFIGURED]`.",
+      "- A value left `[TO BE CONFIGURED]` is left out of the block.",
+      "",
+      "```yaml",
+      "platform:",
+      "  targets: [PC, XR]              # PC | Mobile | Web | Console | XR",
+      "  gamepad_support: \"Partial\"     # Full | Partial | None",
+      "  touch_support: \"None\"          # Full | Partial | None",
+      "  primary_input: \"Keyboard/Mouse\"",
+      "```",
+      "",
+      "Show the block, and the `technical-preferences.md` lines this step changes, and",
+      "ask: \"May I write the `platform` block to `project.yaml` and these lines to",
+      "`technical-preferences.md`?\" When no line changes, ask \"May I write the",
+      "`platform` block to `project.yaml`?\" Write only after that answer, as 5.5.2",
+      "writes the others: insert the block when absent; when present (a re-run, or",
+      "keys set through `/project-settings`), add the keys it lacks and keep its other",
+      "keys (`multiplayer`, `online`, `cert_tier`). A key it already holds changes only",
+      "on the user's explicit answer, never from `technical-preferences.md` or the",
+      "design artifact. Read it back as 5.5.3 does.",
+      ""
+     ],
+     "reason": "setup-platform-step-am34",
+     "supersedes": [
+      "setup-platform-step-am33"
+     ]
     }
    ]
   },
@@ -3898,6 +4414,23 @@
     }
    ]
   },
+  ".claude/skills/setup-engine/references/web.md": {
+   "hunks": [
+    {
+     "id": "9cff859100a946ed",
+     "base": [
+      201,
+      201
+     ],
+     "old": [],
+     "new": [
+      "- Section 5.5.4 writes `platform.targets` as `[Web]`, plus any other target",
+      "  Section 2's answers gave, and the input keys from Section 5's `Web` row."
+     ],
+     "reason": "xr-platform-signal"
+    }
+   ]
+  },
   ".claude/skills/skill-test/SKILL.md": {
    "hunks": [
     {
@@ -3915,7 +4448,7 @@
      "reason": "skill-test-counts"
     },
     {
-     "id": "f6edcc98c7bca87e",
+     "id": "c3be969210672968",
      "base": [
       262,
       263
@@ -3924,9 +4457,12 @@
       "Agents (observations, not scored): 49 read"
      ],
      "new": [
-      "Agents (observations, not scored): 74 read"
+      "Agents (observations, not scored): 77 read"
      ],
-     "reason": "skill-test-counts"
+     "reason": "skill-test-agent-counts-am32",
+     "supersedes": [
+      "skill-test-counts"
+     ]
     },
     {
      "id": "39970cb31148c696",
@@ -3959,7 +4495,7 @@
      "reason": "skill-test-counts"
     },
     {
-     "id": "934cf1888ad534fa",
+     "id": "858b8842cf7edf18",
      "base": [
       577,
       579
@@ -3969,13 +4505,16 @@
       "Agent specs written: 49 (100%)"
      ],
      "new": [
-      "AGENTS (74 total)",
-      "Agent specs written: 74 (100%)"
+      "AGENTS (77 total)",
+      "Agent specs written: 77 (100%)"
      ],
-     "reason": "skill-test-counts"
+     "reason": "skill-test-agent-counts-am32",
+     "supersedes": [
+      "skill-test-counts"
+     ]
     },
     {
-     "id": "1819aa81ba29ae0f",
+     "id": "c5e209e6ef5a5b6d",
      "base": [
       589,
       591
@@ -3986,9 +4525,12 @@
      ],
      "new": [
       "Skill coverage:  81/81 specs (100%)",
-      "Agent coverage:  74/74 specs (100%)"
+      "Agent coverage:  77/77 specs (100%)"
      ],
-     "reason": "skill-test-counts"
+     "reason": "skill-test-agent-counts-am32",
+     "supersedes": [
+      "skill-test-counts"
+     ]
     }
    ]
   },
@@ -4904,7 +5446,7 @@
    ]
   },
   ".claude/skills/setup-engine/references/custom.md": {
-   "id": "a30e6cbd25bb1375",
+   "id": "a1f1ded9f79bf415",
    "base": [
     0,
     0
@@ -5001,9 +5543,12 @@
     "3. **Graphics API(s):** `Vulkan 1.4 (Recommended)` / `Direct3D 12` / `Metal` —",
     "   more than one may be picked; each is a backend of the one RHI.",
     "4. **Shader language:** `HLSL via DXC (Recommended)` / `Slang via slangc`.",
-    "5. **Platforms:** `Windows` / `Linux` / `macOS` / `Console` (several allowed).",
-    "   Metal without macOS, or Direct3D 12 without Windows or console, is a",
-    "   mismatch: name it and ask again.",
+    "5. **Platforms:** `Windows` / `Linux` / `macOS` / `Console` (several allowed);",
+    "   a typed `XR headset` is an answer too (the question tool takes four options;",
+    "   without it, list this as option 5). Metal without macOS, or Direct3D 12",
+    "   without Windows or console, is a mismatch: name it and ask again. For",
+    "   `platform.targets` (Section 5.5.4), `Windows`, `Linux` and `macOS` are `PC`,",
+    "   `Console` is `Console` and `XR headset` is `XR`.",
     "6. **Target framerate:** `120 fps — 8.33 ms frame budget (Recommended for a",
     "   AAA target)` / `60 fps — 16.6 ms frame budget`.",
     "7. **C++ only — naming:** `snake_case, like the standard library",
@@ -5309,9 +5854,9 @@
     "own API.",
     ""
    ],
-   "reason": "custom-setup-reference-phase10",
+   "reason": "custom-setup-reference-am35",
    "supersedes": [
-    "custom-setup-reference"
+    "custom-setup-reference-am32"
    ]
   }
  }

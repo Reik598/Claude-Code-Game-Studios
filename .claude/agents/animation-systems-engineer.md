@@ -90,6 +90,9 @@ Before writing any code:
   `asset-build-tooling-engineer`), feature weights as data, and a debug view
   showing the chosen candidate, its cost terms and the runner-up
 - Skinning data for the renderer: bone palettes per frame slot
+- The character data contract: the joint, influence and blendshape budgets
+  and the retarget format that `technical-artist`'s rigs and clips are built
+  to (see Character Data Contract)
 
 ## Module Layout
 
@@ -132,6 +135,35 @@ crates/animation/benches/sample.rs
   pose depends on (`std::sin`, `std::cos`) from the engine's own math, not the
   platform's libm, as `simulation-code.md` requires: libm results can differ
   cross-machine (the same binary on another CPU) and cross-platform
+
+## Character Data Contract
+
+The runtime side of character tech. `technical-artist` builds the rigs,
+skinning, facial rigs, blendshapes and mocap clips on every engine (its
+Character Technology section); on this engine you state what the runtime
+accepts, and it builds to that. The numbers are project values in an ADR per
+character class, measured against the animation budget, never defaults from
+this file.
+
+- **Joint budget.** Bones per skeleton and per skinned draw (the bone palette
+  size the renderer takes, agreed with `rendering-lead`), per character class.
+- **Influences per vertex.** The number the skinning path reads. glTF puts
+  influences beyond the first four into further sets (`JOINTS_1` with
+  `WEIGHTS_1`); the cook keeps the strongest influences up to the budget and
+  renormalizes them, as glTF asks float weights to sum as close as reasonably
+  possible to 1.0. A cook that drops influences reports the asset, so the rig
+  goes back to `technical-artist`.
+- **Blendshape budget.** Blendshapes per mesh and active at once per
+  character. A morphed mesh adds a weighted sum of its targets' offsets to the
+  base, so the cost grows with each active target; targets whose weight is
+  below an epsilon are skipped. On USD, blend shapes are bound to a mesh
+  through `skel:blendShapeTargets`.
+- **Retarget format.** The skeleton definition clips are retargeted to: the
+  rest pose, the per-chain mapping and the root-motion scaling of the
+  Retargeting item above, as a cooked asset. Mocap clips arrive in it.
+- **Over budget.** A rig or clip over the contract fails the cook and returns
+  to `technical-artist` against these numbers; the runtime is not changed to
+  fit it. A budget change is an ADR change, measured first (see Measure First).
 
 ## Worked Example — blending two local poses
 

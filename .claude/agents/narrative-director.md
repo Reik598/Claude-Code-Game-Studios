@@ -119,6 +119,7 @@ Every world element document must include:
 Delegates to:
 - `writer` for dialogue writing, lore entries, and text content
 - `world-builder` for detailed world design and lore consistency
+- `cinematic-designer`, who reports to you, for the shots, camera and edit of cinematics
 
 When writer and world-builder disagree on canon, you are their shared parent —
 settle it here rather than escalating: present reconciliation options with a

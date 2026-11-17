@@ -38,6 +38,11 @@ HELPER_COMMAND_START = "bash .claude/scripts/"
 # R35, R50 (D3): the statistics helper and the sample it is checked on.
 FRAME_STATS = f"{SCRIPTS_DIR}/frame-stats.sh"
 FRAME_STATS_ROWS = 1200
+# Score report 5 D1, AM35(c): a count that is not a multiple of 100, so k*n/100
+# has a fraction below one half for P95 and P99 (1139.05, 1187.01). Rounding
+# the rank half up instead of up then reads ranks 1139 and 1187, not 1140 and
+# 1188.
+FRAME_STATS_UNEVEN_ROWS = 1199
 FRAME_STATS_SEED = 20261117
 FRAME_STATS_BUDGET_MS = 16.6
 PERCENTILES = (50, 95, 99)
@@ -244,6 +249,21 @@ class NewSkillsTests(unittest.TestCase):
             result = run_frame_stats(str(csv), "1")
         self.assertEqual(result.returncode, 0, result.stderr)
         seen = dict(line.split("\t", 1) for line in result.stdout.splitlines() if "\t" in line)
+        for k in PERCENTILES:
+            with self.subTest(stat=f"p{k}"):
+                self.assertEqual(float(seen[f"p{k}"]), nearest_rank(frames, k))
+
+    def test_frame_stats_rounds_ranks_up_when_n_is_not_a_multiple_of_100(self):
+        rng = random.Random(FRAME_STATS_SEED)
+        frames = [(i + 1) / 100 for i in range(FRAME_STATS_UNEVEN_ROWS)]  # distinct, so each rank has its own value
+        rng.shuffle(frames)
+        with tempfile.TemporaryDirectory() as tmp:
+            csv = Path(tmp) / "uneven.csv"
+            csv.write_text("frame_ms\n" + "".join(f"{v}\n" for v in frames), encoding="utf-8")
+            result = run_frame_stats(str(csv), "frame_ms")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        seen = dict(line.split("\t", 1) for line in result.stdout.splitlines() if "\t" in line)
+        self.assertEqual(int(seen.get("n", -1)), FRAME_STATS_UNEVEN_ROWS)
         for k in PERCENTILES:
             with self.subTest(stat=f"p{k}"):
                 self.assertEqual(float(seen[f"p{k}"]), nearest_rank(frames, k))

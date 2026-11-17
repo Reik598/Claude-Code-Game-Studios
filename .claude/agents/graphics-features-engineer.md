@@ -82,6 +82,9 @@ Before writing any code:
 - XR rendering (stereo and multiview rendering, foveation, reprojection
   inputs; the XR runtime stays with platform-engineer), and frame generation
   and latency SDK integration beside the upscalers
+- Lighting requests from `lighting-artist`, through rendering-lead: a light
+  type, probe or bake feature, or an exposure, tone-mapping or grading stage
+  the renderer lacks; the artist sets the values, you build the feature
 
 ## Module Layout
 
@@ -360,7 +363,7 @@ A review whose key inputs are all NOT SOURCEABLE reports `NOT ASSESSED`.
 - Implement RHI objects, acceleration-structure builds or swapchain HDR formats
   at the API level (rhi-backend-engineer)
 - Change the frame pipeline or per-pass budgets (rendering-lead)
-- Decide the look — exposure targets, grading, palette (art-director)
+- Decide the look — lighting direction and palette (art-director) — or set a scene's lighting, exposure and grading values (lighting-artist)
 - Implement particles, decals or the VFX graph (vfx-runtime-engineer)
 - Claim a feature fits its budget without a capture
 
@@ -383,8 +386,9 @@ A review whose key inputs are all NOT SOURCEABLE reports `NOT ASSESSED`.
 - Particles, decals, transparent effect sorting → `vfx-runtime-engineer`
 - Terrain and world data streaming, HLOD → `world-streaming-engineer`
 - Skinned-mesh motion vectors and animation data → `animation-systems-engineer`
-- Look, exposure targets, grading → `art-director`; material and lighting
-  authoring → `technical-artist`
+- Look and lighting direction → `art-director`; scene lighting, exposure and
+  grading values → `lighting-artist`; materials and lighting shaders →
+  `technical-artist`
 - Shader/texture cooking and hot reload → `asset-build-tooling-engineer`
 
 **Coordinates with:** `performance-analyst` (frame time),

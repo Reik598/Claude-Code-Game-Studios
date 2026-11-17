@@ -3,7 +3,7 @@
 > **How to go from zero to a shipped game using the Agent Architecture.**
 >
 > This guide walks you through every phase of game development using the
-> 74-agent system, 81 slash commands, and 15 automated hooks. It assumes you
+> 77-agent system, 81 slash commands, and 15 automated hooks. It assumes you
 > have Claude Code installed and are working from the project root.
 >
 > The pipeline has 7 phases. At `rigor: standard` and `full`, each phase has
@@ -1390,7 +1390,8 @@ Tier 3 (Specialists):  gameplay-programmer, engine-programmer,
                        qa-tester, performance-analyst, devops-engineer,
                        analytics-engineer, accessibility-specialist,
                        live-ops-designer, prototyper, security-engineer,
-                       community-manager, godot-specialist,
+                       community-manager, lighting-artist, cinematic-designer,
+                       xr-experience-designer, godot-specialist,
                        godot-gdscript-specialist, godot-shader-specialist,
                        godot-csharp-specialist, godot-gdextension-specialist,
                        unity-specialist, unity-dots-specialist,
@@ -1580,6 +1581,7 @@ Reads existing code and generates GDD-format design documentation from it.
 | Build world lore | `world-builder` | 3 |
 | Write dialogue | `writer` | 3 |
 | Plan the story | `narrative-director` | 2 |
+| Design cinematic shots, camera and the cut | `cinematic-designer` | 3 |
 | Plan a sprint | `producer` | 1 |
 | Make a creative decision | `creative-director` | 1 |
 | Make a technical decision | `technical-director` | 1 |
@@ -1591,10 +1593,12 @@ Reads existing code and generates GDD-format design documentation from it.
 | Build dev tools | `tools-programmer` | 3 |
 | Review code architecture | `lead-programmer` | 2 |
 | Create shaders / VFX | `technical-artist` | 3 |
+| Light scenes, set exposure and grading | `lighting-artist` | 3 |
 | Define visual style | `art-director` | 2 |
 | Define audio style | `audio-director` | 2 |
 | Design sound effects | `sound-designer` | 3 |
 | Design UX flows | `ux-designer` | 3 |
+| Design VR comfort, locomotion and interaction | `xr-experience-designer` | 3 |
 | Write test cases | `qa-tester` | 3 |
 | Plan test strategy | `qa-lead` | 2 |
 | Profile performance | `performance-analyst` | 3 |
@@ -1609,6 +1613,7 @@ Reads existing code and generates GDD-format design documentation from it.
 | Communicate with players | `community-manager` | 3 |
 | Godot-specific help | `godot-specialist` | 3 |
 | GDScript-specific help | `godot-gdscript-specialist` | 3 |
+| Godot C# help | `godot-csharp-specialist` | 3 |
 | Godot shader help | `godot-shader-specialist` | 3 |
 | GDExtension modules | `godot-gdextension-specialist` | 3 |
 | Unity-specific help | `unity-specialist` | 3 |

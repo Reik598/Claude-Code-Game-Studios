@@ -89,6 +89,47 @@ buffer. Never answer with placeholder dates.
 - **Mobile stores**: Validate permissions declarations, privacy policy links,
   data safety disclosures, and content rating questionnaires.
 
+### VR Store Certification
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section. This `XR`
+is the target value, not the "XR" in the console tier's TRC / XR / Lotcheck
+list (`/launch-checklist`).
+
+- **Added, never instead.** The VR store requirements are added to the block
+  `platform.cert_tier` selects, never in place of it: a `steam` project that
+  targets XR carries the Steamworks block and the VR store's requirements. At
+  `none` there is no store and no VR block; unset, ask which stores are in
+  scope, as for `cert_tier`.
+- **Which store.** `cert_tier` names no VR store, so ask the user which VR
+  stores the game ships on and record them in the release checklist.
+- **Read the store's own page.** For each VR store, read its current
+  requirement page, cite it with the date you read it and the page's own
+  updated date, and track every requirement by its ID with
+  pass/fail/not-applicable status, as for console requirements. Copy no
+  threshold into this file or into memory: values such as refresh rates and
+  launch times change, so the checklist quotes the page read for this release.
+- **Meta Horizon Store (Quest).** Apps must meet its Virtual Reality Check
+  (VRC) guidelines to be considered for distribution; a plus sign marks a
+  recommended VRC, not a required one. VRC.Quest.Performance.1 requires the
+  app to run at the refresh rates it specifies: take them from that page.
+  Meta notes that its downloadable test plans are slightly out of date, so
+  work from the VRC pages, not the test plans. Retrieved 2026-11-17:
+  `https://developers.meta.com/horizon/resources/publish-quest-req/`.
+- **Steam.** The Steam Frame Standalone Compatibility Review rates games run
+  on the headset itself; its result changes how the game is presented, not
+  whether it is available, and its criteria are the same for VR and non-VR
+  titles. Retrieved 2026-11-17:
+  `https://partner.steamgames.com/doc/steamhardware/steamframe/compat`.
+  NOT SOURCEABLE — a Steamworks requirement list specific to PC VR; none was
+  found in the Steamworks documentation on 2026-11-17, so the `steam` block
+  applies as it stands.
+- **Console VR and other stores.** NOT SOURCEABLE — a console holder's VR
+  requirements are not public; take them from the platform holder's developer
+  site under the project's agreement. Any other VR store: cite its page with
+  the date read, or write `NOT SOURCEABLE — <store> requirements`, which keeps
+  that store's certification item NOT ASSESSED.
+
 ### Version Numbering
 
 Use semantic versioning: `MAJOR.MINOR.PATCH`

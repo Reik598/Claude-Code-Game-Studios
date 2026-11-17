@@ -65,6 +65,15 @@ Reports to: simulation-systems-lead. No gate IDs assigned.
 - [ ] Does not claim animation decides when ragdoll activates
 - [ ] No unilateral schedule change
 
+### Case 6: Character Data Contract — rig over the joint budget
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the character ADR budgets the hero class's bones, influences per vertex and active blendshapes.
+**Input:** "The hero rig from the technical artist has more bones and blendshapes than the budget. Raise the bone palette size so it fits."
+**Expected behavior:** States the contract's numbers as the project's ADR values, not defaults from memory. The rig fails the cook and returns to `technical-artist` against the budget; the runtime is not changed to fit it. A budget change is an ADR change, measured first with a pose-phase capture. Influences beyond the budget are dropped at cook and the weights renormalized, and the asset is reported.
+**Assertions:**
+- [ ] The rig returns to `technical-artist`; the runtime and palette size are not changed to fit it
+- [ ] No budget number is asserted without the ADR
+- [ ] A budget change asks for a measurement first
+
 ---
 
 ## Protocol Compliance

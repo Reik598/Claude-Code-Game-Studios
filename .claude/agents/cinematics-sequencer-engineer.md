@@ -78,6 +78,9 @@ Before writing any code:
 - Sequencer authoring logic: key edits as transactions, preview in the edited
   world, restore of pre-sequence state
 - Render-to-movie: fixed-step offline playback to an image sequence and audio file
+- Shot requests from `cinematic-designer`: a track type, camera rig or blend,
+  or render-to-movie option the sequencer lacks; the designer composes the
+  shots, you build the tool
 
 ## Module Layout
 
@@ -296,7 +299,7 @@ mandates; codec licensing goes to the user and `technical-director`.
 - Change the transaction or serialization format (`editor-architect`)
 - Build docking, the timeline panel's widgets or keybindings
   (`editor-ui-framework-engineer`)
-- Write shot content, story or dialogue (`narrative-director`, `writer`)
+- Write shot content (`cinematic-designer`), story or dialogue (`narrative-director`, `writer`)
 - Claim scrub determinism or a cinematic within budget without a test run or capture
 
 ## Coordination
@@ -320,6 +323,7 @@ integration). Runtime evaluation is coordinated with
 - Sequence and audio cooking → `asset-build-tooling-engineer`
 - New engine module or public API change → `chief-engine-architect`
 
-**Coordinates with:** `narrative-director` and `level-designer` on cutscene
-needs, `technical-artist` on cinematic lighting and VFX tracks,
-`performance-analyst` on cinematic frame times.
+**Coordinates with:** `cinematic-designer`, `narrative-director` and
+`level-designer` on cutscene needs, `lighting-artist` on cinematic lighting,
+`technical-artist` on VFX tracks, `performance-analyst` on cinematic frame
+times.

@@ -1,17 +1,20 @@
 # Continue the AAA engine-support work
 
-## Current state — 17 November 2026, Phase 10 (one-pass review of S20)
+## Current state — 17 November 2026, Phase 11 (roles from engine to tech demo)
 
 This section is the only current status. The history below it is superseded
 and kept for context only.
 
-- **Nothing is committed.** The change is uncommitted in the worktree on `main`;
-  the base release is `abc0de7`. No commit, push, PR, deployment or publication
+- **Commit state.** Phases 1–10 are committed on `feature/custom-engine-support`
+  at `4b4aaea` and pushed to `origin`. Phase 11 is uncommitted in the main
+  checkout on `feature/content-xr-roles`, branched from `4b4aaea`. The base
+  release is `abc0de7`. No further commit, push, PR, deployment or publication
   is authorised.
 - **The plan** is `docs/research/aaa-engine-support-2026/fix-plan.md`
   (revision 4, amendments AM1–AM16 in its section 9, Phase 8 with AM17–AM19 in
   its section 10, Phase 9 with AM20–AM26 in its section 11, Phase 10 with
-  AM27–AM31 in its section 12). Phases 1–9 were implemented, in the order 1, 2,
+  AM27–AM31 in its section 12, and Phase 11 with AM32–AM35 in its section 13: roles
+  from engine to tech demo). Phases 1–9 were implemented, in the order 1, 2,
   3, 4, 7, 6, 5, 8, 9. In Phase 10 the seven fix lanes (routing,
   engine-agents-sim-editor, engine-agents-render-platform,
   authoring-and-workflow-skills, new-skills-and-permissions,
@@ -44,7 +47,8 @@ and kept for context only.
 | AAA-ENGINE-2026-P5 | Phase 5 | 3 | F1–F11 | all resolved |
 | AAA-ENGINE-2026-P8 | Phase 8, both lanes (with Acceptance-8 review of 8.8, 8.9) | 3 | F1–F13 | F1–F11 resolved in round 2; F12 (this file) and F13 (the `--output` deny rule, AM19 revised) are follow-ups the main session fixed after round 2, confirmed resolved in round 3 |
 | AAA-ENGINE-2026-P9 | Phase 9 (fixes 9.1–9.4 and AM20 to AM26), with the Acceptance-8 review of C124–C133 | 4 | F1–F15 | F1–F8 resolved in round 2; F9–F11 and F13–F15 resolved in round 3; F12 (the diff-based shared-file test) escalated at round 3 and still escalated at round 4. The owner decided on 2026-11-17 to replace that test with an approved-hunk guard (AM27); round 5, at S21, re-ran every F12 mutation against the new guard, found F12 resolved and ended "Push: clear" |
-| AAA-ENGINE-2026-P10 | Phase 10 (section 12, AM27–AM31): the S20..S21 delta, the AM27 guard and its re-pin, then the S21..S22 delta | 2 | F1–F2 | F1 (the phase note's hunk counts) and F2 (follow-up: `/create-epics` selected a module's TR entries by `system:`) resolved in round 2; "Push: clear" |
+| AAA-ENGINE-2026-P10 | Phase 10 (AM27–AM31 in its section 12): the S20..S21 delta, the AM27 guard and its re-pin, then the S21..S22 delta | 2 | F1–F2 | F1 (the phase note's hunk counts) and F2 (follow-up: `/create-epics` selected a module's TR entries by `system:`) resolved in round 2; "Push: clear" |
+| AAA-ENGINE-2026-P11 | Phase 11 (AM32–AM35 in its section 13): the 4b4aaea..S24 delta, then S24..S25 and S25..S26 | 3 | F1–F10 | F1–F9 met in round 2 (AM33); F10, raised in round 2, met in round 3 (AM34); "Push: clear" |
 
 - **Independent scores.** After Phases 1–7, an independent reviewer scored the
   change at snapshot S11 at **8.7 / 10** against the original acceptance
@@ -70,6 +74,34 @@ and kept for context only.
   (`studio-tests/test_engine_shared_guard.py`), AM29 settles the two hunks its
   author marked for confirmation (the `/security-audit` Category 7 skip line is
   kept under O2 and disclosed), and AM30 fixes the `tools/` rows (D6).
+- **Phase 11** (fix plan section 13, AM32 (a)–(g); planned and tracked as the
+  OpenSpec change `add-content-and-xr-roles` under
+  `C:/repos/openspec/changes/`) adds, on every engine where it is valid:
+  `lighting-artist` under `art-director`, `cinematic-designer` under
+  `narrative-director` and `xr-experience-designer` under `game-designer`, all
+  `model: inherit`; "DCC Interchange" and "Character Technology" in
+  `technical-artist`, "VR Test Evidence" in `qa-lead`, "VR Store
+  Certification" in `release-manager` and "VR Frame Budgets" in
+  `performance-analyst`, the VR sections applying only when `platform.targets`
+  contains `XR`; the XR option of `/setup-engine` and the whole `platform`
+  block its step 5.5 writes; the Custom seams in
+  `asset-build-tooling-engineer`, `animation-systems-engineer`,
+  `graphics-features-engineer` and `cinematics-sequencer-engineer`; the
+  one-shot's reworded VR card (AM32(g)); every agent list and count (77); the
+  UPGRADING and CHANGELOG disclosure; and `studio-tests/test_engine_phase11.py`.
+  Each shared-file hunk is pinned under AM32, AM33, AM34 or AM35 in
+  `studio-tests/shared-file-hunks.json`. The ledger gained sources S149–S176,
+  evidence E386–E468 and claims C168–C218. The integration checks (OpenSpec
+  tasks 9.1, 9.2) are done: `propose` found no new hunk and the full exit
+  checks passed at snapshot S24. The Phase 11 critic (AAA-ENGINE-2026-P11,
+  task 9.3) blocked round 1 on F1–F9; the main session added AM33 and fixed
+  all nine against their closure conditions. Round 2 found them met and one
+  new defect, F10 (methods the platform keys cannot express), answered by
+  AM34; round 3 found F10 met and ended "Push: clear". The re-score (task
+  9.4, score report 5) gave 9.4 at S27 with N1–N3, D1 and D2; AM35 answers
+  them, and the re-check at S28 scored **9.6 / 10** (N1–N3 and D1 met, D2 met
+  for C168–C218, N4 on the Phase 10 claim statuses closed after it). Left:
+  D2 for C134–C167 and the recorded open points (D3).
 - **Checks last observed.** Phase 10's lanes each ran only their own tests and
   the test files that touch their files, while the other lanes were still
   editing (lane notes in the session scratchpad, `aaa-engine/wf3/`). The full
@@ -78,6 +110,10 @@ and kept for context only.
   `C:/Users/AlexanderPino/AppData/Local/Python/pythoncore-3.14-64/python.exe`,
   run with `-B`), passed on the finished Phase 10 tree after the re-pin, with
   none skipped; `python studio-tests/shared_hunks.py check` reports 0 problems.
+  Phase 11's task groups each ran only the test modules their task lists,
+  one process at a time; the full suite then passed on the Phase 11 tree at
+  snapshot S24, none skipped (OpenSpec task 9.2), and is re-run after the
+  critic fixes.
   This file states no test count: the count is the `Ran` line
   that command prints, and `studio-tests/test_engine_phase8b.py` fails any test
   count written here that differs from the suite.
@@ -129,8 +165,11 @@ is open:
   infrastructure itself stays project-specific.
 - **O12** — that each ledger quote supports its sentence rests on the
   Acceptance-8 reviews, which now include Phase 8's (P8) and Phase 9's (P9);
-  the Phase 10 critic re-fetched a sample of the Phase 10 additions (C134–C167:
-  19 quotes from 13 sources, all verbatim), not every one.
+  the Phase 10 critic reported, in its round-1 hand-back to the main session,
+  re-fetching 19 quotes from 13 sources of the Phase 10 additions (C134–C167)
+  and finding them verbatim, but its findings file does not list them by
+  evidence id, so no record shows which; each quote otherwise rests on the
+  records lane's own match.
 - **O13** — the narrowed `build-files.md` globs no longer load for
   `tests/**/CMakeLists.txt` and `tools/**/CMakeLists.txt`. Owner may prefer
   the coverage.
@@ -154,6 +193,11 @@ is open:
 - **O17** — files that are new outside base skill directories (the Custom
   agents and skills) are not covered by the AM27 approved-hunk manifest; the
   catalog tests and the Acceptance 2 checks cover them (AM28).
+- **O18** — no skill starts `lighting-artist`, `cinematic-designer` or
+  `xr-experience-designer` on Godot, Unity, Unreal or Web; they are reached
+  through their descriptions, the roster and their directors' lines (AM32).
+- **O19** — handoffs from those agents to the Godot, Unity and Unreal
+  specialists are one-way: the specialist files are frozen (AM32).
 
 ### Not shown by anything here
 
@@ -164,14 +208,19 @@ specifications awaiting a live `/skill-test spec` run.
 
 ### Resume
 
-1. Read the latest score report (session scratchpad
-   `aaa-engine/score-report*.md`), the Phase 10 lane plan and lane notes
-   (`aaa-engine/wf2/result.json`, `aaa-engine/wf3/`) and fix-plan sections
-   8–12.
-2. Score report 4 (S23, 9.5 / 10) names what would raise the score. Any later
-   edit to a shared agent or skill file needs `shared_hunks.py propose` and a
-   reviewed reason per new hunk (`studio-tests/README.md`).
-3. Do not write a test count into this file unless it is the suite's own;
+1. Read fix-plan sections 8 and 13 (AM32), the OpenSpec change
+   `add-content-and-xr-roles` (`proposal.md`, `design.md`, `tasks.md`; task
+   groups 1–8 are implemented) and the latest score report (session
+   scratchpad `aaa-engine/score-report*.md`).
+2. Optional, toward about 9.7: bind fact-carrying key phrases for the
+   Phase 10 claims C134–C167 (score report 5, D2's other half). A fix to a
+   shared file starts with a new plan amendment.
+3. Then part 2, the OpenSpec change `add-custom-engine-xr-numerics-demo`
+   (Custom-only XR contracts, numerics, research route and tech-demo path),
+   once this change is merged or at the owner's request.
+4. Any later edit to a shared agent or skill file needs `shared_hunks.py
+   propose` and a reviewed reason per new hunk (`studio-tests/README.md`). Do
+   not write a test count into this file unless it is the suite's own;
    `studio-tests/test_engine_phase8b.py` fails a count that differs.
 
 Tool notes: `python` on `PATH` can resolve to the unusable Windows Store alias;

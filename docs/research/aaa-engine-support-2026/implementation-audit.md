@@ -11,10 +11,13 @@ Claude behavior or production engine support.
 
 ## Final state (17 November 2026)
 
-- The fix plan (revision 4, amendments AM1–AM31, Phases 8, 9 and 10 in its
-  sections 10, 11 and 12) is implemented through Phase 10, including the main
-  session's re-pin of the shared-file manifest (AM27); its critic,
-  AAA-ENGINE-2026-P10, ended at round 2 with every finding resolved (F1, the
+- Commit state: Phases 1–10 are committed on `feature/custom-engine-support`
+  at `4b4aaea` and pushed; Phase 11 is uncommitted on `feature/content-xr-roles`,
+  branched from `4b4aaea`.
+- The fix plan (revision 4, amendments AM1–AM35, Phases 8, 9, 10 and 11 in its
+  sections 10, 11, 12 and 13) is implemented through Phase 11. Phase 10
+  included the main session's re-pin of the shared-file manifest (AM27); its
+  critic, AAA-ENGINE-2026-P10, ended at round 2 with every finding resolved (F1, the
   phase note's hunk counts; F2, `/create-epics` selecting a module's TR entries
   by `system:`). Phases 1–9 were implemented in the order 1, 2, 3,
   4, 7, 6, 5, 8, 9. Phases 1–8 each passed their harsh-critic review: findings
@@ -46,21 +49,41 @@ Claude behavior or production engine support.
   partial or blocked.
   The guard-lane holes R20 and R22–R32 were not fixed: AM27 supersedes
   them.
+- Phase 11 (section 13, AM32 (a)–(g); the OpenSpec change
+  `add-content-and-xr-roles`) adds, on every engine where it is valid,
+  `lighting-artist`, `cinematic-designer` and `xr-experience-designer`
+  (`model: inherit`, reporting to `art-director`, `narrative-director` and
+  `game-designer`); "DCC Interchange" and "Character Technology" in
+  `technical-artist`, and the VR sections of `qa-lead`, `release-manager` and
+  `performance-analyst`, which apply only when `platform.targets` contains
+  `XR`; the `/setup-engine` XR option and the `platform` block it writes; the
+  Custom seams; the reworded one-shot VR card (AM32(g)); the agent lists and
+  counts; and `studio-tests/test_engine_phase11.py`. Each shared-file hunk is
+  pinned under AM32, AM33, AM34 or AM35. The ledger gained S149–S176, E386–E468 and
+  C168–C218. The integration checks (tasks 9.1, 9.2) passed at snapshot S24.
+  The Phase 11 critic blocked round 1 on F1–F9; AM33 and the fixes answer
+  them. Round 2 found them met and one new defect, F10, answered by AM34;
+  round 3 ended "Push: clear". The re-score (task 9.4, score report 5) gave
+  9.4 at S27 with N1–N3, D1 and D2; AM35 answers them, and the re-check at
+  S28 scored 9.6 / 10 (D2 is left open for C134–C167).
 - Suite: Phase 10's lanes ran only their own tests while other lanes were
   editing; the full suite then passed on the finished tree after the re-pin,
-  none skipped, and `shared_hunks.py check` reports 0 problems. No count is stated
+  none skipped, and `shared_hunks.py check` reports 0 problems. Phase 11's
+  task groups ran only the test modules each task lists; the full suite then
+  passed on the Phase 11 tree at S24, none skipped (task 9.2). No count is stated
   here; the command's `Ran` line is the count, and
   `studio-tests/test_engine_phase8b.py` fails a stated count that differs from
   the suite.
-- Not converged: the fix plan's open points O1–O6, O8, O10–O15 and O17 are open
+- Not converged: the fix plan's open points O1–O6, O8, O10–O15 and O17–O19 are open
   (section 8; O9 is closed by fix 8.6, O16 by AM27, confirmed by the P9 and
   Phase 10 critics); O17 (AM28) records that
   the AM27 manifest does not cover files new outside base skill directories.
-- Ledger: 148 sources, 385 evidence records and 167 claims
+- Ledger: 176 sources, 468 evidence records and 218 claims
   (`run_manifest.json`, last `ledger_` entry). The P9 critic checked C124–C133
-  in round 1 (C126's rewrite in round 2); the Phase 10 critic re-fetched a
-  sample of the claims Phase 10 added (C134–C167: 19 quotes from 13 sources,
-  all verbatim), not every one.
+  in round 1 (C126's rewrite in round 2); the Phase 10 critic reported a
+  re-fetch of 19 quotes from 13 sources of the claims Phase 10 added
+  (C134–C167) in its round-1 hand-back, but its findings file does not list
+  them by evidence id (O12).
 
 ## Scope and result
 

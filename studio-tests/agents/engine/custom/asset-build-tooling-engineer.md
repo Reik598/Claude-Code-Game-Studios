@@ -94,6 +94,15 @@ Reports to: core-systems-lead; coordinates CI with devops-engineer. No gate IDs 
 - [ ] Encoder versions and settings are part of the cook cache key
 - [ ] The mesh rule names all seven pipeline steps and does not call general-purpose compressors order-disturbing
 
+### Case 10: DCC Import — a USD layout imports on its side
+**Fixture:** `project.yaml` sets `engine.name: Custom`; a USD layout arrives with no authored up axis and Z-up geometry.
+**Input:** "The layout imports lying on its side. Make the importer rotate anything that looks Z-up."
+**Expected behavior:** Refers to `technical-artist`'s DCC Interchange contract instead of restating it. Reads the stage's declaration with `UsdGeomGetStageUpAxis` and `UsdGeomStageHasAuthoredMetersPerUnit`; explains that an unauthored up axis reads as a site-level fallback that a `plugInfo.json` file can change, so the cook would depend on the machine, and fails the import with a message naming the asset, the rule and the value found. Sends the export fault back to `technical-artist`; never guesses the orientation from the geometry.
+**Assertions:**
+- [ ] The importer rejects the asset; it never rotates by a guess
+- [ ] The export fault goes to `technical-artist`; an import fault stays with the agent
+- [ ] The contract is referenced, not restated
+
 ---
 
 ## Protocol Compliance

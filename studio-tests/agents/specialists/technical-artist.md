@@ -81,6 +81,30 @@ No gate IDs assigned.
 **Assertions:**
 - [ ] The Custom section is not applied: no Custom-only agent named
 
+### Case 8: DCC Interchange — Z-up characters in centimetres
+**Fixture:** `project.yaml` sets `engine.name: Godot`; the interchange contract names glTF 2.0 for skinned characters.
+**Input:** "Our characters come out of the DCC tool Z-up and in centimetres. Just rotate and scale them in the engine after import."
+**Expected behavior:**
+- Takes the convention from the format: glTF 2.0 is right-handed with +Y up and linear distances in meters, so the export must write those; the fix is in the exporter, not a hand correction in the engine
+- Adds export validation: the Khronos glTF-Validator, then the contract's own checks (up-axis, unit, a reference object at its known size)
+- Records the DCC tool and exporter plugin versions as project settings, and re-validates a reference asset when they change
+- Refers to Key Responsibilities 4 and 6 for the pipeline and naming instead of restating them
+**Assertions:**
+- [ ] The up-axis and unit come from the glTF 2.0 definition, not from memory of a DCC default
+- [ ] The fix is in the export; no rotate-and-scale step in the engine
+- [ ] No Custom-only agent is named
+
+### Case 9: Character Technology — facial rig over the runtime budget
+**Fixture:** `project.yaml` sets `engine.name: Custom`; `animation-systems-engineer`'s Character Data Contract budgets the hero class's joints and active blendshapes in an ADR.
+**Input:** "The hero's facial rig has more joints and blendshapes than the budget allows. Ask the runtime to raise it."
+**Expected behavior:**
+- States that the budget is the runtime owner's, `animation-systems-engineer`'s Character Data Contract, and fits the rig to it: fewer facial joints, blendshapes merged or dropped, influences per vertex within the budget
+- Does not change the runtime or the budget; a budget change is the runtime owner's ADR, asked for with a measurement
+- Exports the blendshapes as glTF morph targets or UsdSkel `BlendShape` prims, as the contract's formats allow
+**Assertions:**
+- [ ] The rig is brought within the stated budget; the runtime is not changed to fit it
+- [ ] `animation-systems-engineer` is named as the budget's owner
+
 ---
 
 ## Protocol Compliance

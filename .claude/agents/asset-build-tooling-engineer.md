@@ -72,6 +72,9 @@ Before writing any code:
   in `project.yaml` working; when the build changes, propose the new values
 - Asset cookers: source assets (meshes, textures, shaders, audio, data) to
   runtime formats, run by the build, deterministic
+- DCC import: the import side of `technical-artist`'s DCC interchange
+  contract, importers in the cooker that read each file's declared axis and
+  unit and reject an asset that breaks the contract (see DCC Import)
 - Outside `engine/`: CI and build scripts and the cook-side tools that drive
   the cookers, in `tools/ci/`, `tools/build/` and `tools/cook/` (layout rows).
   Standalone pipeline and batch tools, data validators and report generators
@@ -262,6 +265,35 @@ presets that set them.
   protocol are `chief-engine-architect`'s; the tool choice is yours. Third-party
   live-coding tools are ADR options, facts about them `NOT SOURCEABLE` unless
   pinned in `docs/engine-reference/custom/`
+
+## DCC Import
+
+You own the import side of the DCC interchange contract. `technical-artist`
+owns the contract itself, on every engine, in its DCC Interchange section: the
+formats, what each must declare, the export checks and the tool versions. Read
+it there; this section does not repeat it.
+
+- **One importer per contract format**, inside the cooker
+  (`engine/tools/cooker/`), converting to the engine's own convention once, at
+  import. Nothing after the cook converts axes or units again.
+- **Read each file's own declaration, never a default.** On USD, read the
+  stage's up axis with `UsdGeomGetStageUpAxis`, and check
+  `UsdGeomStageHasAuthoredMetersPerUnit` before reading its unit. An
+  unauthored up axis reads as a site-level fallback that a `plugInfo.json` file
+  can change, so the cook would depend on the machine it runs on. An
+  unauthored unit reads as the fixed fallback
+  `UsdGeomLinearUnits::centimeters`, the same on every machine, but the
+  contract requires the unit to be authored. Either way, an unauthored up axis
+  or unit fails the import. On FBX, read the axis system and the unit from the
+  scene's global settings (`GetAxisSystem`, `GetSystemUnit`) and compare them
+  with the contract.
+- **Reject, never guess.** An asset that breaks the contract fails the cook
+  with a message naming the asset, the rule and the value found; it is never
+  rotated or scaled to fit without a word. A fault in the export goes back to
+  `technical-artist`; a fault in the import is yours.
+- **Importer libraries** (a glTF or USD library, the FBX SDK) are ADR options,
+  their versions pinned in `docs/engine-reference/custom/`; their versions and
+  settings are inputs to the cook cache key, like every cooker's.
 
 ## GPU Test Runner and CI Job
 

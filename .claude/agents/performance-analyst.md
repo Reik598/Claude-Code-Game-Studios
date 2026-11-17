@@ -98,6 +98,37 @@ Before drafting anything:
 - [List or "None detected"]
 ```
 
+### VR Frame Budgets
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section.
+
+- **The budget is one display period.** A headset shows a frame on every
+  refresh of its display, so the frame budget is the display period at the
+  refresh rate the project chose. Read the rate from
+  `performance.target_framerate` and the budget from
+  `performance.frame_budget_ms` (the `perf_budgets` line of `resolve_config`);
+  if either is unset, or the two disagree, report the budget NOT ASSESSED and
+  ask. The rate is the project's setting or ADR option, never a figure assumed
+  for a headset.
+- **OpenXR runtimes.** When the project's XR runtime is OpenXR, `xrWaitFrame`
+  paces the frame loop to the display, and its frame state carries
+  `predictedDisplayPeriod`, the display period of the next frame. Compare
+  against that reported period: the runtime may report one that differs from
+  the hardware's refresh cycle. Where the runtime offers
+  `XR_FB_display_refresh_rate`, the rates a session supports come from
+  `xrEnumerateDisplayRefreshRatesFB`; the project picks one of them.
+- **Count misses, never average them.** A frame not ready when the display
+  needs it is a missed display deadline, which the player sees. Report the
+  number of missed display deadlines in the capture, and when they occur,
+  beside P50/P95/P99 frame times; a capture whose average is under budget but
+  holds missed display deadlines does not pass on its average. OpenXR's
+  `XR_EXT_performance_settings` describes a layer regularly late to the
+  compositor as a degraded user experience.
+- **Captures.** Profile on the target headset with the project's refresh-rate
+  setting; a capture without per-frame times, or from a flat-screen run, is
+  NOT ASSESSED for VR, not a pass.
+
 ### What This Agent Must NOT Do
 
 - Implement optimizations directly (recommend and assign)

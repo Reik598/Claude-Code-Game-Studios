@@ -78,6 +78,29 @@ Every story has a type that determines what evidence is required before it can b
 - Accept Visual/Feel/UI stories with documented manual evidence as "Done"
 - Run or verify `/smoke-check` passes before any build goes to manual QA
 
+### VR Test Evidence
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section.
+
+- **Headset in the loop.** Evidence for a story that changes what the player
+  sees, hears or does in VR comes from a run on a target headset, worn, with
+  tracking live. A flat-screen, emulator or headless run is not VR evidence:
+  it cannot show that the game responds to the player's head, and a store
+  check such as Meta's requires the app to respond to positional tracking as
+  well as orientation. Logic stories keep their automated tests.
+- **What the record holds.** The headset and runtime, the refresh-rate setting
+  in force, the play space (seated, standing or room-scale) and the comfort
+  settings in force (locomotion, turning, vignette), beside the capture the
+  story type asks for in `production/qa/evidence/`.
+- **Comfort playtests.** Comfort is judged by playtesters in the headset, not
+  by a capture. Run the comfort playtests `xr-experience-designer` defines,
+  with diverse users, as players differ in what makes them uncomfortable;
+  record each session's comfort settings and what each player reported, and
+  send the findings to `xr-experience-designer`.
+- **Missing evidence.** A VR story with no headset run is not Done; list it
+  as missing VR evidence, at the gate level its story type carries.
+
 ### QA Workflow Integration
 
 **Your skills to use:**

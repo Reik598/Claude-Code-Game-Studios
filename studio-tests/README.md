@@ -6,7 +6,7 @@ Tests the skills and agents themselves — not any game built with them.
 **This ships as part of the template, and it is meant to.** Claude Code Game Studios is a template
 you are expected to customize — edit a skill, add your own, retune an agent. This
 folder is how you check that what you changed still holds up: `catalog.yaml`
-tracks all 81 skills and 74 agents, `quality-rubric.md` defines per-category
+tracks all 81 skills and 77 agents, `quality-rubric.md` defines per-category
 pass/fail metrics, and `templates/` gives you the spec format for anything new
 you write. Driven by `/skill-test` and `/skill-improve`.
 
@@ -31,7 +31,7 @@ you write. Driven by `/skill-test` and `/skill-improve`.
 studio-tests/
 ├── README.md              ← you are here
 ├── CLAUDE.md              ← tells Claude how to use this framework
-├── catalog.yaml           ← master registry: all 81 skills + 74 agents, coverage tracking
+├── catalog.yaml           ← master registry: all 81 skills + 77 agents, coverage tracking
 ├── quality-rubric.md      ← category-specific pass/fail metrics for /skill-test category
 │
 ├── skills/                ← behavioral spec files for all 81 skills
@@ -48,13 +48,13 @@ studio-tests/
 ├── agents/                ← behavioral spec files for agents (one per agent)
 │   ├── directors/         ← creative-director, technical-director, producer, art-director
 │   ├── leads/             ← lead-programmer, narrative-director, audio-director, game-designer, systems-designer, level-designer, qa-lead
-│   ├── specialists/       ← gameplay/engine/network/AI/tools/UI programmers, technical-artist, sound-designer, ux-designer, performance-analyst, prototyper, writer, world-builder
+│   ├── specialists/       ← gameplay-programmer, engine-programmer, network-programmer, ai-programmer, tools-programmer, ui-programmer, technical-artist, sound-designer, ux-designer, performance-analyst, prototyper, writer, world-builder, lighting-artist, cinematic-designer, xr-experience-designer
 │   ├── engine/            ← engine-specific specialists, split per engine:
 │   │   ├── godot/         ← Godot-specific specialists
 │   │   ├── unity/         ← Unity-specific specialists
 │   │   ├── unreal/        ← Unreal-specific specialists
 │   │   └── custom/        ← Custom-engine leads and specialists
-│   ├── operations/        ← devops, release, live-ops, community, analytics, economy, localization
+│   ├── operations/        ← devops-engineer, release-manager, live-ops-designer, community-manager, analytics-engineer, economy-designer, localization-lead
 │   └── qa/                ← qa-tester, security-engineer, accessibility-specialist
 │
 ├── templates/             ← spec file templates for writing new specs
@@ -167,7 +167,7 @@ did not. The full rules are in the docstring of `shared_hunks.py`.
 |------|--------|
 | `directors` | creative-director, technical-director, producer, art-director |
 | `leads` | lead-programmer, narrative-director, audio-director, game-designer, systems-designer, level-designer, qa-lead |
-| `specialists` | gameplay-programmer, engine-programmer, network-programmer, ai-programmer, tools-programmer, ui-programmer, ux-designer, technical-artist, sound-designer, performance-analyst, prototyper, writer, world-builder |
+| `specialists` | gameplay-programmer, engine-programmer, network-programmer, ai-programmer, tools-programmer, ui-programmer, ux-designer, technical-artist, sound-designer, performance-analyst, prototyper, writer, world-builder, lighting-artist, cinematic-designer, xr-experience-designer |
 | `engine/godot` | godot-specialist, godot-gdscript-specialist, godot-csharp-specialist, godot-shader-specialist, godot-gdextension-specialist |
 | `engine/unity` | unity-specialist, unity-ui-specialist, unity-shader-specialist, unity-dots-specialist, unity-addressables-specialist |
 | `engine/unreal` | unreal-specialist, ue-gas-specialist, ue-replication-specialist, ue-umg-specialist, ue-blueprint-specialist |

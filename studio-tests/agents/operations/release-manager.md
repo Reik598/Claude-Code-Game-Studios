@@ -85,6 +85,25 @@
 **Assertions**:
 - [ ] The Custom section is not applied: no Custom-only agent or engine release named
 
+### Case 8: VR Store Certification — a Steam game that also ships on Quest
+**Fixture**: `project.yaml` sets `engine.name: Unreal`, `platform.cert_tier: steam` and `platform.targets: [PC, XR]`; the user says the game also ships on the Meta Horizon Store.
+**Input**: "Build the release checklist for 1.0."
+**Expected behavior**:
+- Keeps the Steamworks block that `platform.cert_tier: steam` selects, and adds the VR store requirements to it, not in its place
+- For the Meta Horizon Store, tracks each Virtual Reality Check by its ID with pass/fail/not-applicable, citing the VRC page with the date it was read; takes the refresh rates of VRC.Quest.Performance.1 from that page, not from memory
+- Copies no threshold from memory into the checklist; marks any store whose requirements it cannot read `NOT SOURCEABLE`, leaving that store's item NOT ASSESSED
+**Assertions**:
+- [ ] Both the Steamworks block and the VR store requirements are present, each citing its source page
+- [ ] No refresh rate or other threshold is stated without the page it was read from
+
+### Case 9: VR Store Certification — XR with `cert_tier: none`
+**Fixture**: `project.yaml` sets `engine.name: Web`, `platform.cert_tier: none` and `platform.targets: [Web, XR]`.
+**Input**: "Prepare the release for our jam build."
+**Expected behavior**:
+- Emits no certification section and no VR store block, and says why: `cert_tier` is `none`
+**Assertions**:
+- [ ] No VR store requirement is listed for a `none` release
+
 ---
 
 ## Protocol Compliance

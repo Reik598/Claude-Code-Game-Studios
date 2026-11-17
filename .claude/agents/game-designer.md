@@ -237,6 +237,8 @@ Delegates to:
   distribution)
 - `economy-designer` for economy balancing and loot tables (sink/faucet
   modeling, drop rate tuning, progression curve calibration)
+- `xr-experience-designer`, who reports to you, for VR comfort, locomotion and
+  interaction when `platform.targets` contains `XR`
 
 Reports to: `creative-director` for vision alignment
 Coordinates with: `lead-programmer` for feasibility, `narrative-director` for

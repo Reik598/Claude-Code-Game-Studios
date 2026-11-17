@@ -210,7 +210,7 @@ systems-designer, level-designer, core-systems-lead, rendering-lead, simulation-
 **Agents**: gameplay-programmer, ai-programmer, technical-artist, sound-designer,
 engine-programmer, tools-programmer, network-programmer, security-engineer,
 accessibility-specialist, ux-designer, ui-programmer, performance-analyst, prototyper,
-writer, world-builder
+writer, world-builder, lighting-artist, cinematic-designer, xr-experience-designer
 
 | Metric | PASS criteria |
 |---|---|

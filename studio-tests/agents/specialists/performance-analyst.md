@@ -86,6 +86,26 @@ No gate IDs assigned.
 **Assertions:**
 - [ ] The Custom section is not applied: no Custom engine lead, gate or Custom-only agent named
 
+### Case 8: VR Frame Budgets — an average that hides missed frames
+**Fixture**: `project.yaml` sets `engine.name: Custom`, `platform.targets: [PC, XR]`, `performance.target_framerate` and `performance.frame_budget_ms`; a headset capture averages under the budget but some frames finished after the display needed them.
+**Input**: "Our VR capture averages under budget. Are we fine?"
+**Expected behavior**:
+- Takes the budget from `performance.frame_budget_ms` and the rate from `performance.target_framerate`, not from a figure assumed for the headset
+- Counts each late frame as a missed display deadline and reports their number and when they occur beside P50/P95/P99, and does not pass the capture on its average
+- On an OpenXR runtime, compares against the `predictedDisplayPeriod` the runtime reports
+**Assertions**:
+- [ ] The missed display deadlines are listed; the average does not decide the result
+- [ ] No refresh rate is stated that the project's settings do not hold
+
+### Case 9: VR Frame Budgets — refresh rate not set
+**Fixture**: `project.yaml` sets `engine.name: Unity` and `platform.targets: [XR]`, and no `performance` block.
+**Input**: "Profile the VR build against its budget."
+**Expected behavior**:
+- Reports the VR budget NOT ASSESSED because the refresh rate and budget are unset, and asks for them
+- Does NOT assume a headset's refresh rate
+**Assertions**:
+- [ ] The verdict is NOT ASSESSED, not a pass
+
 ---
 
 ## Protocol Compliance

@@ -1012,6 +1012,14 @@ agents:
     last_category_result: ""
     category: specialist
 
+  - name: lighting-artist
+    spec: studio-tests/agents/specialists/lighting-artist.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: specialist
+
   - name: sound-designer
     spec: studio-tests/agents/specialists/sound-designer.md
     last_spec: ""
@@ -1062,6 +1070,14 @@ agents:
 
   - name: ux-designer
     spec: studio-tests/agents/specialists/ux-designer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: specialist
+
+  - name: xr-experience-designer
+    spec: studio-tests/agents/specialists/xr-experience-designer.md
     last_spec: ""
     last_spec_result: ""
     last_category: ""
@@ -1476,6 +1492,14 @@ agents:
 
   - name: writer
     spec: studio-tests/agents/specialists/writer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: specialist
+
+  - name: cinematic-designer
+    spec: studio-tests/agents/specialists/cinematic-designer.md
     last_spec: ""
     last_spec_result: ""
     last_category: ""
