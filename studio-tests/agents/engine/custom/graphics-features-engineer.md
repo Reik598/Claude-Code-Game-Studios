@@ -97,6 +97,14 @@ Reports to: rendering-lead. No gate IDs assigned.
 - [ ] Technique facts are attributed to the Nanite course notes, not stated as universal truths
 - [ ] No performance number for this project without a capture
 
+### Case 10: Industry lessons — "GPU culling is a free 70%"
+**Input:** "DOOM Eternal removes about 70% of triangles on the GPU. Add GPU triangle culling, it's a free win."
+**Expected behavior:** Reads the entry "GPU triangle culling and merged indirect draws" in `.claude/docs/engine-industry-lessons.md`. Says the figure is from a 2020 talk about DOOM Eternal (about 70% of submitted triangles in a typical scene there), not a figure for this project, and states the entry's cost: merged geometry has to use the same pipeline state, and the merging relies on a completely bindless GPU pipeline. Routes GPU culling itself to `shader-pipeline-engineer`, as its redirects say, and offers the lesson as an input to an ADR option.
+**Assertions:**
+- [ ] The 70% figure is attributed to the 2020 talk, not promised for this project
+- [ ] Both costs from the entry are named
+- [ ] GPU culling is routed to `shader-pipeline-engineer`
+
 ---
 
 ## Protocol Compliance

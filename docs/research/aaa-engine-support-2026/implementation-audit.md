@@ -9,13 +9,15 @@ plan `fix-plan.md` replaced this audit. The current state is under "Final
 state" below and in `CONTINUE-ENGINE-SUPPORT.md`. No completion claim for live
 Claude behavior or production engine support.
 
-## Final state (17 November 2026)
+## Final state (18 November 2026)
 
 - Commit state: Phases 1–10 are committed on `feature/custom-engine-support`
-  at `4b4aaea` and pushed; Phase 11 is uncommitted on `feature/content-xr-roles`,
-  branched from `4b4aaea`.
-- The fix plan (revision 4, amendments AM1–AM35, Phases 8, 9, 10 and 11 in its
-  sections 10, 11, 12 and 13) is implemented through Phase 11. Phase 10
+  at `4b4aaea` and pushed; Phase 11 is committed as `7929b58` on
+  `feature/content-xr-roles` (branched from `4b4aaea`), pushed, not merged.
+  Phase 12 (part 2) is implemented on `feature/custom-engine-xr-numerics-demo`,
+  branched from `7929b58`, uncommitted.
+- The fix plan (revision 4, amendments AM1–AM37, Phases 8, 9, 10, 11 and 12 in its
+  sections 10, 11, 12, 13 and 14) is implemented through Phase 12. Phase 10
   included the main session's re-pin of the shared-file manifest (AM27); its
   critic, AAA-ENGINE-2026-P10, ended at round 2 with every finding resolved (F1, the
   phase note's hunk counts; F2, `/create-epics` selecting a module's TR entries
@@ -66,11 +68,36 @@ Claude behavior or production engine support.
   round 3 ended "Push: clear". The re-score (task 9.4, score report 5) gave
   9.4 at S27 with N1–N3, D1 and D2; AM35 answers them, and the re-check at
   S28 scored 9.6 / 10 (D2 is left open for C134–C167).
+- Phase 12 (section 14, AM36 (a)–(g) and AM37; the OpenSpec change
+  `add-custom-engine-xr-numerics-demo`) adds, on Custom only, the XR
+  contracts of `platform-engineer`, `audio-engine-engineer`, the
+  `frame-budget.md` template and `cea-frame-budget.md` (each applying only
+  when `platform.targets` contains `XR`); the Numerics section of
+  `ecs-dod-architect` and the ULP-bound-or-tolerance rule of
+  `ecs-math-code.md`; the research route of `chief-engine-architect` with the
+  `/prototype` engine spike; the `/vertical-slice` tech-demo path;
+  `.claude/docs/engine-industry-lessons.md` with its pointer lines; and
+  `studio-tests/test_engine_phase12.py`. Its shared-file hunks are each pinned
+  `custom-addition` (the `/vertical-slice` Phase 6 block re-pinned under
+  AM37). The ledger gained S177–S205, E469–E578 and C219–C265. The
+  integration checks passed (tasks 8.1, 8.2): `propose` found no new hunk,
+  `check` reports 0 problems, and the full suite passed on the Phase 12 tree
+  at S29, none skipped. The Phase 12 critic (task 8.3) blocked its round 1
+  on F1–F5 and its round 2 on F6 (the fix plan's Status line), with F7 a
+  follow-up; AM37 and the fixes answer them, and its round 3 ended "Push:
+  clear". F7 is carried into AM36(g): a lesson's problem line, like its cost
+  line, may read `NOT SOURCEABLE` with its reason. The independent re-score
+  (task 8.4) gave 9.4/10 at S32 (score report 6); its N1 (three lesson
+  labels: I1's and MC2's problem, M1's cost, now `NOT SOURCEABLE`) and N2
+  (tighter checks in `test_engine_phase12.py`) were addressed; the re-check gave
+  9.6/10 at S33.
 - Suite: Phase 10's lanes ran only their own tests while other lanes were
   editing; the full suite then passed on the finished tree after the re-pin,
   none skipped, and `shared_hunks.py check` reports 0 problems. Phase 11's
   task groups ran only the test modules each task lists; the full suite then
-  passed on the Phase 11 tree at S24, none skipped (task 9.2). No count is stated
+  passed on the Phase 11 tree at S24, none skipped (task 9.2). Phase 12's
+  task groups did the same, and the full suite then passed on the Phase 12
+  tree at S29, none skipped (task 8.2). No count is stated
   here; the command's `Ran` line is the count, and
   `studio-tests/test_engine_phase8b.py` fails a stated count that differs from
   the suite.
@@ -78,12 +105,17 @@ Claude behavior or production engine support.
   (section 8; O9 is closed by fix 8.6, O16 by AM27, confirmed by the P9 and
   Phase 10 critics); O17 (AM28) records that
   the AM27 manifest does not cover files new outside base skill directories.
-- Ledger: 176 sources, 468 evidence records and 218 claims
+- Ledger: 205 sources, 578 evidence records and 265 claims
   (`run_manifest.json`, last `ledger_` entry). The P9 critic checked C124–C133
   in round 1 (C126's rewrite in round 2); the Phase 10 critic reported a
   re-fetch of 19 quotes from 13 sources of the claims Phase 10 added
   (C134–C167) in its round-1 hand-back, but its findings file does not list
-  them by evidence id (O12).
+  them by evidence id (O12). The Phase 12 critic (AAA-ENGINE-2026-P12)
+  re-fetched every quote E469–E572 and the reused E31, E89, E331 and E332 in
+  round 1 and E573–E574 in round 2, and found each verbatim; the statuses of
+  C219–C265 record this. After the review, C248, C259 and C262 were rewritten
+  for score report 6 N1 and E575–E578 added; their statuses record the curl
+  re-fetch of their quotes, and no critic has reviewed the new wording.
 
 ## Scope and result
 

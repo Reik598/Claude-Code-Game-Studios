@@ -500,3 +500,5 @@ training data.
 - **security-engineer** — untrusted asset input to cookers and loaders
 
 Reports to: **core-systems-lead**; coordinates CI with **devops-engineer**
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "A versioned, data-driven creator format"; "Data described in script, with versioning and a permutation budget"

@@ -94,6 +94,28 @@ to add "just one more system." Resist this. Cut, do not extend.
 
 Present scope to the user before building and get confirmation.
 
+**Engine tech demo (Custom only):** Read `engine.name` from `project.yaml`. When
+it is `Custom`, also offer an engine tech-demo path: the slice also shows chosen
+engine capabilities, judged against a frame budget on target hardware. If the
+user takes it, ask which engine capabilities the demo shows, the frame budget it
+is judged on and the target hardware. The Phase 3 plan then lists each capability
+with its module owner, its budget and its evidence: a `/benchmark-report` capture
+(print the command for the user to run) or a test. Route the work by name:
+- Engine work goes to the module owner, through its lead, as listed in
+  `.claude/docs/custom-engine-layout.md`.
+- Content work goes to `lighting-artist` (lighting the showcase scene),
+  `cinematic-designer` (the shots and the cut), `technical-artist` (shaders, VFX
+  and art-to-engine issues), `level-designer` (the layout and pacing of the demo
+  level), `world-builder` (the lore and world rules the demo shows) and
+  `sound-designer` (the sound effect specifications).
+- The demo build is owned by `asset-build-tooling-engineer`: the exact tested
+  build, its configuration and its frozen content.
+- The footage is owned by `cinematic-designer`: each clip records the build, the
+  hardware, the settings, and whether it was rendered offline with
+  render-to-movie or captured in real time.
+- The content handoffs are one-way references: the tech-demo path names these
+  agents, and they need no reference back to it.
+
 ---
 
 ## Phase 3: Plan the Build
@@ -287,6 +309,20 @@ exist) — append one row to the vertical slice table: concept name, date, verdi
 and a link to the REPORT.md. Note whether this was a first-run slice or a re-run
 after a PIVOT. The velocity log in this report is some of the most valuable data in
 the project — cross-reference it with sprint estimates.
+
+**Engine tech demo report (Custom only):** When `engine.name` is `Custom` and the
+user took the Phase 2 tech-demo path, put three more sections into the report draft
+before you ask "May I write this report" above, so that the report the user
+approves and the file you write both hold them. Add them at the report's own
+heading level, before the recommendation: Demo Capabilities (each capability with
+its module owner, budget, evidence and result), Demo Build (its owner, and the
+exact tested build, its configuration and its frozen content) and Footage (its
+owner, and for each clip the build, hardware, settings, and offline or real-time).
+Judge the evidence in that draft by these rules:
+- Footage rendered offline with `render-to-movie` is not performance evidence: a
+  performance claim that cites it is rejected in the report, with the reason.
+- With no real-time capture on the target hardware, the performance item is
+  `NOT ASSESSED`, with the reason, and never recorded as met.
 
 ---
 

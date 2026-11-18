@@ -460,6 +460,61 @@ Fixture defaults.
 
 ---
 
+### Case 13: Spike Mode on Custom — the engine spike
+
+**Fixture:**
+- `project.yaml` has `engine.name: Custom`; `.claude/docs/custom-engine-layout.md`
+  names `render-graph-specialist` as the owner of `engine/renderer/`
+- Review mode: `solo`
+- The question is about a render-graph technique from a published paper
+
+**Input:** `/prototype transient-aliasing --spike`
+
+**Expected behavior:**
+1. Spike Mode runs its steps (question, path, scope, build, note), and also offers
+   an engine spike: a spike that
+   tests the technique against the engine's budgets, following
+   `chief-engine-architect`'s research route
+2. The owner of the affected module, `render-graph-specialist`, is spawned through
+   the Agent tool to write the engine-side code of the spike, and writes the ADR
+   option the spike leads to
+3. The spike keeps spike mode's ~4-hour cap and its folder in `prototypes/`
+   (`prototypes/transient-aliasing-spike-[date]/`, after its ask) and never touches
+   `engine/`
+4. The spike note's result is a measurement against the engine's budgets and an
+   ADR option, not a merge into `engine/`
+
+**Assertions:**
+- [ ] The engine spike is offered, and the spike's engine-side code is written by `render-graph-specialist`, not by the skill itself
+- [ ] No file under `engine/` is created or changed
+- [ ] The spike stays within the ~4-hour cap; a larger study is split into spikes, each with its own question
+- [ ] The spike note names a measurement and an ADR option; nothing is merged into `engine/`
+- [ ] The spike folder and the note-and-`active.md` write each follow an ask that names the files
+
+---
+
+### Case 14: Spike Mode on Unity — no engine spike
+
+**Fixture:**
+- `project.yaml` has `engine.name: Unity`; review mode `solo`; `modes.workflow:
+  standard` (pinned: the note and `active.md` then follow Case 4)
+
+**Input:** `/prototype rope-physics --spike`
+
+**Expected behavior:**
+1. Spike Mode runs as in Case 4
+2. No engine spike is offered, and neither `chief-engine-architect`'s research
+   route nor an ADR option is mentioned: the engine spike is an option shown on
+   Custom only (fix plan amendment AM36(a)), not a skipped check, so nothing
+   announces its absence
+
+**Assertions:**
+- [ ] The words "engine spike" do not appear in the run
+- [ ] No Custom engine agent is spawned
+- [ ] The spike note and `active.md` follow Case 4
+
+---
+
 ## Protocol Compliance
 
 - [ ] One-shot: no route question; at most one plain-text round of quick questions, only for what the person's words leave open; the card comes before any write, and only an explicit Build it goes on

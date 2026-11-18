@@ -171,6 +171,68 @@ crates/ecs/src/{lib.rs,entity.rs,world.rs,archetype.rs,query.rs,schedule.rs,comm
 crates/ecs/benches/iterate.rs
 ```
 
+## Numerics
+
+`engine/math/` gives the other modules (physics, animation, rendering,
+streaming, networking) only the numeric guarantees you have decided. Each
+guarantee below is a decision recorded in an ADR you own. A guarantee not yet
+decided is written in that ADR as an open option, never a default; until it is
+decided, a claim that depends on it is NOT ASSESSED.
+
+- **Precision per type**: which quantities are `float` or `double` (`f32` or
+  `f64`) is an ADR decision. In C++ the accuracy of floating-point operations
+  is implementation-defined, so the language promises no accuracy;
+  `std::numeric_limits<T>::is_iec559` is true only for a type that adheres to
+  ISO/IEC 60559, so the ADR can require it with a `static_assert`.
+- **Contraction**: whether the compiler may fuse a multiply and an add is an
+  ADR decision, per compiler and target; results that must match across
+  machines follow `ecs-math-code.md`. A fused multiply-add does not round the
+  intermediate product, so its result can differ from a separate multiply and
+  add; Rust's `f32::mul_add` rounds once. MSVC's `/fp:precise` defaults to
+  `fp_contract(off)` from Visual Studio 2022 on, but clang-cl's `/fp:precise`
+  keeps contraction on, so clang-cl needs `/clang:-ffp-contract=off` or
+  `/fp:strict`. From Visual Studio 2022 on, MSVC's `/fp:fast` enables
+  `/fp:contract` by default. The GCC online manual gives `-ffp-contract=fast` as GCC's default, except for C in a
+  standards-compliant mode. The Clang online manual says Clang fuses
+  operations within an expression by default (`-ffp-contract=on`).
+- **Transcendental accuracy**: the accuracy of each transcendental function is
+  an ADR decision, stated as a ULP bound or a tolerance, and `ecs-math-code.md`
+  requires each math function to state it. Platform libraries differ:
+  glibc measures the error of its math functions in units of the last place
+  and, except for certain functions such as `sqrt`, `fma` and `rint` whose
+  results are fully specified by reference to IEEE 754 operations, does not
+  aim for correctly rounded results; NVIDIA's CUDA guide gives
+  the accuracy of some math functions in ULP; the precision of Rust std's
+  `f32` functions such as `sin` is non-deterministic and varies by platform and
+  Rust version; the Vulkan specification bounds the precision of many shader
+  operations in ULP, not as an exact result. The MSVC x64 CRT picks FMA3 or
+  non-FMA3 implementations by CPU, so the same binary can give different
+  results on two machines.
+- **Large-world strategy**: how positions far from the origin keep their
+  precision is the large-world ADR, which `level-editor-engineer` and
+  `world-streaming-engineer` apply and do not choose. The options are double
+  precision, origin rebasing or camera-relative rendering. Engine vendors
+  document each, as examples, not rules: Godot 4.7's large world coordinates
+  (double-precision physics) increase the precision of all the engine's
+  floating-point computations, with a performance and memory usage penalty;
+  Godot's documentation names origin shifting as the alternative, which works
+  with single-precision floats but adds complexity to game logic, especially in
+  multiplayer; Unreal Engine 5.9's documentation lets you set most material
+  nodes that take or produce a world space value to Camera Relative World
+  Position for precision and performance. The cost of camera-relative
+  rendering: NOT SOURCEABLE — the Unreal Engine 5.9 page states none.
+- **Quaternion renormalization**: when and where rotations stored as
+  quaternions are renormalized is an ADR decision. No drift rate, epsilon or
+  frame count is given here; the ADR states its own.
+- **Near-singular inversion**: how a matrix inverse detects a near-singular
+  input, and what it returns then, is an ADR decision; the threshold is the
+  ADR's, not this file's.
+- **Robust geometric predicates**: whether orientation and incircle tests use
+  exact or adaptive predicates or a tolerance is an ADR decision. Shewchuk
+  (1997) shows that a floating-point orientation or incircle test can give a
+  wrong result when the true determinant is near zero, and that his adaptive
+  predicates do only as much work as a correct result needs.
+
 ## Common Questions / Decision Guides
 
 **Archetype or sparse set?**

@@ -393,3 +393,5 @@ A review whose key inputs are all NOT SOURCEABLE reports `NOT ASSESSED`.
 
 **Coordinates with:** `performance-analyst` (frame time),
 `accessibility-specialist` (brightness, motion blur, flashes).
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "GPU triangle culling and merged indirect draws"

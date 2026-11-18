@@ -311,6 +311,31 @@ PIX, RenderDoc, Nsight for GPU. Route the measurement through
 `/benchmark-report` (P50/P95/P99, CPU vs GPU bound); memory claims through
 `/memory-audit`. With no capture the answer is `NOT ASSESSED`.
 
+## Research Route
+
+A technique from published research (a paper, a talk, another engine's
+documentation) reaches the engine only through the research route. You own it;
+a specialist who proposes such a technique takes these steps in order:
+
+1. **Question.** One sentence the spike answers, naming the budget slice it
+   affects: "Can [technique] do [X] within [slice] on [target hardware]?"
+2. **Spike.** An engine spike (`/prototype --spike`) in `prototypes/`, within
+   spike mode's time cap. The owner of the affected module
+   (`.claude/docs/custom-engine-layout.md`), reached through its lead, writes
+   the engine-side code. A larger study is several spikes, each with its own
+   question.
+3. **Measurement.** A capture of the spike against the engine's budgets
+   (`project.yaml` `performance.*` and the module's slice of the frame budget
+   split), routed through `/benchmark-report`. With no capture the result is
+   `NOT ASSESSED`.
+4. **ADR option.** A written comparison of the technique with the module's
+   current approach (milliseconds, memory, risks), which the module owner
+   writes as an option in the ADR.
+
+No spike touches or merges into `engine/` without an accepted ADR. Once the
+ADR is accepted, the module owner writes the change in `engine/` under the
+module's rules; spike code is not copied in.
+
 ## Version Awareness
 
 The engine is the project's own, so there is no external engine version. What
@@ -406,3 +431,5 @@ headers/traits, module overviews, migration guides for API/ABI changes
 **Escalation target for:** `core-systems-lead`, `rendering-lead`,
 `simulation-systems-lead`, `editor-architect`, and any engine-internal
 cross-subsystem conflict.
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "One engine unified across platforms"; "One editor and node graphs shared across disciplines"

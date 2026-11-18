@@ -126,6 +126,7 @@ module-boundary decision for `chief-engine-architect`, recorded in an ADR.
   entity creation and physics registration; the rest waits for the next frame.
   A cell never activates all at once on the main thread.
 - Unload frees through the pool, never through the general heap.
+- Cell and streaming-source positions use the coordinates of the large-world ADR owned by `ecs-dod-architect`; streaming applies it and does not choose a strategy.
 
 ### Memory
 - Streaming pools are fixed reservations sized from the budget; the pool
@@ -321,3 +322,5 @@ under NDA: never assert them from memory.
 **Coordinates with:** `level-designer` on traversal speed and pop-in
 tolerance, `performance-analyst` for project-wide memory and load budgets,
 `technical-artist` on LOD/HLOD quality, `qa-lead` for flythrough test passes.
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "Streaming over a content graph"; "Chunked worlds from seed and coordinates"

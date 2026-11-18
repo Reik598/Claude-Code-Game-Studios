@@ -64,6 +64,11 @@ reviewing such a change.
 - A baseline exists but the report's `Regression result` reads
   `NOT ASSESSED` for a reason other than `no baseline` (captures not
   comparable, no threshold given)
+- `platform.targets` in `project.yaml` contains `XR` and
+  `performance.target_framerate` is unset, so no frame can be judged against
+  its missed display deadline. `platform.targets` is not in the context you
+  are passed: read it from `project.yaml` yourself. On a project whose targets
+  hold no `XR`, this item does not apply
 
 A known breach outranks a gap: a CPU or GPU frame P95, or an affected
 subsystem's P95, over its budget is REJECT even when another column or the

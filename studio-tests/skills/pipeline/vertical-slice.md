@@ -273,6 +273,86 @@ Fixture defaults.
 
 ---
 
+### Case 7: Custom — the engine tech-demo path
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `engine.language: C++23`,
+  `modes.review_mode: solo`; `.claude/docs/custom-engine-layout.md` names
+  `graphics-features-engineer` as the owner of `engine/renderer/features/`, with
+  `rendering-lead` as its lead
+- The design and architecture files of Case 1 exist
+- In Phase 2 the user takes the tech-demo path: the demo shows ray-traced shadows
+  in a lit showcase scene, judged against the project's frame budget on one named
+  target GPU
+- Run A: a real-time capture on the target hardware exists, through
+  `/benchmark-report`
+- Run B: the only footage was rendered offline with render-to-movie, and the draft
+  report cites it for the performance claim; there is no real-time capture on the
+  target hardware
+
+**Input:** `/vertical-slice`
+
+**Expected behavior:**
+1. In Phase 2 the skill reads `engine.name` from `project.yaml` inside its Custom
+   block (the bootstrap line resolves only `review_mode,automation,workflow`); it
+   is `Custom`, so the engine tech-demo path is offered
+2. Taken, the path asks which engine capabilities the demo shows, the frame budget
+   it is judged on and the target hardware
+3. The Phase 3 plan lists each capability with its module owner, its budget and its
+   evidence: ray-traced shadows → `graphics-features-engineer` (through
+   `rendering-lead`), with a `/benchmark-report` capture (the command printed for
+   the user to run) or a test
+4. Content work is routed by name: lighting the showcase scene → `lighting-artist`;
+   the shots and the cut → `cinematic-designer`; the other content work to
+   `technical-artist`, `level-designer`, `world-builder` and `sound-designer`,
+   each for the part the skill lists beside it
+5. The demo build is owned by `asset-build-tooling-engineer` (the exact tested
+   build, its configuration and its frozen content); the footage is owned by
+   `cinematic-designer`, and each clip records the build, the hardware, the
+   settings, and whether it was rendered offline with render-to-movie or captured
+   in real time
+6. Phase 6 adds Demo Capabilities, Demo Build and Footage sections to the report
+   draft, at its own heading level, before the recommendation, and does so before
+   it asks "May I write this report"; in Run A the capture is the evidence of the
+   performance item in Demo Capabilities
+7. Run B: the performance claim that cites the render-to-movie footage is rejected
+   in the report as performance evidence, with the reason; with no real-time
+   capture on the target hardware, the performance item is `NOT ASSESSED`, with the
+   reason, and is not recorded as met
+
+**Assertions:**
+- [ ] The tech-demo path is offered only after `engine.name` is read as `Custom`
+- [ ] Each capability in the plan has a module owner, a budget and its evidence
+- [ ] Lighting the showcase scene goes to `lighting-artist`
+- [ ] The demo build and the footage each have the named owner, and each clip records build, hardware, settings, and offline or real-time
+- [ ] Run B: render-to-movie footage is not accepted as performance evidence
+- [ ] Run B: the performance item reads `NOT ASSESSED` with its reason, never met
+- [ ] The three sections, judged by the evidence rules, are in the report the user approves at the "May I write" ask, and in the REPORT.md written for this slice, before its recommendation
+
+---
+
+### Case 8: Godot — no tech-demo path
+
+**Fixture:**
+- As Case 1 (`engine.name: Godot`, `modes.review_mode: solo`,
+  `modes.workflow: standard`)
+
+**Input:** `/vertical-slice`
+
+**Expected behavior:**
+1. Phases 1–8 run as in Case 1
+2. No tech-demo path is offered in Phase 2 and no Demo Capabilities, Demo Build or
+   Footage section is added in Phase 6: the path is an option shown on Custom only
+   (fix plan amendment AM36(a)), not a skipped check, so nothing announces its
+   absence
+
+**Assertions:**
+- [ ] The words "tech-demo path" do not appear in the run
+- [ ] No Custom engine agent (such as `asset-build-tooling-engineer` or `graphics-features-engineer`) is named or spawned
+- [ ] REPORT.md has the sections of Case 1 and no Demo Capabilities, Demo Build or Footage section
+
+---
+
 ## Protocol Compliance
 
 - [ ] Reads the concept (or the brief at `minimal`) before defining the validation question

@@ -66,6 +66,20 @@ Reports to: core-systems-lead. No gate IDs assigned.
 - [ ] `core-systems-lead` named as the owner
 - [ ] No unilateral edit; "May I write" before any write
 
+### Case 6: Numerics — accuracy of `sin` and quaternion drift
+**Fixture:** No ADR records the numeric guarantees of `engine/math/`. The project builds with MSVC on Windows and Clang on Linux.
+**Input:** "What accuracy does our `sin` promise physics, and how often should we renormalize quaternions?"
+**Expected behavior:**
+- Answers that the accuracy of `sin` is an ADR decision stated as a ULP bound or a tolerance; with no ADR it is an open option, never a default, and any claim that depends on it is `NOT ASSESSED`
+- Says platform libraries give no single bound (glibc measures error in units of the last place and, except for functions such as `sqrt`, `fma` and `rint`, does not aim for correctly rounded results; Rust std's precision non-deterministic), so the ADR states the engine's own
+- Names quaternion renormalization as an ADR decision and gives no drift rate, epsilon or frame count
+- When contraction comes up, names each compiler with its default (MSVC, GCC, Clang, and clang-cl for `/fp:precise`)
+**Assertions:**
+- [ ] Accuracy framed as an ADR decision with a ULP bound or tolerance; open option when undecided
+- [ ] No number given for renormalization
+- [ ] Every compiler default stated names its compiler
+- [ ] "May I write" before writing the ADR
+
 ---
 
 ## Protocol Compliance

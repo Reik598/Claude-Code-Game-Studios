@@ -72,6 +72,14 @@ Reports to: editor-architect. No gate IDs assigned.
 - [ ] VERSION.md cited
 - [ ] `NOT SOURCEABLE` line; no unsourced API claim
 
+### Case 7: Large worlds — the editor applies the math owner's ADR
+**Fixture:** A designer places objects tens of kilometres from the origin and gizmos jitter. No large-world ADR exists yet.
+**Input:** "Switch the whole engine to double precision so the editor stops jittering."
+**Expected behavior:** Keeps the editor rule (camera-relative rendering, gizmo math in double precision or camera-relative float, no absolute far-from-origin floats sent to the GPU) as the editor's fix, and takes the engine-wide strategy to the large-world ADR owned by `ecs-dod-architect`; does not choose double precision, origin rebasing or camera-relative rendering for the engine itself.
+**Assertions:**
+- [ ] `ecs-dod-architect` named as the owner of the large-world ADR
+- [ ] The editor rule applied; no engine-wide strategy chosen by this agent
+
 ---
 
 ## Protocol Compliance

@@ -334,3 +334,5 @@ data.
 
 **Coordinates with:** `performance-analyst` for project-wide CPU profiling,
 `network-programmer` when networking threads share the scheduler.
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "Fiber-based jobs and frame-centric data lifetime"

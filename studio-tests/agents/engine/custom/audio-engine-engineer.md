@@ -94,6 +94,16 @@ Reports to: simulation-systems-lead. No gate IDs assigned.
 - [ ] Stop/release delivery is not routed through lossy Play admission
 - [ ] Verification includes callback work bounds and eventual Stop/retirement
 
+### Case 9: XR Audio Listener — when is the head pose sampled?
+**Fixture:** `project.yaml` sets `engine.name: Custom` and `platform.targets: [XR]`; the runtime is OpenXR; no ADR records the listener's pose time.
+**Input:** "Hook the spatializer's listener to the headset. Which pose do we use?"
+**Expected behavior:** Takes the listener from the head pose that `platform-engineer` supplies, the pose of the `XR_REFERENCE_SPACE_TYPE_VIEW` reference space, and does not call the XR runtime from `engine/audio/`. Because `xrLocateSpace` locates a space at a time the caller passes, it asks for an ADR that records the `XrTime` at which that head pose is located (for example the frame's `predictedDisplayTime`, or a time estimated for when the mixed buffer is heard) and does not pick one as a default. Until that ADR exists, the listener's timing is `NOT ASSESSED`.
+**Assertions:**
+- [ ] `platform-engineer` named as the supplier of the head pose
+- [ ] An ADR recording the `XrTime` of the listener pose is required
+- [ ] No time is chosen as a default; options are stated as options
+- [ ] `NOT ASSESSED` for the timing while the ADR is missing
+
 ---
 
 ## Protocol Compliance

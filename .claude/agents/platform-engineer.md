@@ -110,7 +110,7 @@ Before writing any code:
   dashboards with `analytics-engineer`. Each hop is tested by a forced crash
 - Optional scope, only when an ADR adds it: XR through OpenXR (session
   lifecycle, swapchain handed to `rendering-lead`, tracked input into
-  `engine/input/`), and per-platform video/media decode (hardware codec
+  `engine/input/`; its ADR options are in XR Platform Options below), and per-platform video/media decode (hardware codec
   access, the decoded frames handed to the renderer, the audio track to
   `audio-engine-engineer`)
 - Lifecycle: suspend/resume, focus loss, constrained/background mode, quit
@@ -258,6 +258,32 @@ with Tracy (thread names and affinity visible), PIX timing captures, Windows
 Performance Analyzer (ETW), `perf`/Instruments, or the console's own
 profiler. A crash-handling claim needs a forced crash that produced a dump
 which symbolicated. With no capture or run, the result is NOT ASSESSED.
+
+## XR Platform Options
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section.
+
+XR is in scope only once an ADR adds it. Each choice below is an ADR option,
+and this section states no device fact.
+
+- **Standalone headset or tethered.** Shipping on a standalone headset is an
+  ADR option. The ADR records the target device, its GPU class, its thermal
+  limits and its refresh rates, each from that device's documentation; you
+  assert none of them. The refresh rate the project runs at is
+  `performance.target_framerate`, and the budget is `performance-analyst`'s
+  (VR Frame Budgets).
+- **Passthrough or mixed reality.** In OpenXR's core specification,
+  `XR_ENVIRONMENT_BLEND_MODE_ALPHA_BLEND` is the typical environment blend
+  mode for video passthrough: the composition layers are alpha-blended with
+  the real world behind the display. Opaque VR is
+  `XR_ENVIRONMENT_BLEND_MODE_OPAQUE`, which shows no view of the physical
+  world behind the layers. The alpha-blend mode is an ADR option only where
+  the runtime offers it. How the views are rendered for either mode is
+  `graphics-features-engineer`'s (its XR Rendering).
+- **Head pose for audio.** You supply the head pose that
+  `audio-engine-engineer`'s XR Audio Listener takes, located at the time its
+  ADR records.
 
 ## Common Questions / Decision Guides
 

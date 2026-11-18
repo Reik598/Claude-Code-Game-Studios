@@ -344,3 +344,5 @@ the standalone pipeline tools in `tools/asset-pipeline/`), `ui-programmer` (game
 **Coordinates with:** `technical-director` (ADR acceptance, licences),
 `core-systems-lead` (world-scoped services for PIE), `security-engineer`
 (plugin loading), `localization-lead`, `accessibility-specialist`.
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "One editor and node graphs shared across disciplines"; "Visual programming compiled to native code"

@@ -34,7 +34,10 @@ engine" also lists what this release adds wherever it is valid: the
 their reporting lines in `art-director`, `narrative-director` and
 `game-designer`; new sections in `technical-artist`, `qa-lead`,
 `release-manager` and `performance-analyst`; the `/setup-engine` XR option and
-the `platform` block it writes; and the one-shot's reworded VR card.
+the `platform` block it writes; and the one-shot's reworded VR card. The engine
+spike in `/prototype`, the tech-demo path in `/vertical-slice` and
+`engine-industry-lessons.md` are Custom only: other engines see no change from
+them.
 
 No engine code is shipped: no scaffold and no sample engine. The framework
 supports writing one.
@@ -254,11 +257,46 @@ Also on every engine:
   placement (`rhi-renderer-code.md`); `qa-lead`, `release-manager`,
   `online-services-engineer`, `devops-engineer`, `audio-engine-engineer` and
   `platform-engineer` gain the handoff lines to these owners.
+  `platform-engineer`: XR platform options (standalone headsets and
+  passthrough are ADR options; the ADR records the device's GPU class, thermal
+  limits and refresh rates, and the agent asserts none). `audio-engine-engineer`:
+  XR audio listener (an ADR records the `XrTime` at which the listener's head
+  pose is located). Both apply only when `platform.targets` contains `XR`, and
+  `cea-frame-budget.md` reports an XR project with
+  `performance.target_framerate` unset as NOT ASSESSED. `ecs-dod-architect`:
+  numerics (each numeric guarantee of `engine/math/` is an ADR decision:
+  precision per type, contraction, transcendental accuracy, the large-world
+  strategy, quaternion renormalization, near-singular inversion, robust
+  predicates); `ecs-math-code.md` requires a ULP bound or a tolerance per math
+  function, and `level-editor-engineer` and `world-streaming-engineer` apply
+  the large-world ADR owned by `ecs-dod-architect`. `chief-engine-architect`:
+  a research route (a question, an engine spike in `prototypes/`, a
+  measurement against the budgets, an ADR option; nothing merges into
+  `engine/` without an accepted ADR), which `/prototype` spike mode offers as
+  an engine spike on Custom. On Custom, `/vertical-slice` offers an engine
+  tech-demo path: each capability with its module owner, budget and evidence,
+  the demo build owned by `asset-build-tooling-engineer`, the footage by
+  `cinematic-designer`, and render-to-movie footage rejected as performance
+  evidence. `.claude/docs/engine-industry-lessons.md` (Custom only) records
+  lessons that the studios of in-house engines published (Frostbite, Naughty
+  Dog, id Tech, Decima, Northlight, Snowdrop, Minecraft Bedrock), each dated,
+  with the problem it solved and its cost (each `NOT SOURCEABLE` where the
+  studio states none) and its source, as inputs to ADR options;
+  `chief-engine-architect`, `render-graph-specialist`,
+  `concurrency-job-system-engineer`, `editor-architect`,
+  `graphics-features-engineer`, `shader-pipeline-engineer`,
+  `asset-build-tooling-engineer` and `world-streaming-engineer` each point to
+  the entries that bear on their module in one line.
 - **Templates**: `memory-invariants.md`, `frame-budget.md` and
   `engine-module-spec.md`. 65 templates. The ADR template carries the six
   engine-mode sections inside an HTML comment, so on Godot, Unity, Unreal and
   Web `adr-status.sh` reports 17 template sections and no missing engine
-  section, as in 1.3.0.
+  section, as in 1.3.0. `frame-budget.md` has an XR section, "XR —
+  display-locked frame", that applies only when `platform.targets` contains
+  `XR`: it reads the refresh rate from `performance.target_framerate`, points
+  to `performance-analyst`'s "VR Frame Budgets" for the budget and missed
+  display deadlines, adds the OpenXR frame-submission rules, and records what
+  the display shows after a miss as runtime-defined (`NOT SOURCEABLE`).
 - **Tests and CI**: `test-run.sh custom` reads CTest and `cargo test` output;
   zero tests run is never a pass, and with both runners in `commands.test` each
   is read and the worse result wins. `test-scaffold.sh custom` makes the three
@@ -309,7 +347,7 @@ Also on every engine:
   `test_engine_new_skills.py`, `test_engine_accuracy.py`,
   `test_engine_accuracy_gpu.py`, `test_engine_phase8.py`,
   `test_engine_phase8b.py`, `test_engine_phase9.py`, `test_engine_phase11.py`,
-  `test_engine_records.py`,
+  `test_engine_phase12.py`, `test_engine_records.py`,
   `test_engine_shared_guard.py` and `test_custom_ci.py`;
   `check_audio_examples.py` compiles the audio rule's examples (needs `rustc`).
   None of it was run in a live session.

@@ -532,6 +532,22 @@ TECHNICAL_SECTIONS = [
     (".claude/agents/technical-artist.md", "Character Technology", "AM32(a), task 6.3"),
     (".claude/agents/asset-build-tooling-engineer.md", "DCC Import", "AM32, task 6.3"),
     (".claude/agents/animation-systems-engineer.md", "Character Data Contract", "AM32, task 6.3"),
+    # Phase 12 (AM36(f), OpenSpec add-custom-engine-xr-numerics-demo): the
+    # Custom XR contracts, registered before their text.
+    (".claude/agents/platform-engineer.md", "XR Platform Options", "AM36(f), task 2.3"),
+    (".claude/agents/audio-engine-engineer.md", "XR Audio Listener", "AM36(f), task 2.3"),
+    (".claude/docs/templates/frame-budget.md", "XR — display-locked frame", "AM36(f), task 2.3"),
+    # The math owner's numeric guarantees, registered before their text.
+    (".claude/agents/ecs-dod-architect.md", "Numerics", "AM36(f), task 3.3"),
+    # The industry-lessons document's engine sections (AM36(g), design D6),
+    # registered before their text.
+    (".claude/docs/engine-industry-lessons.md", "Frostbite (EA)", "AM36(f)(g), task 6.3"),
+    (".claude/docs/engine-industry-lessons.md", "Naughty Dog engine", "AM36(f)(g), task 6.3"),
+    (".claude/docs/engine-industry-lessons.md", "id Tech (id Software)", "AM36(f)(g), task 6.3"),
+    (".claude/docs/engine-industry-lessons.md", "Decima (Guerrilla Games)", "AM36(f)(g), task 6.3"),
+    (".claude/docs/engine-industry-lessons.md", "Northlight (Remedy)", "AM36(f)(g), task 6.3"),
+    (".claude/docs/engine-industry-lessons.md", "Snowdrop (Ubisoft Massive)", "AM36(f)(g), task 6.3"),
+    (".claude/docs/engine-industry-lessons.md", "Minecraft Bedrock (Mojang and Microsoft)", "AM36(f)(g), task 6.3"),
 ]
 
 

@@ -1,20 +1,22 @@
 # Continue the AAA engine-support work
 
-## Current state — 17 November 2026, Phase 11 (roles from engine to tech demo)
+## Current state — 18 November 2026, Phase 12 (Custom engine XR, numerics, tech demo and industry lessons)
 
 This section is the only current status. The history below it is superseded
 and kept for context only.
 
 - **Commit state.** Phases 1–10 are committed on `feature/custom-engine-support`
-  at `4b4aaea` and pushed to `origin`. Phase 11 is uncommitted in the main
-  checkout on `feature/content-xr-roles`, branched from `4b4aaea`. The base
+  at `4b4aaea` and pushed to `origin`. Phase 11 is committed as `7929b58` on
+  `feature/content-xr-roles` (branched from `4b4aaea`), pushed, not merged.
+  Phase 12 (part 2) is implemented on `feature/custom-engine-xr-numerics-demo`,
+  branched from `7929b58`, uncommitted in the main checkout. The base
   release is `abc0de7`. No further commit, push, PR, deployment or publication
   is authorised.
 - **The plan** is `docs/research/aaa-engine-support-2026/fix-plan.md`
   (revision 4, amendments AM1–AM16 in its section 9, Phase 8 with AM17–AM19 in
   its section 10, Phase 9 with AM20–AM26 in its section 11, Phase 10 with
   AM27–AM31 in its section 12, and Phase 11 with AM32–AM35 in its section 13: roles
-  from engine to tech demo). Phases 1–9 were implemented, in the order 1, 2,
+  from engine to tech demo, and Phase 12 with AM36–AM37 in its section 14). Phases 1–9 were implemented, in the order 1, 2,
   3, 4, 7, 6, 5, 8, 9. In Phase 10 the seven fix lanes (routing,
   engine-agents-sim-editor, engine-agents-render-platform,
   authoring-and-workflow-skills, new-skills-and-permissions,
@@ -49,6 +51,7 @@ and kept for context only.
 | AAA-ENGINE-2026-P9 | Phase 9 (fixes 9.1–9.4 and AM20 to AM26), with the Acceptance-8 review of C124–C133 | 4 | F1–F15 | F1–F8 resolved in round 2; F9–F11 and F13–F15 resolved in round 3; F12 (the diff-based shared-file test) escalated at round 3 and still escalated at round 4. The owner decided on 2026-11-17 to replace that test with an approved-hunk guard (AM27); round 5, at S21, re-ran every F12 mutation against the new guard, found F12 resolved and ended "Push: clear" |
 | AAA-ENGINE-2026-P10 | Phase 10 (AM27–AM31 in its section 12): the S20..S21 delta, the AM27 guard and its re-pin, then the S21..S22 delta | 2 | F1–F2 | F1 (the phase note's hunk counts) and F2 (follow-up: `/create-epics` selected a module's TR entries by `system:`) resolved in round 2; "Push: clear" |
 | AAA-ENGINE-2026-P11 | Phase 11 (AM32–AM35 in its section 13): the 4b4aaea..S24 delta, then S24..S25 and S25..S26 | 3 | F1–F10 | F1–F9 met in round 2 (AM33); F10, raised in round 2, met in round 3 (AM34); "Push: clear" |
+| AAA-ENGINE-2026-P12 | Phase 12 (AM36–AM37 in its section 14): the 7929b58..S29 delta, then S29..S30 and S30..S31 | 3 | F1–F7 | F1–F5 resolved in round 2 (F1 by AM37; F2–F4 by rewriting C256, C244, C264 and C265, with E573 and E574 re-fetched verbatim); F6 (the fix plan's Status line), raised in round 2, resolved in round 3; F7 (follow-up: a lesson's problem line may read `NOT SOURCEABLE`), raised in round 2 and recorded in round 3, carried into AM36(g); "Push: clear" |
 
 - **Independent scores.** After Phases 1–7, an independent reviewer scored the
   change at snapshot S11 at **8.7 / 10** against the original acceptance
@@ -102,6 +105,41 @@ and kept for context only.
   them, and the re-check at S28 scored **9.6 / 10** (N1–N3 and D1 met, D2 met
   for C168–C218, N4 on the Phase 10 claim statuses closed after it). Left:
   D2 for C134–C167 and the recorded open points (D3).
+- **Phase 12** (fix plan section 14, AM36 (a)–(g) and AM37; planned and tracked as the
+  OpenSpec change `add-custom-engine-xr-numerics-demo` under
+  `C:/repos/openspec/changes/`) adds, on Custom only: "XR Platform Options"
+  in `platform-engineer` and "XR Audio Listener" in `audio-engine-engineer`,
+  the XR section of the `frame-budget.md` template and the XR item of
+  `cea-frame-budget.md`, all applying only when `platform.targets` contains
+  `XR`; "Numerics" in `ecs-dod-architect`, the ULP-bound-or-tolerance rule in
+  `ecs-math-code.md`, and the large-world ADR line in `level-editor-engineer`
+  and `world-streaming-engineer`; the research route in
+  `chief-engine-architect` and the engine spike in `/prototype` spike mode;
+  the engine tech-demo path in `/vertical-slice`;
+  `.claude/docs/engine-industry-lessons.md` and its pointer lines in the
+  pointed Custom agents; the UPGRADING and CHANGELOG disclosure; and
+  `studio-tests/test_engine_phase12.py`. Its shared-file hunks, in
+  `prototype/references/spike-mode.md` and `vertical-slice/SKILL.md`, are each
+  pinned `custom-addition` (the Phase 6 block of `vertical-slice/SKILL.md`
+  re-pinned under AM37). The ledger gained sources S177–S205, evidence
+  E469–E578 and claims C219–C265. The integration checks passed (OpenSpec
+  tasks 8.1, 8.2): `propose` found no new hunk, `check` reports 0 problems,
+  and the full suite passed on the Phase 12 tree, none skipped. The Phase 12
+  critic (task 8.3, AAA-ENGINE-2026-P12) blocked its round 1 on F1–F5 and
+  its round 2 on F6 (the fix plan's Status line), with F7 a follow-up; AM37
+  and the fixes answer them, and its round 3 ended with "Push: clear". F7 is
+  carried into AM36(g): a lesson's problem line, like its cost line, may read
+  `NOT SOURCEABLE` with its reason. The claim statuses C219–C265 record the
+  review's result. The independent re-score (task 8.4) gave 9.4/10 at S32
+  (score report 6), and 9.6/10 at S33 after its N1 and N2 were addressed. For
+  N1, three lesson labels were rewritten against a fresh curl fetch: I1's
+  problem now gives the short development time and the catch-up, MC2's the
+  isolated versions with cross-platform play as Mojang's aim, and M1's cost
+  reads `NOT SOURCEABLE` (C248, C262 and C259, with new evidence
+  E575–E578; no critic has reviewed the new wording). For N2,
+  `test_engine_phase12.py` now pins the XR gate sentence, the gate bullet's
+  condition, the large-world appliers' "does not choose a strategy" and
+  the verb and year of the C250 and C262 key phrases.
 - **Checks last observed.** Phase 10's lanes each ran only their own tests and
   the test files that touch their files, while the other lanes were still
   editing (lane notes in the session scratchpad, `aaa-engine/wf3/`). The full
@@ -113,7 +151,11 @@ and kept for context only.
   Phase 11's task groups each ran only the test modules their task lists,
   one process at a time; the full suite then passed on the Phase 11 tree at
   snapshot S24, none skipped (OpenSpec task 9.2), and is re-run after the
-  critic fixes.
+  critic fixes. Phase 12's task groups each ran only the test modules their
+  task lists, one process at a time; the full suite then passed on the
+  Phase 12 tree at snapshot S29, none skipped (OpenSpec task 8.2). The fixes
+  for the Phase 12 critic's rounds 1 and 2 ran only their test modules; the
+  critic's own runs of the full suite at rounds 2 and 3 passed, none skipped.
   This file states no test count: the count is the `Ran` line
   that command prints, and `studio-tests/test_engine_phase8b.py` fails any test
   count written here that differs from the suite.
@@ -215,9 +257,13 @@ specifications awaiting a live `/skill-test spec` run.
 2. Optional, toward about 9.7: bind fact-carrying key phrases for the
    Phase 10 claims C134–C167 (score report 5, D2's other half). A fix to a
    shared file starts with a new plan amendment.
-3. Then part 2, the OpenSpec change `add-custom-engine-xr-numerics-demo`
-   (Custom-only XR contracts, numerics, research route and tech-demo path),
-   once this change is merged or at the owner's request.
+3. Part 2, the OpenSpec change `add-custom-engine-xr-numerics-demo`, is
+   implemented on `feature/custom-engine-xr-numerics-demo` from `7929b58`
+   (task groups 1–7), uncommitted. Its integration checks passed (8.1, 8.2),
+   and its critic (8.3, AAA-ENGINE-2026-P12) ended round 3 with "Push:
+   clear". The independent re-score (8.4) gave 9.4/10 at S32 and 9.6/10
+   at S33 after its N1 and N2 were addressed. Commit and push only on the
+   owner's request.
 4. Any later edit to a shared agent or skill file needs `shared_hunks.py
    propose` and a reviewed reason per new hunk (`studio-tests/README.md`). Do
    not write a test count into this file unless it is the suite's own;

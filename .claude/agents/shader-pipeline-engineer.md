@@ -353,3 +353,5 @@ data.
 - **vfx-runtime-engineer** — VFX compute kernels and their permutations
 
 Reports to: **rendering-lead**
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "Few shaders: coherent branching over permutations"; "Data described in script, with versioning and a permutation budget"

@@ -41,6 +41,9 @@ On any other engine, ignore this file.
 - Every SIMD path has a scalar reference implementation and a unit test that
   compares the two
 - Floating-point comparisons in tests use a stated tolerance, never `==`
+- Each math function states its accuracy in its doc comment: a ULP bound or a
+  tolerance, as the numerics ADR records it (`ecs-dod-architect`, Numerics). A
+  math function with neither is a review finding
 
 ## Examples
 

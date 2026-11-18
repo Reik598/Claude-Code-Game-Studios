@@ -85,6 +85,21 @@ Reports to: core-systems-lead. No gate IDs assigned.
 - [ ] Page requests use the existing request queue and pool budget, not a side channel
 - [ ] Ownership of build and runtime selection is routed exactly
 
+### Case 8: Large worlds — cell coordinates far from the origin
+**Input:** "Cells beyond a few tens of kilometres jitter once activated. Should streaming rebase the origin when the player crosses a cell?"
+**Expected behavior:** Says the coordinate strategy is the large-world ADR owned by `ecs-dod-architect`, and that streaming applies it and does not choose one; takes the question to that agent with the observed symptom and the cell positions; keeps its own work to positions and activation as the ADR defines them.
+**Assertions:**
+- [ ] `ecs-dod-architect` named as the owner of the large-world ADR
+- [ ] No origin-rebasing scheme designed by this agent alone
+
+### Case 9: Industry lessons — a content graph or chunks
+**Input:** "Should our streaming work like Decima's content graph or like Minecraft's chunks?"
+**Expected behavior:** Reads the entries "Streaming over a content graph" and "Chunked worlds from seed and coordinates" in `.claude/docs/engine-industry-lessons.md`. Presents each as an input to an ADR option, with its date (a talk published in 2023 that describes Horizon Zero Dawn as shipped; documentation from 2025) and its cost: a content graph must always be loaded fully, and opening and closing so many files is costly; seed parity holds as long as the seed value is 9 or fewer characters, feature placement order is not guaranteed within each pass, and with a custom height range in a behavior pack no more world generation takes place. Picks neither as the default.
+**Assertions:**
+- [ ] Both entries are cited with their dates
+- [ ] Each entry's cost is stated
+- [ ] Neither is presented as the decision
+
 ---
 
 ## Protocol Compliance

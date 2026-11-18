@@ -69,6 +69,14 @@ Reports to: core-systems-lead. No gate IDs assigned.
 - [ ] `core-systems-lead` named
 - [ ] No unilateral cross-module edit; "May I write" before any write
 
+### Case 6: Industry lessons — fibers because Naughty Dog used them
+**Input:** "Naughty Dog runs its jobs on fibers. Switch our job system to fibers."
+**Expected behavior:** Reads the entry "Fiber-based jobs and frame-centric data lifetime" in `.claude/docs/engine-industry-lessons.md`. Presents it as one input to an ADR option, dated 2015, with the cost the entry states: with fibers, system synchronization primitives can no longer be used, so atomic spin locks are used almost everywhere, and a fiber switched in the middle of a function can wake up with the wrong thread-local storage (TLS) pointer. Does not make fibers the default.
+**Assertions:**
+- [ ] The entry is cited with its 2015 date
+- [ ] All three costs from the entry are named
+- [ ] Offered as an input to an ADR option, not as the decision
+
 ---
 
 ## Protocol Compliance

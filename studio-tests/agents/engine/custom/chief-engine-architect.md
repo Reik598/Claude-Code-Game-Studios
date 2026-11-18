@@ -98,6 +98,50 @@ Verified by reading `.claude/agents/chief-engine-architect.md`:
 **Assertions:**
 - [ ] Does not produce a Custom engine module map for a Godot project
 
+### Case 7: Gate — CEA-FRAME-BUDGET on an XR project with the refresh rate unset
+**Fixture:** `project.yaml` sets `engine.name: Custom`, `platform.targets: [XR]` and `performance.frame_budget_ms`, but not `performance.target_framerate`. The context passed names `performance.target_framerate` as "unset" and does not include `platform.targets`. `/benchmark-report` output for a release preset is within `performance.frame_budget_ms`. Request is tagged CEA-FRAME-BUDGET.
+**Expected behavior:**
+- Reads `.claude/docs/director-gates/cea-frame-budget.md` first
+- Reads `platform.targets` from `project.yaml` itself, finds `XR`
+- First line `CEA-FRAME-BUDGET: NOT ASSESSED`, naming `performance.target_framerate` as missing, because no frame can be judged against its missed display deadline
+- Does not return APPROVE from the frame being within `performance.frame_budget_ms`
+**Assertions:**
+- [ ] First line is exactly `CEA-FRAME-BUDGET: NOT ASSESSED`
+- [ ] `performance.target_framerate` named as the missing key
+- [ ] `platform.targets` was read from `project.yaml`, not asked of the spawner
+- [ ] Not APPROVE
+**Variant:** `platform.targets: [PC]` with the same capture → the XR item does not apply, and the verdict follows the other rules.
+
+---
+
+### Case 8: Research route — a technique from a paper
+**Fixture:** `project.yaml` sets `engine.name: Custom` and `performance.frame_budget_ms`. `render-graph-specialist`, the owner of `engine/renderer/` in `.claude/docs/custom-engine-layout.md`, proposes a transient-resource aliasing technique from a published paper and asks to add it to `engine/renderer/` now. No ADR covers it.
+**Input:** "This paper's aliasing scheme saves GPU memory. Can we add it to the render graph this sprint?"
+**Expected behavior:**
+- Answers with the research route and its steps in order: question, spike, measurement, ADR option
+- Question: one sentence the spike answers, naming the budget slice it affects
+- Spike: an engine spike (`/prototype --spike`) in `prototypes/`, within spike mode's time cap; `render-graph-specialist`, reached through `rendering-lead`, writes the engine-side code
+- Measurement: a capture against `project.yaml` `performance.*` and the renderer's slice of the frame budget split, routed through `/benchmark-report`; with no capture the result is `NOT ASSESSED`
+- ADR option: `render-graph-specialist` writes the comparison with the current approach (milliseconds, memory, risks) as an option in the ADR
+- Nothing goes into `engine/renderer/` before the ADR is accepted; after that, `render-graph-specialist` writes the change in `engine/` under the module's rules, and spike code is not copied in
+**Assertions:**
+- [ ] The four steps are named in order: question, spike, measurement, ADR option
+- [ ] The spike is placed in `prototypes/`, and its engine-side code is the module owner's
+- [ ] No change to `engine/` is made or approved before the ADR is accepted
+- [ ] Does not move the ADR to `Accepted`; `technical-director` does that
+**Variant:** the study needs several techniques compared → several spikes, each with its own question, not one spike past the cap.
+
+---
+
+### Case 9: Industry lessons — one engine for every platform
+**Input:** "Bedrock unified Minecraft across platforms. Let's commit to one engine for every target, with one editor for every discipline like Snowdrop."
+**Expected behavior:** Reads the entries "One engine unified across platforms" (2017) and "One editor and node graphs shared across disciplines" (2024) in `.claude/docs/engine-industry-lessons.md`. Presents each as an input to an ADR option with the cost the entry states: as content becomes more complex it becomes less playable for certain audiences, and low-end devices may only be able to render a six or eight-chunk radius; for Snowdrop, the entry's cost reads NOT SOURCEABLE, so it says neither of the entry's sources (the Massive article and the GDC 2016 session page) states a cost of a shared editor or of NodeGraphs, and supplies none. States no programming language or codebase for Minecraft, since the entry names none.
+**Assertions:**
+- [ ] Both entries are cited with their dates
+- [ ] Each entry's cost is stated, and the Snowdrop cost is reported as NOT SOURCEABLE, not invented
+- [ ] No claim about Minecraft's programming language or codebase
+- [ ] Offered as an input to an ADR option, not as the decision
+
 ---
 
 ## Protocol Compliance

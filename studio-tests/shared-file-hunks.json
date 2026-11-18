@@ -271,6 +271,11 @@
    "class": "departure",
    "ref": "fix 8.4, AM28, section 12, AM32(c), AM35(a)",
    "text": "references/custom.md (added in a base skill directory, Custom only): cookers sit under engine/tools/ with runtime loading in engine/assets/ (R138); C3 names the C++ test framework choice and `/project-settings testing.framework=<name>` (R111); C5 step 3 states the story route's prerequisites (AM28 D5) and that module specs reach epics and stories only at `workflow: standard` or `full` (AM28 D4). AM32(c): C2's Platforms answers map to `platform.targets` (`Windows`, `Linux` and `macOS` are `PC`, `Console` is `Console`, `XR headset` is `XR`) for Section 5.5.4. AM35(a): C2's Platforms question keeps four options, the question tool's limit (C168), and takes `XR headset` as a typed answer, as guided Question 2 takes `VR headset (XR)`. Custom only."
+  },
+  "custom-addition-am37": {
+   "class": "custom-addition",
+   "ref": "section 2, AM22 P1(b), AM37",
+   "text": "The /vertical-slice Phase 6 Custom block re-pinned under AM37: whole inserted lines that name Custom, stand as their own unit and leave every base line as it was, now saying that the tech-demo report sections go into the draft before the 'May I write' ask. Held to the same predicate as custom-addition (addition_failures), which check re-runs because the class is custom-addition."
   }
  },
  "files": {
@@ -3662,6 +3667,34 @@
     }
    ]
   },
+  ".claude/skills/prototype/references/spike-mode.md": {
+   "hunks": [
+    {
+     "id": "9ca93acdfb6bda58",
+     "base": [
+      56,
+      56
+     ],
+     "old": [],
+     "new": [
+      "**Engine spike (Custom only):** When `engine.name` is `Custom`, spike mode also",
+      "offers an engine spike: a spike that tests an engine technique (from a paper, a",
+      "talk or published engine documentation) against the engine's budgets, following",
+      "`chief-engine-architect`'s research route:",
+      "- The owner of the affected module (`.claude/docs/custom-engine-layout.md`)",
+      "  writes the engine-side code of the spike, spawned through the Agent tool, and",
+      "  writes the ADR option the spike leads to.",
+      "- The spike keeps spike mode's ~4-hour cap and its folder in `prototypes/`, and",
+      "  never touches `engine/`. A larger study is several spikes, each with its own",
+      "  question.",
+      "- The spike note's result is a measurement against the engine's budgets and an",
+      "  ADR option, not a merge into `engine/`.",
+      ""
+     ],
+     "reason": "custom-addition"
+    }
+   ]
+  },
   ".claude/skills/security-audit/SKILL.md": {
    "hunks": [
     {
@@ -5297,6 +5330,68 @@
       "  tests/integration/ (Web, Custom)"
      ],
      "reason": "engine-list-gains-custom"
+    }
+   ]
+  },
+  ".claude/skills/vertical-slice/SKILL.md": {
+   "hunks": [
+    {
+     "id": "6f9fe2f001bcd6ec",
+     "base": [
+      95,
+      95
+     ],
+     "old": [],
+     "new": [
+      "",
+      "**Engine tech demo (Custom only):** Read `engine.name` from `project.yaml`. When",
+      "it is `Custom`, also offer an engine tech-demo path: the slice also shows chosen",
+      "engine capabilities, judged against a frame budget on target hardware. If the",
+      "user takes it, ask which engine capabilities the demo shows, the frame budget it",
+      "is judged on and the target hardware. The Phase 3 plan then lists each capability",
+      "with its module owner, its budget and its evidence: a `/benchmark-report` capture",
+      "(print the command for the user to run) or a test. Route the work by name:",
+      "- Engine work goes to the module owner, through its lead, as listed in",
+      "  `.claude/docs/custom-engine-layout.md`.",
+      "- Content work goes to `lighting-artist` (lighting the showcase scene),",
+      "  `cinematic-designer` (the shots and the cut), `technical-artist` (shaders, VFX",
+      "  and art-to-engine issues), `level-designer` (the layout and pacing of the demo",
+      "  level), `world-builder` (the lore and world rules the demo shows) and",
+      "  `sound-designer` (the sound effect specifications).",
+      "- The demo build is owned by `asset-build-tooling-engineer`: the exact tested",
+      "  build, its configuration and its frozen content.",
+      "- The footage is owned by `cinematic-designer`: each clip records the build, the",
+      "  hardware, the settings, and whether it was rendered offline with",
+      "  render-to-movie or captured in real time.",
+      "- The content handoffs are one-way references: the tech-demo path names these",
+      "  agents, and they need no reference back to it."
+     ],
+     "reason": "custom-addition"
+    },
+    {
+     "id": "2988b8061a4f8fe2",
+     "base": [
+      290,
+      290
+     ],
+     "old": [],
+     "new": [
+      "**Engine tech demo report (Custom only):** When `engine.name` is `Custom` and the",
+      "user took the Phase 2 tech-demo path, put three more sections into the report draft",
+      "before you ask \"May I write this report\" above, so that the report the user",
+      "approves and the file you write both hold them. Add them at the report's own",
+      "heading level, before the recommendation: Demo Capabilities (each capability with",
+      "its module owner, budget, evidence and result), Demo Build (its owner, and the",
+      "exact tested build, its configuration and its frozen content) and Footage (its",
+      "owner, and for each clip the build, hardware, settings, and offline or real-time).",
+      "Judge the evidence in that draft by these rules:",
+      "- Footage rendered offline with `render-to-movie` is not performance evidence: a",
+      "  performance claim that cites it is rejected in the report, with the reason.",
+      "- With no real-time capture on the target hardware, the performance item is",
+      "  `NOT ASSESSED`, with the reason, and never recorded as met.",
+      ""
+     ],
+     "reason": "custom-addition-am37"
     }
    ]
   }

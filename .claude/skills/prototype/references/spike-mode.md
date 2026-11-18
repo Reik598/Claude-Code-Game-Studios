@@ -54,4 +54,17 @@ spikes in two ways:
 - If the answer is NO at this scope, this is an architecture or scope constraint
   that affects everything downstream — better to surface it now than during Sprint 8
 
+**Engine spike (Custom only):** When `engine.name` is `Custom`, spike mode also
+offers an engine spike: a spike that tests an engine technique (from a paper, a
+talk or published engine documentation) against the engine's budgets, following
+`chief-engine-architect`'s research route:
+- The owner of the affected module (`.claude/docs/custom-engine-layout.md`)
+  writes the engine-side code of the spike, spawned through the Agent tool, and
+  writes the ADR option the spike leads to.
+- The spike keeps spike mode's ~4-hour cap and its folder in `prototypes/`, and
+  never touches `engine/`. A larger study is several spikes, each with its own
+  question.
+- The spike note's result is a measurement against the engine's budgets and an
+  ADR option, not a merge into `engine/`.
+
 ---

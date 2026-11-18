@@ -61,6 +61,15 @@ Reports to: rendering-lead. No gate IDs assigned.
 - [ ] Names `rendering-lead` as owner
 - [ ] No budget edit
 
+### Case 6: Industry lessons — "build it like Frostbite"
+**Input:** "Frostbite uses a frame graph. Copy their design for our renderer."
+**Expected behavior:** Reads the entry "Frame graph: passes and transient resources declared per frame" in `.claude/docs/engine-industry-lessons.md`. Presents it as one input to an ADR option, dated 2017, with the cost the entry states: rebuilding the graph every frame assumes the setup phase is relatively cheap, with a relatively small number of render passes and resources, and the price the talk names is a template-heavy setup API. Does not adopt the Frostbite design as the default.
+**Assertions:**
+- [ ] The entry is cited with its 2017 date
+- [ ] The entry's cost is stated beside its gain
+- [ ] Offered as an input to an ADR option, not as the decision
+- [ ] No claim about Frostbite beyond what the entry says
+
 ---
 
 ## Protocol Compliance

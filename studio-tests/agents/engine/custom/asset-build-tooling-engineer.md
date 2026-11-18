@@ -103,6 +103,14 @@ Reports to: core-systems-lead; coordinates CI with devops-engineer. No gate IDs 
 - [ ] The export fault goes to `technical-artist`; an import fault stays with the agent
 - [ ] The contract is referenced, not restated
 
+### Case 11: Industry lessons — versioning a data format
+**Input:** "Our data format breaks every time a field changes. Should we version it like Minecraft packs or like Remedy's Lua files?"
+**Expected behavior:** Reads the entries "A versioned, data-driven creator format" (2025) and "Data described in script, with versioning and a permutation budget" (2024) in `.claude/docs/engine-industry-lessons.md`. Presents both as inputs to an ADR option: in Minecraft Bedrock, files made in older formats still work in newer versions of the game only if the format version is set correctly, and incorrect format versions are a frequent source of errors; Remedy describes material data in Lua with versioning and patching in the same file. Picks neither as the default.
+**Assertions:**
+- [ ] Both entries are cited with their dates
+- [ ] The cost from the Minecraft entry is named
+- [ ] Neither is presented as the decision
+
 ---
 
 ## Protocol Compliance

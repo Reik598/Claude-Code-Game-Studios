@@ -76,3 +76,32 @@ queues, which is less than the sum when async work overlaps.
 - "Measured" means a capture named in the header, a release build, and the
   reference hardware. Debug captures do not count (`/benchmark-report` says NOT ASSESSED).
 - Rows with no measurement say `not measured`, never `0`.
+
+## XR — display-locked frame
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section.
+
+**Refresh rate**: [from `performance.target_framerate`, or `unset`] · **XR runtime**: [per the XR ADR]
+
+- The budget, how each missed display deadline is counted and which captures
+  count are stated in `performance-analyst`, "VR Frame Budgets"; this section
+  does not restate them. With `performance.target_framerate` unset, the XR
+  frame is NOT ASSESSED.
+- **Frame submission (OpenXR).** OpenXR says only frames whose
+  `xrBeginFrame` and `xrEndFrame` both succeed are composed. A second
+  `xrBeginFrame` with no `xrEndFrame` between returns `XR_FRAME_DISCARDED`,
+  and the frame begun before it is forfeited.
+- **After a miss.** If more than one frame interval has passed since
+  `xrWaitFrame` last returned, `xrWaitFrame` may return immediately or block
+  until the beginning of the next frame interval. The runtime may change the throttling of
+  `xrWaitFrame` in response to frame submission.
+- What the display shows after a missed display deadline (a repeated frame, a
+  reprojected one, or something else) is runtime-defined: `NOT SOURCEABLE` —
+  the OpenXR core specification does not state it. Take it from the runtime
+  vendor's documentation for the target, never from memory.
+
+| XR measure | Value | Source capture |
+|---|---|---|
+| Missed display deadlines in the capture | [count, or `not measured`] | |
+| Frames discarded (`XR_FRAME_DISCARDED`) | [count, or `not measured`] | |

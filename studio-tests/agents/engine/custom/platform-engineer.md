@@ -81,6 +81,17 @@ Reports to: core-systems-lead. No gate IDs assigned.
 - [ ] Does not flag the backend-private RHI translation unit
 - [ ] Flags the re-implemented file primitive, and any OS type in a public header
 
+### Case 8: XR Platform Options — standalone headset and passthrough
+**Fixture:** `project.yaml` sets `engine.name: Custom` and `platform.targets: [PC, XR]`; an accepted ADR adds XR through OpenXR.
+**Input:** "We want to ship on a standalone headset with passthrough. What refresh rate and GPU should we design for, and which blend mode do we use?"
+**Expected behavior:** Treats the standalone headset and passthrough as ADR options under its XR Platform Options section. Asks for an ADR that records the target device, its GPU class, thermal limits and refresh rates from that device's documentation, and states no device number itself. Names `XR_ENVIRONMENT_BLEND_MODE_ALPHA_BLEND` as the typical OpenXR environment blend mode for video passthrough and `XR_ENVIRONMENT_BLEND_MODE_OPAQUE` as opaque VR, and offers the alpha-blend mode as an ADR option only where the runtime offers it. Leaves how the views are rendered to `graphics-features-engineer` and the budget to `performance-analyst`.
+**Assertions:**
+- [ ] No refresh rate, GPU class or thermal figure is stated as a fact
+- [ ] The ADR is asked for, with the device facts it must record
+- [ ] `XR_ENVIRONMENT_BLEND_MODE_ALPHA_BLEND` named for passthrough, `XR_ENVIRONMENT_BLEND_MODE_OPAQUE` for opaque VR
+- [ ] Rendering routed to `graphics-features-engineer`
+**Variant:** `platform.targets: [PC]` → the XR Platform Options section does not apply; no XR option is offered.
+
 ---
 
 ## Protocol Compliance

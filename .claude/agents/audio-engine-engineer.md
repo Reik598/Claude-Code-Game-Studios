@@ -246,6 +246,26 @@ pub fn render(&self, out: &mut [f32]) {
 }
 ```
 
+## XR Audio Listener
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section.
+
+- **The listener is the head pose.** On an XR target the audio listener
+  follows the player's head pose. `platform-engineer` supplies the head pose
+  from the XR runtime; this module does not call the XR runtime itself.
+- **OpenXR terms.** The head pose is the pose of the
+  `XR_REFERENCE_SPACE_TYPE_VIEW` reference space, which tracks the view origin
+  of the primary viewer; every OpenXR runtime supports it. `xrLocateSpace`
+  locates a space at a time the caller passes (an `XrTime`), so a head pose is
+  always the pose at some time.
+- **The time is an ADR decision.** Before spatial audio on XR is reviewed,
+  require an ADR that records the `XrTime` at which the head pose for the
+  listener is located, and why. Candidate options include the frame's
+  `predictedDisplayTime` (the anticipated display time of the next frame) or
+  a time estimated for when the mixed buffer is heard; the ADR picks one, and
+  none is a default. Without that ADR, the listener's timing is NOT ASSESSED.
+
 ## Common Questions / Decision Guides
 
 **Middleware or in-house?** The ADR decides, raised by `audio-director` through

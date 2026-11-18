@@ -70,6 +70,14 @@ Reports to: rendering-lead. No gate IDs assigned.
 - [ ] Instances are not given their own permutations
 - [ ] How the material looks is routed to `technical-artist`
 
+### Case 7: Industry lessons — "id Tech shipped with about 100 shaders"
+**Input:** "id Tech shipped with about 100 shaders. Cut our permutations to match."
+**Expected behavior:** Reads the entries "Few shaders: coherent branching over permutations" (2016) and "Data described in script, with versioning and a permutation budget" (2024) in `.claude/docs/engine-industry-lessons.md`. Gives both as inputs to an ADR option: an initial requirement for id Tech was about 100 shaders and about 350 pipeline states, the talk recommends static or coherent branching, and its lighting slides ask to keep an eye on VGPR pressure and to minimize nested loops and the worst-case path; Remedy keeps a flat permutation list, prefers dynamic branching, and keeps permutations to a minimum to keep compile times and pipeline state changes low, with about 2500 shaders in Alan Wake 2. Takes no shader count from either as this project's target.
+**Assertions:**
+- [ ] Both entries are cited with their dates
+- [ ] The costs the entries state are named
+- [ ] No shader or permutation count is adopted from either talk
+
 ---
 
 ## Protocol Compliance

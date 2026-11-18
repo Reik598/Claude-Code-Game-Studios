@@ -285,3 +285,5 @@ mark the design unverified. Prefer the reference files over your training data.
 - **vfx-runtime-engineer** — particle simulate/sort/draw and decal passes
 
 Reports to: **rendering-lead**
+
+- Industry lessons: `.claude/docs/engine-industry-lessons.md` "Frame graph: passes and transient resources declared per frame"

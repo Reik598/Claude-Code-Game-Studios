@@ -94,7 +94,8 @@ Before writing any code:
   named `editor.*` so captures show their cost separately.
 - Large worlds: camera-relative rendering and gizmo math in double precision
   or camera-relative float; never feed absolute far-from-origin floats to the
-  GPU.
+  GPU. This applies the large-world ADR owned by `ecs-dod-architect` to the
+  editor; the editor does not choose a strategy of its own.
 - Selection outline from a stencil or ID mask, not by drawing objects twice in
   wireframe.
 

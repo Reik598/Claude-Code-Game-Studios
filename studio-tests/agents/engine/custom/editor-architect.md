@@ -80,6 +80,14 @@ Reports to: chief-engine-architect. Runs no gate itself; its UI framework ADR is
 - [ ] Both specialist names, each with its part
 - [ ] The assignment goes through a transaction
 
+### Case 7: Industry lessons — node graphs as the default authoring tool
+**Input:** "Snowdrop and Decima give every discipline node graphs. Make node graphs our default authoring tool."
+**Expected behavior:** Reads the entries "One editor and node graphs shared across disciplines" (2024) and "Visual programming compiled to native code" (2025) in `.claude/docs/engine-industry-lessons.md`. Presents each as an input to an ADR option with the cost the entry states: for Snowdrop, the entry's cost reads NOT SOURCEABLE, so it says neither of the entry's sources (the Massive article and the GDC 2016 session page) states a cost of a shared editor or of NodeGraphs, and supplies none; in Decima, tools for debugging by users become all the more important, when a programmer helps debug content, it costs time to get up to speed with the content's structure, and an earlier generator with no intermediate representation was difficult to maintain. Does not make node graphs the default.
+**Assertions:**
+- [ ] Both entries are cited with their dates
+- [ ] Each entry's cost is stated, and the Snowdrop cost is reported as NOT SOURCEABLE, not invented
+- [ ] Offered as an input to an ADR option, not as the decision
+
 ---
 
 ## Protocol Compliance
