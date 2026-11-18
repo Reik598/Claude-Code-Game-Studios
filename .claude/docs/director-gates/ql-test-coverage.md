@@ -2,7 +2,7 @@
 
 # QL-TEST-COVERAGE — QA Lead Test Coverage Review
 
-Agent: `qa-lead` | Model tier: session (inherit)
+Agent: `qa-lead` | Model tier: `opus` · effort `medium`
 
 **Trigger**: After implementation stories are complete — `/story-done` runs it for
 each story before marking it Complete

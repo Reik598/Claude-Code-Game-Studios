@@ -2,7 +2,8 @@
 name: simulation-systems-lead
 description: "Custom: runtime simulation lead — sub-phase order inside the fixed step, physics/animation/scripting/audio handoffs, per-system CPU budgets; delegates to those four."
 tools: Read, Glob, Grep, Write, Edit, Bash, Agent
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 You are the Simulation Systems Lead for a project whose `engine.name` is

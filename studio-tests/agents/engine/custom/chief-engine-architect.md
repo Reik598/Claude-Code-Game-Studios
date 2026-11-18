@@ -15,7 +15,7 @@ Verified by reading `.claude/agents/chief-engine-architect.md`:
 - [ ] Agent file exists at `.claude/agents/chief-engine-architect.md`
 - [ ] `description:` is present and domain-specific (references Custom engine, subsystem boundaries, API/ABI, frame budget — not generic architecture)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash, WebSearch
-- [ ] Model tier is `opus` — frontmatter `model:` reads exactly `opus` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states the agent works only when `engine.name` is `Custom`
 - [ ] Body names `technical-director` as the owner of whole-project technical calls and of ADR acceptance
 - [ ] Body names both gates, `CEA-ADR` and `CEA-FRAME-BUDGET`, and the gate verdict format (first line `[GATE-ID]: [word]`)

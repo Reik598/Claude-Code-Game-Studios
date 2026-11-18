@@ -2,7 +2,7 @@
 
 # CEA-ADR — Engine-Internal ADR Review
 
-Agent: `chief-engine-architect` | Model tier: Opus | Domain: Engine internals — memory, threading, frame budget, ABI, determinism, platform and graphics-API support
+Agent: `chief-engine-architect` | Model tier: `opus` · effort `high` | Domain: Engine internals — memory, threading, frame budget, ABI, determinism, platform and graphics-API support
 
 **Applies only when** `engine.name` is `Custom`. On any other engine, do not
 spawn this gate; an engine-internal ADR there does not exist, and TD-ADR covers

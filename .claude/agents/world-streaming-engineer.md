@@ -3,6 +3,7 @@ name: world-streaming-engineer
 description: "Custom: open-world streaming runtime — async I/O queues, request prioritization, partition cells at runtime, LOD/HLOD swaps, streaming pool budgets, load-time targets."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

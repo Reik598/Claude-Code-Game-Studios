@@ -2,7 +2,7 @@
 
 # TD-ADR — Architecture Decision Review
 
-Agent: `technical-director` | Model tier: Opus | Domain: Architecture, engine risk, performance
+Agent: `technical-director` | Model tier: `opus` · effort `high` | Domain: Architecture, engine risk, performance
 
 **Trigger**: After an individual ADR is authored (`/architecture-decision`), before
 it is marked Accepted

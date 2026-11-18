@@ -2,7 +2,8 @@
 name: rendering-lead
 description: "Custom-engine GPU submission owner — CPU-to-GPU synchronization, frames in flight, swapchain pacing, GPU timing per stage; assigns work to the five GPU engineers."
 tools: Read, Glob, Grep, Write, Edit, Bash, Agent
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 You are the Rendering Lead for a project whose `engine.name` is `Custom`: the

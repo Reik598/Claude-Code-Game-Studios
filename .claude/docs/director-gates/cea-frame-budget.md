@@ -2,7 +2,7 @@
 
 # CEA-FRAME-BUDGET — Frame Budget Review of a Tick or Frame-Graph Change
 
-Agent: `chief-engine-architect` | Model tier: Opus | Domain: Frame budgets, CPU/GPU frame time per subsystem
+Agent: `chief-engine-architect` | Model tier: `opus` · effort `high` | Domain: Frame budgets, CPU/GPU frame time per subsystem
 
 **Applies only when** `engine.name` is `Custom`. On any other engine, do not
 spawn this gate.

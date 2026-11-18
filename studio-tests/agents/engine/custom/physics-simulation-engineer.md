@@ -12,7 +12,7 @@ Reports to: simulation-systems-lead. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/physics-simulation-engineer.md`
 - [ ] `description:` is present and domain-specific (deterministic rigid body, broad/narrow phase, solver, collision primitives)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `simulation-systems-lead`" (not `core-systems-lead`)
 - [ ] Has a worked Correct vs Incorrect example in both C++23 and Rust, and a module layout block
 - [ ] Has `## Version Awareness` and `## Tooling`

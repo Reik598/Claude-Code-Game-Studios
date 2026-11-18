@@ -5,9 +5,10 @@ The following 77 agents are available (25 of them only on a Custom engine). Each
 spans multiple domains, the coordinating agent (usually `producer` or the
 domain lead) should delegate to specialists.
 
-Which model an agent runs on is set by the `model:` line in its own file;
-`model-tiers.md` lists the agents that pin one. Every other agent runs on the
-session's model.
+Which model and effort an agent runs on is set by the `model:` and `effort:`
+lines in its own file, which `.claude/agent-models.yaml` writes;
+`model-tiers.md` lists the agents per tier. No agent runs on the session's
+model unless a project's `overrides:` gives it `session`.
 
 ## Tier 1 -- Leadership Agents
 | Agent | Domain | When to Use |

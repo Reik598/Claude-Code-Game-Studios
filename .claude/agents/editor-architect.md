@@ -2,7 +2,8 @@
 name: editor-architect
 description: "Custom-engine editor architecture — editor/runtime split, reflection and serialization, undo transactions, play-in-editor, plugin API, asset GUIDs; owns the UI framework ADR."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: medium
 maxTurns: 20
 memory: project
 ---

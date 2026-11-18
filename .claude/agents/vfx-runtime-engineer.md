@@ -3,6 +3,7 @@ name: vfx-runtime-engineer
 description: "Custom: GPU particle simulation and emitters, particle rendering, deferred and projected decals, the effect graph executed on the GPU, transparency sorting, per-effect cost budgets — runtime for effects technical-artist authors."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

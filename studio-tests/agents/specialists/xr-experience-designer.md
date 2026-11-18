@@ -11,7 +11,7 @@ Reports to: game-designer. No gate IDs assigned.
 
 - [ ] `description:` field is present and domain-specific (references VR / comfort / locomotion / interaction) and does not start with `Custom:`
 - [ ] `tools:` list includes Read, Write, Edit, Glob, Grep — does NOT include Bash (`disallowedTools: Bash`)
-- [ ] Model tier is `inherit` — frontmatter `model:` reads exactly `inherit` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] `### Comfort and Locomotion` and `### XR Interaction` each open with the XR condition (`platform.targets` contains `XR`)
 - [ ] No comfort value is stated as a fact: no number with a unit in `### Comfort and Locomotion`
 - [ ] The Engine-Side Partners table has one row per engine: Custom (`platform-engineer` for the XR runtime and `graphics-features-engineer` for XR rendering, the existing owners), Godot, Unity and Unreal (that engine's own specialists), Web (`lead-programmer`, with the reason); no Custom agent is named outside the Custom row

@@ -3,6 +3,7 @@ name: asset-build-tooling-engineer
 description: "Custom-engine build graph and asset cooking — CMake presets or Cargo workspaces, content-addressed asset cookers, hot reload, the Tracy/PIX instrumentation build switch (module owners place the zones), CI benchmark runs."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 You are the Asset Build and Tooling Engineer for a project whose `engine.name`

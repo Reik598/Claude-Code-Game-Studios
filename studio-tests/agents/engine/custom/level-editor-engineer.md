@@ -12,7 +12,7 @@ Reports to: editor-architect. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/level-editor-engineer.md`
 - [ ] `description:` is present and domain-specific (viewport, ID-buffer picking, gizmos, outliner, prefab overrides, streaming cells)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `editor-architect`"
 - [ ] Worked Correct vs Incorrect example in both C++23 and Rust (ID-buffer picking with fenced readback vs synchronous readback / pointer IDs) and a module layout block with `engine/editor/level/` and `crates/editor-level`
 - [ ] Has `## Version Awareness` (`docs/engine-reference/custom/VERSION.md`, `NOT SOURCEABLE`) and `## Tooling` (validation layers, RenderDoc, `test-run.sh custom`, golden-image tests)

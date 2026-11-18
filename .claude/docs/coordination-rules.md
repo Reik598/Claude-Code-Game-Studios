@@ -36,6 +36,9 @@ pin in auto mode. Started by Claude through the Skill tool: no. Never tell a
 user a `haiku` skill saves money; an `opus` skill typed in a Sonnet session
 costs more. The agent-side `model:` is a different mechanism, and is applied.
 
+**A subagent that cannot finish** may be started again one tier up on a stated
+signal, and the session stops at the top to ask the user: `.claude/docs/escalation-ladder.md`.
+
 ## Subagents vs Agent Teams
 
 This project uses two distinct multi-agent patterns:

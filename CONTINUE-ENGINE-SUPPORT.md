@@ -1,6 +1,6 @@
 # Continue the AAA engine-support work
 
-## Current state — 18 November 2026, Phase 12 (Custom engine XR, numerics, tech demo and industry lessons)
+## Current state — 18 November 2026, Phase 13 (agent models and effort)
 
 This section is the only current status. The history below it is superseded
 and kept for context only.
@@ -8,15 +8,18 @@ and kept for context only.
 - **Commit state.** Phases 1–10 are committed on `feature/custom-engine-support`
   at `4b4aaea` and pushed to `origin`. Phase 11 is committed as `7929b58` on
   `feature/content-xr-roles` (branched from `4b4aaea`), pushed, not merged.
-  Phase 12 (part 2) is implemented on `feature/custom-engine-xr-numerics-demo`,
-  branched from `7929b58`, uncommitted in the main checkout. The base
+  Phase 12 (part 2) is committed as `9e135e7` on
+  `feature/custom-engine-xr-numerics-demo`. Phases 1–12 are merged into `main`
+  through PR #1 (`22fbb13`). Phase 13 (agent models and effort) is
+  implemented on `feature/agent-model-effort`, branched from `22fbb13`,
+  uncommitted. The base
   release is `abc0de7`. No further commit, push, PR, deployment or publication
   is authorised.
 - **The plan** is `docs/research/aaa-engine-support-2026/fix-plan.md`
   (revision 4, amendments AM1–AM16 in its section 9, Phase 8 with AM17–AM19 in
   its section 10, Phase 9 with AM20–AM26 in its section 11, Phase 10 with
   AM27–AM31 in its section 12, and Phase 11 with AM32–AM35 in its section 13: roles
-  from engine to tech demo, and Phase 12 with AM36–AM37 in its section 14). Phases 1–9 were implemented, in the order 1, 2,
+  from engine to tech demo, Phase 12 with AM36–AM37 in its section 14, and Phase 13 with AM38 in its section 15). Phases 1–9 were implemented, in the order 1, 2,
   3, 4, 7, 6, 5, 8, 9. In Phase 10 the seven fix lanes (routing,
   engine-agents-sim-editor, engine-agents-render-platform,
   authoring-and-workflow-skills, new-skills-and-permissions,
@@ -51,6 +54,7 @@ and kept for context only.
 | AAA-ENGINE-2026-P9 | Phase 9 (fixes 9.1–9.4 and AM20 to AM26), with the Acceptance-8 review of C124–C133 | 4 | F1–F15 | F1–F8 resolved in round 2; F9–F11 and F13–F15 resolved in round 3; F12 (the diff-based shared-file test) escalated at round 3 and still escalated at round 4. The owner decided on 2026-11-17 to replace that test with an approved-hunk guard (AM27); round 5, at S21, re-ran every F12 mutation against the new guard, found F12 resolved and ended "Push: clear" |
 | AAA-ENGINE-2026-P10 | Phase 10 (AM27–AM31 in its section 12): the S20..S21 delta, the AM27 guard and its re-pin, then the S21..S22 delta | 2 | F1–F2 | F1 (the phase note's hunk counts) and F2 (follow-up: `/create-epics` selected a module's TR entries by `system:`) resolved in round 2; "Push: clear" |
 | AAA-ENGINE-2026-P11 | Phase 11 (AM32–AM35 in its section 13): the 4b4aaea..S24 delta, then S24..S25 and S25..S26 | 3 | F1–F10 | F1–F9 met in round 2 (AM33); F10, raised in round 2, met in round 3 (AM34); "Push: clear" |
+| AAA-ENGINE-2026-P13 | Phase 13 (AM38 in its section 15): the 22fbb13..P13-S1 delta, then P13-S1..P13-S2 | 2 | F1–F9 | F1 (the Must-not check admitted any model/effort line; now positional), F2 (C266 and C267 rewritten to say no more than E579–E586), F3 (status lines), F4 (the ladder's limits in the notes), F5 (no tier counts in the notes) and F6 (three grammar fixtures) resolved in round 2; F7 (the spec's tier name) and F8 (`--root` without a value) fixed in round 1's fixes; F9 (follow-up: the gate headers after a `session` override) recorded in round 2 and fixed; "Push: clear" |
 | AAA-ENGINE-2026-P12 | Phase 12 (AM36–AM37 in its section 14): the 7929b58..S29 delta, then S29..S30 and S30..S31 | 3 | F1–F7 | F1–F5 resolved in round 2 (F1 by AM37; F2–F4 by rewriting C256, C244, C264 and C265, with E573 and E574 re-fetched verbatim); F6 (the fix plan's Status line), raised in round 2, resolved in round 3; F7 (follow-up: a lesson's problem line may read `NOT SOURCEABLE`), raised in round 2 and recorded in round 3, carried into AM36(g); "Push: clear" |
 
 - **Independent scores.** After Phases 1–7, an independent reviewer scored the
@@ -259,12 +263,22 @@ specifications awaiting a live `/skill-test spec` run.
    shared file starts with a new plan amendment.
 3. Part 2, the OpenSpec change `add-custom-engine-xr-numerics-demo`, is
    implemented on `feature/custom-engine-xr-numerics-demo` from `7929b58`
-   (task groups 1–7), uncommitted. Its integration checks passed (8.1, 8.2),
+   (task groups 1–7), committed as `9e135e7` and merged into `main` (PR #1).
+   Its integration checks passed (8.1, 8.2),
    and its critic (8.3, AAA-ENGINE-2026-P12) ended round 3 with "Push:
    clear". The independent re-score (8.4) gave 9.4/10 at S32 and 9.6/10
    at S33 after its N1 and N2 were addressed. Commit and push only on the
    owner's request.
-4. Any later edit to a shared agent or skill file needs `shared_hunks.py
+4. Phase 13, the OpenSpec change `set-agent-model-and-effort` (fix plan
+   section 15, AM38), is implemented on `feature/agent-model-effort` (task
+   groups 1–5 and task 6.1), uncommitted: `.claude/agent-models.yaml` sets
+   every agent's model and effort, `.claude/scripts/agent-models.sh` writes and
+   checks them, and `.claude/docs/escalation-ladder.md` holds the escalation
+   rule. Its exit checks (6.1) passed after AM38(e); its critic (6.2,
+   AAA-ENGINE-2026-P13) blocked round 1 on F1-F6, which the fixes answer, and
+   ended round 2 with "Push: clear". Commit and push only on the owner's
+   request.
+5. Any later edit to a shared agent or skill file needs `shared_hunks.py
    propose` and a reviewed reason per new hunk (`studio-tests/README.md`). Do
    not write a test count into this file unless it is the suite's own;
    `studio-tests/test_engine_phase8b.py` fails a count that differs.

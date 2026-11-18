@@ -1,0 +1,134 @@
+# Agent models and effort: the one place each agent role's model and effort
+# level is set (fix plan AM38). Claude Code reads them only from each agent's
+# frontmatter, so after an edit here run:
+#
+#   bash .claude/scripts/agent-models.sh sync     # write them into .claude/agents/
+#   bash .claude/scripts/agent-models.sh check    # list any difference
+#
+# tiers:     model and effort, from lowest to highest. This order is also the
+#            escalation ladder (.claude/docs/escalation-ladder.md): a failing
+#            subagent is started again one tier up. `optional: true` on the last
+#            tier means it is skipped unless a project enables it (remove the
+#            line to make it a normal rung).
+# agents:    every agent and its default tier. A tier follows what the role's
+#            file does and which skills and gates start it, not its name; the
+#            comment says which way a role would move and on what.
+# overrides: per-project changes, one line per agent; they win over `agents:`.
+#            `session` restores the old behaviour for one role: `model: inherit`
+#            and no `effort:` line, so it runs on the session's model and effort.
+#
+# Grammar: two-space indent, `key: value`, a trailing ` # comment` allowed; no
+# tabs, no duplicate keys, no {...} or [...].
+
+tiers:
+  sonnet-medium:
+    model: sonnet
+    effort: medium
+  sonnet-high:
+    model: sonnet
+    effort: high
+  opus-medium:
+    model: opus
+    effort: medium
+  opus-high:
+    model: opus
+    effort: high
+  opus-xhigh:
+    model: opus
+    effort: xhigh
+  fable-high:
+    model: fable
+    effort: high
+    optional: true
+
+agents:
+  # Final cross-domain verdicts, and work whose errors are subtle and costly
+  # (concurrency, lock-free code, memory, GPU submission, real-time audio,
+  # determinism, netcode, security).
+  creative-director: opus-high
+  technical-director: opus-high
+  producer: opus-high                          # down to opus-medium if its gates are treated as advisory
+  lead-programmer: opus-high                   # down to opus-medium if another review sits after its own
+  chief-engine-architect: opus-high
+  core-systems-lead: opus-high                 # down to opus-medium if every change it reviews arrives with a TSan/Loom/Miri run
+  rendering-lead: opus-high
+  simulation-systems-lead: opus-high           # down to opus-medium without lockstep, replay or cross-machine determinism
+  memory-allocator-specialist: opus-high
+  concurrency-job-system-engineer: opus-high
+  rhi-backend-engineer: opus-high
+  render-graph-specialist: opus-high
+  audio-engine-engineer: opus-high             # down to sonnet-high if the audio ADR picks Wwise or FMOD
+  physics-simulation-engineer: opus-high       # down to sonnet-high if determinism is same binary, same machine
+  ecs-dod-architect: opus-high                 # down to opus-medium with single-threaded systems and no cross-machine numerics
+  engine-programmer: opus-high                 # down to sonnet-high on Custom, where it owns game-facing glue only
+  network-programmer: opus-high
+  security-engineer: opus-high
+  godot-gdextension-specialist: opus-high      # down to sonnet-high if no native memory or thread code
+  unity-dots-specialist: opus-high             # down to opus-medium if DOTS use is simple Burst jobs
+  ue-replication-specialist: opus-high
+
+  # Judgement across several documents that a gate or lead reviews.
+  game-designer: opus-medium
+  economy-designer: opus-medium                # down to sonnet-high if a typical task is one loot table
+  narrative-director: opus-medium              # up to opus-high while CD-NARRATIVE stays unwired
+  art-director: opus-medium
+  qa-lead: opus-medium                         # down to sonnet-high if review_mode stays below full
+  godot-specialist: opus-medium                # up to opus-high where it is the only ADR engine reviewer
+  unity-specialist: opus-medium                # up to opus-high as only ADR engine reviewer; down to sonnet-high if per-story checks dominate
+  unreal-specialist: opus-medium               # up to opus-high as only ADR engine reviewer; down to sonnet-high if per-story checks dominate
+  editor-architect: opus-medium                # up to opus-high if its format is also the runtime save format
+
+  # Bounded analysis and implementation, checked by a lead or tests.
+  systems-designer: sonnet-high                # up to opus-medium if it reconciles entities across several GDDs
+  level-designer: sonnet-high
+  world-builder: sonnet-high                   # up to opus-medium if it runs without the ND-CONSISTENCY re-check
+  writer: sonnet-high                          # down to sonnet-medium at team.size small or larger
+  technical-artist: sonnet-high                # up to opus-medium if the DCC interchange contract dominates
+  audio-director: sonnet-high                  # up to opus-medium for project-wide work (sound bible, middleware ADR inputs)
+  ux-designer: sonnet-high                     # up to opus-medium for project-wide work
+  accessibility-specialist: sonnet-high
+  localization-lead: sonnet-high
+  live-ops-designer: sonnet-high               # up to opus-medium for project-wide work
+  xr-experience-designer: sonnet-high          # low confidence: no skill starts it yet
+  qa-tester: sonnet-high
+  release-manager: sonnet-high                 # up to opus-medium if /team-release routes the go/no-go through it
+  gameplay-programmer: sonnet-high
+  ai-programmer: sonnet-high
+  ui-programmer: sonnet-high                   # up to opus-medium on Custom, where it owns the text stack
+  performance-analyst: sonnet-high
+  analytics-engineer: sonnet-high              # down to sonnet-medium if it only writes event specs
+  unity-addressables-specialist: sonnet-high
+  ue-gas-specialist: sonnet-high               # up to opus-medium for multiplayer predicted abilities
+  platform-engineer: sonnet-high               # up to opus-high for crash handling, certification or anti-cheat
+  world-streaming-engineer: sonnet-high        # up to opus-high for DirectStorage/io_uring or untrusted mod packages
+  online-services-engineer: sonnet-high        # up to opus-high if purchase or token code ships without security review
+  asset-build-tooling-engineer: sonnet-high
+  shader-pipeline-engineer: sonnet-high        # up to opus-high for cache-key or bindless changes without golden images
+  graphics-features-engineer: sonnet-high
+  vfx-runtime-engineer: sonnet-high
+  animation-systems-engineer: sonnet-high
+  scripting-runtime-engineer: sonnet-high      # up to opus-high when mods or UGC ship
+  level-editor-engineer: sonnet-high
+  cinematics-sequencer-engineer: sonnet-high
+  engine-technical-writer: sonnet-high         # down to sonnet-medium for generated reference only
+
+  # Execution inside one API, content to a brief, and checklist work.
+  lighting-artist: sonnet-medium
+  cinematic-designer: sonnet-medium
+  sound-designer: sonnet-medium                # up to sonnet-high while it runs /team-audio alone at team.size individual
+  community-manager: sonnet-medium
+  tools-programmer: sonnet-medium              # up to sonnet-high for pipeline transformers that change assets
+  devops-engineer: sonnet-medium               # up to sonnet-high on Custom build farms or when it owns signing keys
+  prototyper: sonnet-medium
+  godot-csharp-specialist: sonnet-medium       # up to sonnet-high when it implements rather than checks
+  godot-gdscript-specialist: sonnet-medium
+  godot-shader-specialist: sonnet-medium
+  unity-shader-specialist: sonnet-medium       # up to sonnet-high for custom URP/HDRP passes
+  unity-ui-specialist: sonnet-medium
+  ue-blueprint-specialist: sonnet-medium
+  ue-umg-specialist: sonnet-medium
+  editor-ui-framework-engineer: sonnet-medium  # up to sonnet-high if the ADR picks the engine's own retained framework
+
+overrides:
+  # chief-engine-architect: fable-high
+  # sound-designer: session

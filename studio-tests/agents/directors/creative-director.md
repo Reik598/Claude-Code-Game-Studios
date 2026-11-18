@@ -13,7 +13,7 @@ Verified by reading the agent's `.claude/agents/creative-director.md` frontmatte
 
 - [ ] `description:` field is present and domain-specific (references creative vision, pillars, GDD alignment — not generic)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, WebSearch and `disallowedTools:` lists Bash
-- [ ] Model tier is `opus` — frontmatter `model:` reads exactly `opus` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over technical architecture or production scheduling
 
 ---

@@ -69,6 +69,52 @@ MUST_NOT_PATHSPECS = (
     "docs/engine-reference/godot/", "docs/engine-reference/unity/", "docs/engine-reference/unreal/",
     "docs/engine-reference/web/",
 )
+# Fix plan AM38(e), owner decision 2026-11-18: in a Must-not agent file only
+# the frontmatter `model:` and `effort:` lines may differ from the base release,
+# and in its spec only the Model-tier line; every other line stays the base
+# release's, so each engine specialist's content and routing are unchanged.
+SPEC_TIER_PREFIX = "- [ ] Model tier is "
+
+
+def base_release_text(path):
+    """A file's text at the base release, read as UTF-8 (the agents hold em dashes)."""
+    return subprocess.run(["git", "-C", str(ROOT), "show", f"{BASE_RELEASE}:{path}"], capture_output=True,
+                          encoding="utf-8").stdout
+
+
+def must_not_problems(path, base, work):
+    """The differences between a Must-not file and the base release that AM38(e)
+    does not admit, as a list (empty when only the admitted lines differ).
+
+    Positional, not a filter: the work file must be the base file with its one
+    frontmatter `model:` line replaced in place and at most one `effort:` line
+    directly after it (an agent), or with its one Model-tier line replaced in
+    place (a spec). Any other added, moved or changed line is a problem."""
+    base_lines = base.replace("\r\n", "\n").split("\n")
+    work_lines = work.replace("\r\n", "\n").split("\n")
+    if path.startswith(".claude/agents/"):
+        close = base_lines.index("---", 1) if base_lines[:1] == ["---"] and "---" in base_lines[1:] else 0
+        at = [i for i in range(1, close) if base_lines[i].startswith("model:")]
+        if len(at) != 1 or any(base_lines[i].startswith("effort:") for i in range(1, close)):
+            return [f"{path}: the base frontmatter has no single model: line and no effort: line to replace"]
+        i = at[0]
+        head, tail = base_lines[:i], base_lines[i + 1:]
+        if work_lines[:i] != head or len(work_lines) <= i or not work_lines[i].startswith("model:"):
+            return [f"{path}: lines before the model: line, or the model: line itself, differ from the base release"]
+        rest = work_lines[i + 1:]
+        if rest[:1] and rest[0].startswith("effort:") and not (tail[:1] and tail[0].startswith("effort:")):
+            rest = rest[1:]
+        return [] if rest == tail else [f"{path}: a line after the model: and effort: lines differs from the base release"]
+    if path.startswith("studio-tests/agents/engine/"):
+        at = [i for i, line in enumerate(base_lines) if line.startswith(SPEC_TIER_PREFIX)]
+        if len(at) != 1:
+            return [f"{path}: the base spec has no single Model-tier line to replace"]
+        i = at[0]
+        if (len(work_lines) != len(base_lines) or work_lines[:i] != base_lines[:i]
+                or not work_lines[i].startswith(SPEC_TIER_PREFIX) or work_lines[i + 1:] != base_lines[i + 1:]):
+            return [f"{path}: a line other than the Model-tier line differs from the base release"]
+        return []
+    return [] if work_lines == base_lines else [f"{path}: differs from the base release"]
 # (c) The whole allowed-tools of each skill this change added, with the reason
 # for each entry. Recorded, not derived: what a skill needs is a reading of its
 # text (.claude/rules/skill-authoring.md:76-79). A change to a list is made
@@ -457,9 +503,57 @@ class Phase9(unittest.TestCase):
                 self.assertTrue(fnmatch.filter(base_files, pattern), "the pathspec matches no base file: out of date")
         changed = git("diff", "--name-status", BASE_RELEASE, "--", *MUST_NOT_PATHSPECS)
         self.assertEqual(changed.returncode, 0, changed.stderr)
-        self.assertEqual(changed.stdout.strip(), "", "Must-not files differ from the base release")
+        for line in changed.stdout.splitlines():
+            status, path = line.split("\t", 1)
+            with self.subTest(path=path):
+                self.assertEqual(status, "M", "a Must-not file was added, removed or renamed")
+                base = base_release_text(path)
+                work = (ROOT / path).read_text(encoding="utf-8")
+                self.assertEqual(must_not_problems(path, base, work), [])
         added = git("ls-files", "--others", "--exclude-standard", "--", *MUST_NOT_PATHSPECS)
         self.assertEqual(added.stdout.strip(), "", "untracked files under the Must-not paths")
+
+    def test_must_not_exception_covers_only_model_and_effort(self):
+        # AM38(e): the exception admits the agent's frontmatter `model:` and
+        # `effort:` lines and the spec's Model-tier line, and nothing else.
+        agent = ".claude/agents/unity-specialist.md"
+        base = base_release_text(agent)
+        work = (ROOT / agent).read_text(encoding="utf-8")
+        self.assertEqual(must_not_problems(agent, base, work), [])
+        lines = work.replace("\r\n", "\n").split("\n")
+        close = lines.index("---", 1)
+        model_at = next(i for i in range(1, close) if lines[i].startswith("model:"))
+        effort_at = next(i for i in range(1, close) if lines[i].startswith("effort:"))
+
+        def edited(fn):
+            copy = list(lines)
+            fn(copy)
+            return "\n".join(copy)
+        cases = {
+            "a description edit": edited(lambda c: c.__setitem__(2, c[2].replace("Unity", "Unity Engine", 1))),
+            "a tools edit": edited(lambda c: c.__setitem__(
+                next(i for i in range(1, close) if c[i].startswith("tools:")), c[3] + ", Agent")),
+            "a body line after the frontmatter": edited(lambda c: c.__setitem__(close + 2, c[close + 2] + " (edited)")),
+            "a second effort line": edited(lambda c: c.insert(effort_at + 1, "effort: low")),
+            "a second model line": edited(lambda c: c.insert(effort_at + 1, "model: haiku")),
+            "model moved above name": edited(lambda c: c.insert(1, c.pop(model_at))),
+            "effort moved away from model": edited(lambda c: c.insert(1, c.pop(effort_at))),
+        }
+        for label, text in cases.items():
+            with self.subTest(edit=label):
+                self.assertTrue(must_not_problems(agent, base, text), f"{label} passed the Must-not check")
+        spec = "studio-tests/agents/engine/unity/unity-specialist.md"
+        spec_base = base_release_text(spec)
+        spec_work = (ROOT / spec).read_text(encoding="utf-8")
+        self.assertEqual(must_not_problems(spec, spec_base, spec_work), [])
+        tier_line = next(line for line in spec_work.splitlines() if line.startswith(SPEC_TIER_PREFIX))
+        spec_cases = {
+            "a heading edit": spec_work.replace("## ", "### ", 1),
+            "a second Model-tier line": spec_work.replace(tier_line, tier_line + "\n" + tier_line, 1),
+        }
+        for label, text in spec_cases.items():
+            with self.subTest(spec_edit=label):
+                self.assertTrue(must_not_problems(spec, spec_base, text), f"{label} passed the Must-not check")
 
     def test_new_skills_allowed_tools_equal_the_recorded_lists(self):
         # Fix 9.3 (c): every allowed-tools entry of a skill this change added is

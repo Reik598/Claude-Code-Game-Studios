@@ -3,6 +3,7 @@ name: graphics-features-engineer
 description: "Custom: lighting and global illumination, shadow maps, ray-traced reflections, post-processing, temporal anti-aliasing and upscaler integration, HDR display output, sky, atmosphere, water and terrain rendering."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

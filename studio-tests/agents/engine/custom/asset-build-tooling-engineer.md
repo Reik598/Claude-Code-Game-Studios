@@ -12,7 +12,7 @@ Reports to: core-systems-lead; coordinates CI with devops-engineer. No gate IDs 
 - [ ] Agent file exists at `.claude/agents/asset-build-tooling-engineer.md`
 - [ ] `description:` is present and domain-specific (CMake presets / Cargo workspaces, content-addressed cookers, hot reload, instrumentation, CI benchmarks)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **core-systems-lead**" and names `devops-engineer` for CI
 - [ ] Has worked Correct vs Incorrect cook-key examples (C++23 and Rust), a presets example and a module layout block
 - [ ] Has `## Version Awareness` and `## Tooling` (`test-run.sh custom`; zero tests never a pass)

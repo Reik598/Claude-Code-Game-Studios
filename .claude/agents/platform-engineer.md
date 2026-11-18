@@ -3,6 +3,7 @@ name: platform-engineer
 description: "Custom: OS and console layer — windowing, gamepads/haptics, file I/O, thread affinity, virtual memory, crash dumps, suspend/resume, cert technical requirements."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

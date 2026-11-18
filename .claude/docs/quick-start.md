@@ -68,8 +68,8 @@ There are three tiers of agents:
 - **Tier 3 — Specialists** who execute within their domain
   - Designers, programmers, artists, writers, testers, engineers
 
-The tiers are seniority of role. Thirty-three of the 77 agents run on your session's model; the
-agent file's own `model:` line says which do not
+The tiers are seniority of role. All 77 agents run on the model and effort
+`.claude/agent-models.yaml` gives them, chosen for what each role does
 (`.claude/docs/model-tiers.md`).
 
 ### 2. Pick the Right Agent for the Job

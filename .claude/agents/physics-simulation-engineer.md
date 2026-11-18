@@ -2,7 +2,8 @@
 name: physics-simulation-engineer
 description: "Custom: deterministic rigid body simulation — fixed stepping, broad/narrow phase, constraint solver, the collision primitives it supplies to engine/math/."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 

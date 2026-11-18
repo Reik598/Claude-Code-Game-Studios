@@ -3,6 +3,7 @@ name: chief-engine-architect
 description: "Custom engine authority — subsystem boundaries, dependency direction, API/ABI stability, ADR compliance, per-subsystem frame budget split."
 tools: Read, Glob, Grep, Write, Edit, Bash, WebSearch
 model: opus
+effort: high
 maxTurns: 30
 memory: project
 ---

@@ -12,7 +12,7 @@ Reports to: rendering-lead. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/render-graph-specialist.md`
 - [ ] `description:` is present and domain-specific (transient aliasing, automatic barriers, async compute scheduling)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **rendering-lead**"
 - [ ] Has a worked Correct vs Incorrect pass declaration (C++23 and Rust) and a module layout block
 - [ ] Has `## Version Awareness` and `## Tooling` (synchronization validation, captures, `test-run.sh custom`)

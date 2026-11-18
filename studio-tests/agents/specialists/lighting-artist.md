@@ -11,7 +11,7 @@ Reports to: art-director. No gate IDs assigned.
 
 - [ ] `description:` field is present and domain-specific (references lighting / exposure / tone mapping / grading / bake settings) and does not start with `Custom:`
 - [ ] `tools:` list includes Read, Write, Edit, Glob, Grep — does NOT include Bash (`disallowedTools: Bash`)
-- [ ] Model tier is `inherit` — frontmatter `model:` reads exactly `inherit` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-medium` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] "What This Agent Must NOT Do" names `art-director` for lighting direction and `technical-artist` for lighting shaders
 - [ ] The Engine-Side Partners table has one row per engine: Custom (`graphics-features-engineer` through `rendering-lead`), Godot, Unity and Unreal (that engine's own specialists), Web (`lead-programmer`, with the reason); no Custom agent is named outside the Custom row
 
