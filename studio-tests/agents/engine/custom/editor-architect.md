@@ -12,7 +12,7 @@ Reports to: chief-engine-architect. Runs no gate itself; its UI framework ADR is
 - [ ] Agent file exists at `.claude/agents/editor-architect.md`
 - [ ] `description:` is present and domain-specific (editor/runtime split, reflection, undo transactions, play-in-editor, UI framework ADR)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-medium` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `chief-engine-architect`"
 - [ ] Has a routing table naming `level-editor-engineer`, `editor-ui-framework-engineer` and `cinematics-sequencer-engineer` by exact name, plus `tools-programmer`, `ui-programmer`, `ux-designer`, `render-graph-specialist`, `ecs-dod-architect`, `asset-build-tooling-engineer`
 - [ ] Has an escalation protocol naming `chief-engine-architect` and the `CEA-ADR` gate file `.claude/docs/director-gates/cea-adr.md`

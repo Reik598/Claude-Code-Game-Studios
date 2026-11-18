@@ -229,7 +229,7 @@ For a single agent there is no verdict, only observations:
 ```
 === Agent Static Check: qa-lead ===
 
-Model: inherit · Effort: unset · Turn limit: 20
+Model: opus · Effort: medium · Turn limit: 20
 Tools: Read, Glob, Grep, Write, Edit, Bash. Fits the job (it writes test plans).
 Observations (not scored):
   asks-user (lines 31, 52): tells the agent to get approval before writing.

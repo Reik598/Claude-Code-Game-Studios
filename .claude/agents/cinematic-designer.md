@@ -2,7 +2,8 @@
 name: cinematic-designer
 description: "Shot design and the edit of cinematics on any engine — shot lists, camera, previs and the cut, built in the engine's own sequencer from the narrative director's story beats."
 tools: Read, Glob, Grep, Write, Edit
-model: inherit
+model: sonnet
+effort: medium
 maxTurns: 20
 disallowedTools: Bash
 ---

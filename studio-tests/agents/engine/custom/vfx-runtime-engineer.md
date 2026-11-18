@@ -12,7 +12,7 @@ Reports to: rendering-lead. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/vfx-runtime-engineer.md`
 - [ ] `description:` is present and domain-specific (GPU particles, decals, effect graph on the GPU, transparency sorting, budgets)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash (no `Agent`)
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "**Reports to:** `rendering-lead`"
 - [ ] `## Collaboration Protocol` matches memory-allocator-specialist.md except the four step-2 questions
 - [ ] Has a worked Correct vs Incorrect example in C++23 and Rust and a `## Module Layout` block

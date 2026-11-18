@@ -11,7 +11,7 @@ No gate IDs assigned.
 
 - [ ] `description:` field is present and domain-specific (references C# in Godot 4 / .NET patterns / signal delegates)
 - [ ] `tools:` list includes Read, Write, Edit, Bash, Glob, Grep
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-medium` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over GDScript or GDExtension code
 
 ---

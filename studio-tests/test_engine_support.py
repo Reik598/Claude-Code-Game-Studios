@@ -27,8 +27,9 @@ ALWAYS_LOADED_PINNED = {
     "CLAUDE.md": "bb4322d7364e8d986f6e3a5302145facdd8168456eada598952b7c18bd1d24b3",
     ".claude/docs/directory-structure.md":
         "287fb123fc227b1f1538172247f933eeee544787707a96fbbc7d8d7c241e221f",
+    # Re-pinned at fix plan AM38(d), task 4.2: the pointer to escalation-ladder.md.
     ".claude/docs/coordination-rules.md":
-        "e05f40665002073a260a330274c0fb958e0f92e474965fb24c3388a22fbc712c",
+        "c46b8be11aa86cfbfe934436a7e4d37749d9b7a5fab4ea9695ca4a78790edd35",
 }
 # R9. Always-loaded files the reviewed change left untouched: compared with the
 # base release, where only added blocks that name Custom are allowed.
@@ -668,17 +669,17 @@ KIND_NEW_RULES = "new rules"
 # Custom set, i.e. the agents valid on every engine (lighting-artist,
 # cinematic-designer, xr-experience-designer at AM32).
 KIND_NEW_ALL_ENGINE_AGENTS = "new agents outside the Custom set"
-KIND_INHERIT = "agents on model: inherit"
-KIND_PINNED = "agents with a pinned model"
 KIND_OPUS = "agents on opus"
 KIND_SONNET = "agents on sonnet"
 KIND_HAIKU = "agents on haiku"
-KIND_CUSTOM_SONNET = "Custom agents on sonnet"
-KIND_SUB_SPECIALISTS_SONNET = "Godot, Unity and Unreal agents on sonnet"
-# README's tier sentence: the sonnet agents that are neither a department lead
-# (studio-tests/agents/leads/) nor a Custom lead.
-KIND_SONNET_SPECIALISTS = "agents on sonnet other than the leads"
-LEAD_SPEC_DIR = "studio-tests/agents/leads"
+# Fix plan AM38: the tiers of .claude/agent-models.yaml, counted from each
+# agent's frontmatter `model:` and `effort:` together, so a move between two
+# efforts of one model changes a count.
+KIND_OPUS_HIGH = "agents on opus at high effort"
+KIND_OPUS_MEDIUM = "agents on opus at medium effort"
+KIND_SONNET_HIGH = "agents on sonnet at high effort"
+KIND_SONNET_MEDIUM = "agents on sonnet at medium effort"
+EFFORT_LINE = re.compile(r"^effort:\s*(\S+)", re.M)
 # Fix plan AM15: the agents core-systems-lead starts (its `subagent_type:`
 # lines), and the Custom agents other than the architect.
 KIND_CORE_SYSTEMS_DELEGATES = "agents core-systems-lead starts"
@@ -701,6 +702,7 @@ ASK_OR_WRITE_TOOLS = re.compile(r"\b(?:AskUserQuestion|Write)\b")
 OLD_NAME_HEADING = re.compile(r"^# /[\w-]+ — old name of /[\w-]+$", re.M)
 MODEL_LINE = re.compile(r"^model:\s*(\S+)", re.M)
 INHERIT, OPUS, SONNET, HAIKU = "inherit", "opus", "sonnet", "haiku"
+HIGH, MEDIUM = "high", "medium"
 # The digits or the number word a count is written with.
 COUNT_UNITS = ("zero one two three four five six seven eight nine ten eleven twelve thirteen "
                "fourteen fifteen sixteen seventeen eighteen nineteen").split()
@@ -719,24 +721,21 @@ COUNT_SITES = [
     (".claude/docs/quick-start.md", r"organizes (\d+) specialized", KIND_AGENTS),
     (".claude/docs/quick-start.md", r"(\w+) leads — `core-systems-lead`", KIND_CUSTOM_LEADS),
     (".claude/docs/quick-start.md", r"and (\w+) engine\s+specialists", KIND_CUSTOM_SPECIALISTS),
-    # AM32 (task 7.1): a count in words can be hyphenated ("Thirty-three"),
-    # so the word sites of KIND_INHERIT capture [\w-]+.
-    (".claude/docs/quick-start.md", r"([\w-]+) of the \d+ agents run on", KIND_INHERIT),
-    (".claude/docs/quick-start.md", r"of the (\d+) agents run on", KIND_AGENTS),
+    # AM38: the tier sentence that replaced "Thirty-three of the 77 agents run on".
+    (".claude/docs/quick-start.md", r"All (\d+) agents run on the model and effort", KIND_AGENTS),
     (".claude/docs/quick-start.md", r"agents/\s+-- (\d+) agent definitions", KIND_AGENTS),
     (".claude/docs/quick-start.md", r"skills/\s+-- (\d+) slash command definitions", KIND_SKILLS),
     (".claude/docs/quick-start.md", r"rules/\s+-- (\d+) path-specific rule files", KIND_RULES),
     (".claude/docs/setup-requirements.md", r"on a (\d+)-agent project", KIND_AGENTS),
     (".claude/docs/setup-requirements.md", r"ships (\d+) skills", KIND_SKILLS),
     (".claude/docs/skills-reference.md", r"^(\d+) slash commands organized", KIND_SKILLS),
-    (".claude/docs/model-tiers.md", r"(\d+) agents use `model: inherit`", KIND_INHERIT),
-    (".claude/docs/model-tiers.md", r"model\.\s+(\d+) are pinned", KIND_PINNED),
-    (".claude/docs/model-tiers.md", r"\*\*opus \((\d+)\):\*\*", KIND_OPUS),
-    (".claude/docs/model-tiers.md", r"\*\*sonnet \((\d+)\):\*\*", KIND_SONNET),
+    # AM38: the per-tier list of .claude/agent-models.yaml replaced the
+    # inherit / pinned / opus / sonnet sentences.
+    (".claude/docs/model-tiers.md", r"\*\*opus · high \((\d+)\):\*\*", KIND_OPUS_HIGH),
+    (".claude/docs/model-tiers.md", r"\*\*opus · medium \((\d+)\):\*\*", KIND_OPUS_MEDIUM),
+    (".claude/docs/model-tiers.md", r"\*\*sonnet · high \((\d+)\):\*\*", KIND_SONNET_HIGH),
+    (".claude/docs/model-tiers.md", r"\*\*sonnet · medium \((\d+)\):\*\*", KIND_SONNET_MEDIUM),
     (".claude/docs/model-tiers.md", r"\*\*haiku \((\d+)\):\*\*", KIND_HAIKU),
-    (".claude/docs/model-tiers.md", r"the (\d+) Custom-engine leads and specialists", KIND_CUSTOM_SONNET),
-    (".claude/docs/model-tiers.md", r"The Custom-engine ([\w-]+), used only", KIND_CUSTOM_SONNET),
-    (".claude/docs/model-tiers.md", r"the (\d+)\s+engine sub-specialists", KIND_SUB_SPECIALISTS_SONNET),
     (".claude/scripts/agent-check.sh", r"across (\d+) agent files", KIND_AGENTS),
     (".claude/scripts/skill-lint.sh", r"across (\d+) skills", KIND_SKILLS),
     (".claude/skills/setup-engine/SKILL.md", r"specialist agents are the (\d+) custom-engine agents", KIND_CUSTOM),
@@ -769,9 +768,10 @@ COUNT_SITES = [
     ("README.md", r"plus (\d+) for a Custom engine", KIND_CUSTOM),
     ("README.md", r"\| \*\*Skills\*\* \| (\d+) \|", KIND_SKILLS),
     ("README.md", r"\| \*\*Rules\*\* \| (\d+) \|", KIND_RULES),
-    ("README.md", r"the (\w+) engine leads\s+and \S+ specialists name Sonnet", KIND_CUSTOM_LEADS),
-    ("README.md", r"engine leads\s+and (\S+) specialists name Sonnet", KIND_SONNET_SPECIALISTS),
-    ("README.md", r"name Sonnet, and the remaining ([\w-]+)", KIND_INHERIT),
+    # AM38: README's tier sentence now counts the table's models and efforts.
+    ("README.md", r"title: ([\w-]+) roles run on Opus", KIND_OPUS),
+    ("README.md", r"\(([\w-]+) of them at high effort\)", KIND_OPUS_HIGH),
+    ("README.md", r"and\s+([\w-]+) on Sonnet", KIND_SONNET),
     ("README.md", r"access all (\d+) skills", KIND_SKILLS),
     ("README.md", r"access all \d+ skills \(plus (\w+) old names", KIND_OLD_NAMES),
     # CHANGELOG.md and UPGRADING.md: searched in the Unreleased section only.
@@ -998,28 +998,25 @@ def published_count_values():
     absent when the base release is not in this clone."""
     agents = {p.stem: read(p.relative_to(ROOT)) for p in (ROOT / ".claude/agents").glob("*.md")}
     models = {name: (MODEL_LINE.search(frontmatter(text)) or [None, INHERIT])[1] for name, text in agents.items()}
+    efforts = {name: (EFFORT_LINE.search(frontmatter(text)) or [None, None])[1] for name, text in agents.items()}
     skill_dirs = {p.parent.name: read(p.relative_to(ROOT)) for p in (ROOT / ".claude/skills").glob("*/SKILL.md")}
     old_names = {name for name, text in skill_dirs.items() if OLD_NAME_HEADING.search(text)}
     public = {name: text for name, text in skill_dirs.items() if name not in old_names}
     rules = {p.stem for p in (ROOT / ".claude/rules").glob("*.md")}
     custom = {p.stem for p in (ROOT / CUSTOM_AGENT_SPEC_DIR).glob("*.md")}
     architects, leads = custom_hierarchy()
-    sub_specialists = {p.stem for p in (ROOT / "studio-tests/agents/engine").glob("*/*.md")} - custom
-    department_leads = {p.stem for p in (ROOT / LEAD_SPEC_DIR).glob("*.md")}
     values = {
         KIND_AGENTS: len(agents), KIND_SKILLS: len(public), KIND_SKILL_DIRS: len(skill_dirs),
         KIND_OLD_NAMES: len(old_names), KIND_RULES: len(rules), KIND_CUSTOM: len(custom),
         KIND_CUSTOM_LEADS: len(leads), KIND_CUSTOM_SPECIALISTS: len(custom - architects - leads),
         KIND_CUSTOM_ARCHITECT: len(architects),
-        KIND_INHERIT: sum(m == INHERIT for m in models.values()),
-        KIND_PINNED: sum(m != INHERIT for m in models.values()),
         KIND_OPUS: sum(m == OPUS for m in models.values()),
         KIND_SONNET: sum(m == SONNET for m in models.values()),
         KIND_HAIKU: sum(m == HAIKU for m in models.values()),
-        KIND_CUSTOM_SONNET: sum(models.get(a) == SONNET for a in custom),
-        KIND_SUB_SPECIALISTS_SONNET: sum(models.get(a) == SONNET for a in sub_specialists),
-        KIND_SONNET_SPECIALISTS: sum(m == SONNET and a not in leads and a not in department_leads
-                                     for a, m in models.items()),
+        KIND_OPUS_HIGH: sum(models[a] == OPUS and efforts[a] == HIGH for a in models),
+        KIND_OPUS_MEDIUM: sum(models[a] == OPUS and efforts[a] == MEDIUM for a in models),
+        KIND_SONNET_HIGH: sum(models[a] == SONNET and efforts[a] == HIGH for a in models),
+        KIND_SONNET_MEDIUM: sum(models[a] == SONNET and efforts[a] == MEDIUM for a in models),
         KIND_CORE_SYSTEMS_DELEGATES: len(set(SUBAGENT_TYPE_LINE.findall(agents["core-systems-lead"]))),
         KIND_CUSTOM_BELOW_ARCHITECT: len(custom - architects),
         KIND_ASK_OR_WRITE: sum(bool(ASK_OR_WRITE_TOOLS.search(

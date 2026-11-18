@@ -276,11 +276,31 @@
    "class": "custom-addition",
    "ref": "section 2, AM22 P1(b), AM37",
    "text": "The /vertical-slice Phase 6 Custom block re-pinned under AM37: whole inserted lines that name Custom, stand as their own unit and leave every base line as it was, now saying that the tech-demo report sections go into the draft before the 'May I write' ask. Held to the same predicate as custom-addition (addition_failures), which check re-runs because the class is custom-addition."
+  },
+  "agent-model-effort-am38": {
+   "class": "departure",
+   "ref": "AM38",
+   "text": "AM38, agent models and effort on every engine: each base agent's frontmatter `model:` line is set and an `effort:` line is added directly after it, both written by .claude/scripts/agent-models.sh sync from .claude/agent-models.yaml. Godot, Unity, Unreal and Web projects run each agent on that model and effort instead of the base release's pin or the session's model; UPGRADING 'Other engines' and CHANGELOG disclose it with the way back (a `session` override per role, or CLAUDE_CODE_SUBAGENT_MODEL_FORCE with CLAUDE_CODE_EFFORT_LEVEL). The one sentence in /gate-check's references/4-assessment.md that said `art-director` runs on the session's model now names the models and efforts the table gives the phase-gate panel. /skill-test's example agent static check for `qa-lead` shows the model and effort the table gives it."
   }
  },
  "files": {
   ".claude/agents/accessibility-specialist.md": {
    "hunks": [
+    {
+     "id": "8f6ab526ec3560cd",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "4074c6a9e0464c07",
      "base": [
@@ -340,6 +360,21 @@
   ".claude/agents/ai-programmer.md": {
    "hunks": [
     {
+     "id": "2a230d66d8ef5145",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "1671b11069170106",
      "base": [
       94,
@@ -396,6 +431,21 @@
   ".claude/agents/analytics-engineer.md": {
    "hunks": [
     {
+     "id": "d7af25f5aef58702",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "df6887318c47a00f",
      "base": [
       100,
@@ -433,6 +483,21 @@
   ".claude/agents/art-director.md": {
    "hunks": [
     {
+     "id": "3631cb15171c8e0a",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "3945bbd982b86429",
      "base": [
       83,
@@ -449,6 +514,21 @@
   },
   ".claude/agents/audio-director.md": {
    "hunks": [
+    {
+     "id": "44755d1370497fca",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "a431bb7d83cfc3bf",
      "base": [
@@ -518,8 +598,52 @@
     }
    ]
   },
+  ".claude/agents/community-manager.md": {
+   "hunks": [
+    {
+     "id": "8879f38676c281a3",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/creative-director.md": {
+   "hunks": [
+    {
+     "id": "2379230ab8079624",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/devops-engineer.md": {
    "hunks": [
+    {
+     "id": "78c2cc544e07a4c1",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "e717d8611a031691",
      "base": [
@@ -643,8 +767,42 @@
     }
    ]
   },
+  ".claude/agents/economy-designer.md": {
+   "hunks": [
+    {
+     "id": "b6f98ba5fb28ff7c",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/engine-programmer.md": {
    "hunks": [
+    {
+     "id": "914b676cb24917e3",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "184cf629e8e25678",
      "base": [
@@ -694,6 +852,21 @@
   ".claude/agents/game-designer.md": {
    "hunks": [
     {
+     "id": "b4d991cc8d94f6c8",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "ef9d54d9f351d40c",
      "base": [
       239,
@@ -710,6 +883,21 @@
   },
   ".claude/agents/gameplay-programmer.md": {
    "hunks": [
+    {
+     "id": "dc41765869d5fa80",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "94c76c957a901b85",
      "base": [
@@ -736,8 +924,109 @@
     }
    ]
   },
+  ".claude/agents/godot-csharp-specialist.md": {
+   "hunks": [
+    {
+     "id": "b4780c574166cd54",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/godot-gdextension-specialist.md": {
+   "hunks": [
+    {
+     "id": "95b26623e0a7513a",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: sonnet"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/godot-gdscript-specialist.md": {
+   "hunks": [
+    {
+     "id": "930b8f12d69bad2f",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/godot-shader-specialist.md": {
+   "hunks": [
+    {
+     "id": "a143521bd62f3b03",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/godot-specialist.md": {
+   "hunks": [
+    {
+     "id": "dcf57756a32a6be6",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/lead-programmer.md": {
    "hunks": [
+    {
+     "id": "3288a80e23b69e50",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: sonnet"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "a87222092eeb4581",
      "base": [
@@ -766,8 +1055,61 @@
     }
    ]
   },
+  ".claude/agents/level-designer.md": {
+   "hunks": [
+    {
+     "id": "6d1860ca0c667419",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/live-ops-designer.md": {
+   "hunks": [
+    {
+     "id": "3e5ad78ed4b613c3",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/localization-lead.md": {
    "hunks": [
+    {
+     "id": "2ce77112ddda945f",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "d5b0d17d74faff71",
      "base": [
@@ -801,6 +1143,21 @@
   ".claude/agents/narrative-director.md": {
    "hunks": [
     {
+     "id": "e13c36ed8230979e",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "18d332577b3a30b1",
      "base": [
       121,
@@ -816,6 +1173,21 @@
   },
   ".claude/agents/network-programmer.md": {
    "hunks": [
+    {
+     "id": "72960929646b32df",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "584cd62d2c8560f7",
      "base": [
@@ -916,6 +1288,21 @@
   },
   ".claude/agents/performance-analyst.md": {
    "hunks": [
+    {
+     "id": "55351708704bc878",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "c882b375c7b6a9d1",
      "base": [
@@ -1038,6 +1425,18 @@
   ".claude/agents/producer.md": {
    "hunks": [
     {
+     "id": "2459c9d818aa5f5a",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "eefb275f5d764835",
      "base": [
       151,
@@ -1076,6 +1475,18 @@
   ".claude/agents/prototyper.md": {
    "hunks": [
     {
+     "id": "5b3d2d55859f4cab",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "1046c6c09467b73e",
      "base": [
       294,
@@ -1107,6 +1518,21 @@
   },
   ".claude/agents/qa-lead.md": {
    "hunks": [
+    {
+     "id": "705344402f9ac59f",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "be706f4ea1b650c4",
      "base": [
@@ -1210,6 +1636,21 @@
   ".claude/agents/qa-tester.md": {
    "hunks": [
     {
+     "id": "892478060bf9f882",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "43059a9e43ebeb70",
      "base": [
       267,
@@ -1251,6 +1692,21 @@
   },
   ".claude/agents/release-manager.md": {
    "hunks": [
+    {
+     "id": "467c8dc26700e353",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "3bbf703b99d95f5d",
      "base": [
@@ -1350,6 +1806,21 @@
   ".claude/agents/security-engineer.md": {
    "hunks": [
     {
+     "id": "9100497a5d0204d4",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "2693a37569b080d3",
      "base": [
       144,
@@ -1435,6 +1906,21 @@
   ".claude/agents/sound-designer.md": {
    "hunks": [
     {
+     "id": "6ae8e2179a3ebcc0",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "95ba550b09e3b03f",
      "base": [
       86,
@@ -1471,8 +1957,42 @@
     }
    ]
   },
+  ".claude/agents/systems-designer.md": {
+   "hunks": [
+    {
+     "id": "eb153190d70bff54",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/technical-artist.md": {
    "hunks": [
+    {
+     "id": "0388502a777b3574",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "6076f655b6a85d87",
      "base": [
@@ -1600,6 +2120,18 @@
   ".claude/agents/technical-director.md": {
    "hunks": [
     {
+     "id": "3365126c28746fe7",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
+    {
      "id": "b9d2e551076e1f37",
      "base": [
       141,
@@ -1649,6 +2181,21 @@
   },
   ".claude/agents/tools-programmer.md": {
    "hunks": [
+    {
+     "id": "52f1898026e49485",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "a00b8149548e8980",
      "base": [
@@ -1707,8 +2254,90 @@
     }
    ]
   },
+  ".claude/agents/ue-blueprint-specialist.md": {
+   "hunks": [
+    {
+     "id": "382e33c8e53c6731",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/ue-gas-specialist.md": {
+   "hunks": [
+    {
+     "id": "54bba799db4db967",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/ue-replication-specialist.md": {
+   "hunks": [
+    {
+     "id": "59e68c85781ce2b2",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: sonnet"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/ue-umg-specialist.md": {
+   "hunks": [
+    {
+     "id": "ad75c632455a2f89",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/ui-programmer.md": {
    "hunks": [
+    {
+     "id": "57938c1d1903c4ff",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "e9d264d01208b9fa",
      "base": [
@@ -1765,8 +2394,128 @@
     }
    ]
   },
+  ".claude/agents/unity-addressables-specialist.md": {
+   "hunks": [
+    {
+     "id": "b393aa3af91120aa",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/unity-dots-specialist.md": {
+   "hunks": [
+    {
+     "id": "c8c381421a3cb60c",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: sonnet"
+     ],
+     "new": [
+      "model: opus",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/unity-shader-specialist.md": {
+   "hunks": [
+    {
+     "id": "f5434aa8d9eb66d4",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/unity-specialist.md": {
+   "hunks": [
+    {
+     "id": "22d21112912c2f72",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/unity-ui-specialist.md": {
+   "hunks": [
+    {
+     "id": "320f00398c724054",
+     "base": [
+      5,
+      5
+     ],
+     "old": [],
+     "new": [
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
+  ".claude/agents/unreal-specialist.md": {
+   "hunks": [
+    {
+     "id": "919e9dcb65cf59eb",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: opus",
+      "effort: medium"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/ux-designer.md": {
    "hunks": [
+    {
+     "id": "785b54b4d355d9c0",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "48f1b6ccf956e39e",
      "base": [
@@ -1786,8 +2535,42 @@
     }
    ]
   },
+  ".claude/agents/world-builder.md": {
+   "hunks": [
+    {
+     "id": "0c3c6483c654d710",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    }
+   ]
+  },
   ".claude/agents/writer.md": {
    "hunks": [
+    {
+     "id": "e92ccbf479fb0cff",
+     "base": [
+      4,
+      5
+     ],
+     "old": [
+      "model: inherit"
+     ],
+     "new": [
+      "model: sonnet",
+      "effort: high"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "25e66e7af3947e4a",
      "base": [
@@ -3015,6 +3798,22 @@
       "- Custom engine: `chief-engine-architect` (CEA gates), only when `engine` is `Custom`"
      ],
      "reason": "custom-addition"
+    },
+    {
+     "id": "694bec69eaa7c354",
+     "base": [
+      46,
+      48
+     ],
+     "old": [
+      "`technical-director` and `producer` are Opus-tier, and `art-director` runs on",
+      "the session's model, so the panel is sized to the project rather than fixed at four. The gate still runs at"
+     ],
+     "new": [
+      "`technical-director` and `producer` run on Opus at high effort, and `art-director` on",
+      "Opus at medium effort, so the panel is sized to the project rather than fixed at four. The gate still runs at"
+     ],
+     "reason": "agent-model-effort-am38"
     },
     {
      "id": "5cc42998d6ac9b98",
@@ -4466,6 +5265,20 @@
   },
   ".claude/skills/skill-test/SKILL.md": {
    "hunks": [
+    {
+     "id": "779a10eee318c0b6",
+     "base": [
+      231,
+      232
+     ],
+     "old": [
+      "Model: inherit · Effort: unset · Turn limit: 20"
+     ],
+     "new": [
+      "Model: opus · Effort: medium · Turn limit: 20"
+     ],
+     "reason": "agent-model-effort-am38"
+    },
     {
      "id": "e60e90e63778cbeb",
      "base": [

@@ -13,7 +13,7 @@ Verified by reading the agent's `.claude/agents/qa-lead.md` frontmatter:
 
 - [ ] `description:` field is present and domain-specific (references test strategy, story readiness, coverage, bug triage — not generic)
 - [ ] `tools:` includes Read for story files, test files, and coding-standards; Bash because it runs `/smoke-check` before every QA hand-off; Write/Edit for the QA plans and sign-off reports it produces, each write gated on the user's approval in its collaboration protocol
-- [ ] Model tier is `inherit` — frontmatter `model:` reads exactly `inherit` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-medium` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over implementation decisions or game design
 
 ---

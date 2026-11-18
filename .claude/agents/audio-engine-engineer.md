@@ -2,7 +2,8 @@
 name: audio-engine-engineer
 description: "Custom: audio runtime — mixer, DSP graph, spatialization/HRTF, streamed decoding, voice virtualization, Wwise/FMOD integration or in-house per ADR."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 

@@ -12,7 +12,7 @@ Reports to: chief-engine-architect. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/engine-technical-writer.md`
 - [ ] `description:` is present and domain-specific (API reference from headers/traits, module overviews, ADR-based migration guides, editor manual)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (drafting/analysis of individual modules is the Sonnet row of `.claude/docs/model-tiers.md`; nothing justifies `opus`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **chief-engine-architect**"
 - [ ] Body limits writes to `docs/` and forbids edits in `engine/`, `game/`, `tests/` and ADRs
 - [ ] Has a worked Correct vs Incorrect example in C++23 and Rust (cited reference entry vs uncited claims; compiled doctest vs `ignore`) and a read/write layout block

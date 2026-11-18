@@ -2,7 +2,8 @@
 name: memory-allocator-specialist
 description: "Custom: linear/arena, pool, slab, buddy and TLSF allocators, cache-line-padded layout, fragmentation tracking, allocator-aware containers."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 

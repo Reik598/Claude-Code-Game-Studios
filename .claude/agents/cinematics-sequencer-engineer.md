@@ -3,6 +3,7 @@ name: cinematics-sequencer-engineer
 description: "Custom: cinematic sequencer — timeline tracks (transform, animation, audio, event, camera cut), playback inside the tick, deterministic scrubbing, camera rigs and blends, offline render-to-movie."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

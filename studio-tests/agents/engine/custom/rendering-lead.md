@@ -12,7 +12,7 @@ Reports to: chief-engine-architect. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/rendering-lead.md`
 - [ ] `description:` is present and domain-specific (CPU-to-GPU synchronization, frames in flight, swapchain pacing, GPU timing)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash, Agent
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **chief-engine-architect**"
 - [ ] Has a Routing Table and a Sub-Specialist Orchestration section that limits `Agent` starts to its five specialists: rhi-backend-engineer, render-graph-specialist, shader-pipeline-engineer, graphics-features-engineer, vfx-runtime-engineer
 - [ ] Has an Escalation Protocol naming `chief-engine-architect` and CEA-FRAME-BUDGET

@@ -14,10 +14,13 @@ Claude behavior or production engine support.
 - Commit state: Phases 1–10 are committed on `feature/custom-engine-support`
   at `4b4aaea` and pushed; Phase 11 is committed as `7929b58` on
   `feature/content-xr-roles` (branched from `4b4aaea`), pushed, not merged.
-  Phase 12 (part 2) is implemented on `feature/custom-engine-xr-numerics-demo`,
-  branched from `7929b58`, uncommitted.
-- The fix plan (revision 4, amendments AM1–AM37, Phases 8, 9, 10, 11 and 12 in its
-  sections 10, 11, 12, 13 and 14) is implemented through Phase 12. Phase 10
+  Phase 12 (part 2) is committed as `9e135e7` on
+  `feature/custom-engine-xr-numerics-demo`. Phases 1–12 are merged into `main`
+  through PR #1 (`22fbb13`). Phase 13 (agent models and effort) is
+  implemented on `feature/agent-model-effort`, branched from `22fbb13`,
+  uncommitted; its exit checks (6.1) passed after AM38(e), and its critic (AAA-ENGINE-2026-P13) blocked round 1 on F1-F6, which the fixes answer, and ended round 2 with Push: clear (F9, a follow-up, recorded and fixed).
+- The fix plan (revision 4, amendments AM1–AM38, Phases 8, 9, 10, 11, 12 and 13 in its
+  sections 10, 11, 12, 13, 14 and 15) is implemented through Phase 13. Phase 10
   included the main session's re-pin of the shared-file manifest (AM27); its
   critic, AAA-ENGINE-2026-P10, ended at round 2 with every finding resolved (F1, the
   phase note's hunk counts; F2, `/create-epics` selecting a module's TR entries
@@ -105,7 +108,7 @@ Claude behavior or production engine support.
   (section 8; O9 is closed by fix 8.6, O16 by AM27, confirmed by the P9 and
   Phase 10 critics); O17 (AM28) records that
   the AM27 manifest does not cover files new outside base skill directories.
-- Ledger: 205 sources, 578 evidence records and 265 claims
+- Ledger: 206 sources, 586 evidence records and 269 claims
   (`run_manifest.json`, last `ledger_` entry). The P9 critic checked C124–C133
   in round 1 (C126's rewrite in round 2); the Phase 10 critic reported a
   re-fetch of 19 quotes from 13 sources of the claims Phase 10 added

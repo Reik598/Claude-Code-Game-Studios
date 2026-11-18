@@ -2,7 +2,8 @@
 name: core-systems-lead
 description: "Custom engine foundation lead — main tick ordering, ownership rules, OS abstraction layer; coordinates allocator, threading, ECS, platform, streaming and online SDK specialists."
 tools: Read, Glob, Grep, Write, Edit, Bash, Agent
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 memory: project
 ---

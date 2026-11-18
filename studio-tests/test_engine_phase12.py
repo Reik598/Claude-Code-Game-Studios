@@ -408,7 +408,11 @@ LESSONS_KEY_PHRASES = {
 # Every claim Phase 12 adds from here on that names a file is bound to a key
 # phrase in one of these maps; each later group adds its maps to the tuple.
 FIRST_PHASE12_CLAIM = 219
-ALL_KEY_PHRASES = (*SECTION_KEY_PHRASES.values(), NUMERICS_KEY_PHRASES, *LESSONS_KEY_PHRASES.values())
+# Each later phase's map joins the completeness test below (Phase 12 task 2.2):
+# fix plan AM38's claims are bound in test_agent_models.py.
+from test_agent_models import KEY_PHRASES as AGENT_MODEL_KEY_PHRASES  # noqa: E402
+ALL_KEY_PHRASES = (*SECTION_KEY_PHRASES.values(), NUMERICS_KEY_PHRASES, *LESSONS_KEY_PHRASES.values(),
+                   {phrase: claim_id for claim_id, (_, phrase) in AGENT_MODEL_KEY_PHRASES.items()})
 
 
 def units_of(path, heading):

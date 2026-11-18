@@ -11,7 +11,7 @@
 
 - [ ] `description:` field is present and domain-specific (references GAS, abilities, GameplayEffects, AttributeSets)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash — no `Agent` tool
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over UI implementation or low-level net serialization
 
 ---

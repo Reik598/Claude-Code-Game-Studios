@@ -12,7 +12,7 @@ Reports to: editor-architect. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/editor-ui-framework-engineer.md`
 - [ ] `description:` is present and domain-specific (docking, property inspector with drawers, thumbnails, keybindings, IME, high-DPI, theming)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-medium` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `editor-architect`"
 - [ ] States the framework choice is `editor-architect`'s ADR and lists the four options without picking one
 - [ ] Worked Correct vs Incorrect example in both C++23 and Rust (reflection-driven drawer through a transaction vs widget writing the component) and a module layout block with `engine/editor/ui/` and `crates/editor-ui`

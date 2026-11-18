@@ -473,12 +473,12 @@ Custom engine projects only (engine.name: Custom)
           under chief-engine-architect:   engine-technical-writer
 ```
 
-Each agent declares a model in its frontmatter: the three directors and
-`chief-engine-architect` ask for Opus, `lead-programmer`, the four engine leads
-and thirty-five specialists name Sonnet, and the remaining thirty-three
-**inherit your session's model**. Treat the tiers as seniority of role, not as
-a billing plan — outside the Custom-engine set, most of the studio runs on
-whatever model you are already using.
+Each agent's model and effort come from one table,
+`.claude/agent-models.yaml`, chosen for what each role does rather than its
+title: thirty roles run on Opus (twenty-one of them at high effort) and
+forty-seven on Sonnet. None inherits your session's model unless you give it
+`session` under the table's `overrides:` (`.claude/docs/model-tiers.md`).
+Treat the tiers as seniority of role, not as a billing plan.
 
 ### Engine Specialists
 

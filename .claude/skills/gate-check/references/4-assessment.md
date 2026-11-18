@@ -45,8 +45,8 @@ decides *whether* the panel runs, `workflow` decides *how wide* it is.
 - `full` → run the panel.
 
 **Axis 2 — `workflow` decides the panel width.** `creative-director`,
-`technical-director` and `producer` are Opus-tier, and `art-director` runs on
-the session's model, so the panel is sized to the project rather than fixed at four. The gate still runs at
+`technical-director` and `producer` run on Opus at high effort, and `art-director` on
+Opus at medium effort, so the panel is sized to the project rather than fixed at four. The gate still runs at
 every tier; only its breadth scales:
 
 | `workflow` | Panel | Directors |

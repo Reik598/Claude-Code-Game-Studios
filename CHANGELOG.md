@@ -37,12 +37,14 @@ their reporting lines in `art-director`, `narrative-director` and
 the `platform` block it writes; and the one-shot's reworded VR card. The engine
 spike in `/prototype`, the tech-demo path in `/vertical-slice` and
 `engine-industry-lessons.md` are Custom only: other engines see no change from
-them.
+them. The release also sets every agent's model and effort level on every
+engine, from one table: see the last item under "Also on every engine".
 
 No engine code is shipped: no scaffold and no sample engine. The framework
 supports writing one.
 
 Also on every engine:
+- Every agent now runs on the model and effort that `.claude/agent-models.yaml` gives it (fix plan AM38): Opus or Sonnet, at high or medium effort, chosen for what each role's file does and which skills and gates start it; `.claude/docs/model-tiers.md` lists the roles per tier. No agent inherits the session's model by default, and every agent sets `effort:`. `bash .claude/scripts/agent-models.sh sync` writes the table into the agent files and `agent-models.sh check` lists any difference. This costs more than before: far more roles run on Opus than before, and each sets its effort. A session above a role's pin no longer lifts it: on a Fable session the roles that used to inherit now run on their pin, and on an Opus session at `xhigh` the directors now run at `high`. The way back: per role, the value `session` under the table's `overrides:` (`<agent>: session`: the session's model and effort for that role); after a `session` override, `studio-tests/` reports that agent's spec line, its director-gate headers in `.claude/docs/director-gates/` and the per-tier counts in `model-tiers.md` and `README.md` until you update them. For every subagent, `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` together with `CLAUDE_CODE_EFFORT_LEVEL`; or keep your own `.claude/agents/`. A new `.claude/docs/escalation-ladder.md`, pointed to from `coordination-rules.md`, lets the session start a subagent that cannot finish again a tier up, on the signals it states, and stop at the top to ask you. Its limits: `CLAUDE_CODE_EFFORT_LEVEL` overrides its effort steps and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` its model steps, so with both set, as in the way back above, the ladder does nothing; your main session's model and effort stay yours (`/model`, `/effort`); and whether a session follows the ladder is live behaviour that the tests do not show. `/gate-check`'s panel sentence and `/skill-test`'s example agent check name the new models.
 - `/create-architecture` and `/create-control-manifest` name an absent
   `breaking-changes.md`, `deprecated-apis.md` or `current-best-practices.md` as
   `NOT SOURCEABLE — <file> is not present` instead of passing over it (no
@@ -348,7 +350,7 @@ Also on every engine:
   `test_engine_accuracy_gpu.py`, `test_engine_phase8.py`,
   `test_engine_phase8b.py`, `test_engine_phase9.py`, `test_engine_phase11.py`,
   `test_engine_phase12.py`, `test_engine_records.py`,
-  `test_engine_shared_guard.py` and `test_custom_ci.py`;
+  `test_engine_shared_guard.py`, `test_agent_models.py` and `test_custom_ci.py`;
   `check_audio_examples.py` compiles the audio rule's examples (needs `rustc`).
   None of it was run in a live session.
 

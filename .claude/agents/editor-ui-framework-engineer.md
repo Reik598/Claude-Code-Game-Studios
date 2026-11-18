@@ -3,6 +3,7 @@ name: editor-ui-framework-engineer
 description: "Custom-engine editor panels — docking and saved layouts, data-driven property inspector with custom drawers, content browser thumbnails, command keybindings, IME, high-DPI, editor theming."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: medium
 maxTurns: 20
 ---
 

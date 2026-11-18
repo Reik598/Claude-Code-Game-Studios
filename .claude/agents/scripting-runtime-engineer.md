@@ -3,6 +3,7 @@ name: scripting-runtime-engineer
 description: "Custom: gameplay framework and script runtime — entity/actor model over ECS, embedded VM (Lua/Luau/C#/WASM per ADR), visual scripting execution, script↔native bindings, hot reload, sandboxing."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

@@ -2,7 +2,7 @@
 
 # PR-EPIC — Epic Structure Feasibility Review
 
-Agent: `producer` | Model tier: Opus | Domain: Scope, timeline, dependencies, production risk
+Agent: `producer` | Model tier: `opus` · effort `high` | Domain: Scope, timeline, dependencies, production risk
 
 **Trigger**: After epics are defined by `/create-epics`, before stories are
 broken out — validates the epic structure is producible before `/create-stories`

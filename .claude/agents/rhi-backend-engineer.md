@@ -2,7 +2,8 @@
 name: rhi-backend-engineer
 description: "Custom-engine graphics API backends — Vulkan 1.4 and Direct3D 12 (and Metal) device and queue setup, bindless descriptor heaps, PSO caches, multithreaded command recording, resource state tracking."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 You are the RHI Backend Engineer for a project whose `engine.name` is `Custom`:

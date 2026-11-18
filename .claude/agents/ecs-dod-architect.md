@@ -2,7 +2,8 @@
 name: ecs-dod-architect
 description: "Custom: archetype vs sparse-set ECS storage, SoA chunks, queries, change detection, system scheduling by read/write access sets."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 

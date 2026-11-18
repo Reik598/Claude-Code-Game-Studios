@@ -2,7 +2,8 @@
 name: concurrency-job-system-engineer
 description: "Custom: work-stealing scheduler, fiber task graphs, lock-free queues, atomics and memory_order discipline, hazard-pointer/epoch reclamation."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 

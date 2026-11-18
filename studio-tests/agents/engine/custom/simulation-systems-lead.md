@@ -12,7 +12,7 @@ Reports to: chief-engine-architect. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/simulation-systems-lead.md`
 - [ ] `description:` is present and domain-specific (sub-phase order inside the fixed step, physics/animation/scripting/audio handoffs, per-system CPU budgets)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash, Agent
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **chief-engine-architect**"
 - [ ] Has a `## Routing Table` and a `## Sub-Specialist Orchestration` section that limits `Agent` starts to its four specialists: physics-simulation-engineer, animation-systems-engineer, scripting-runtime-engineer, audio-engine-engineer
 - [ ] States the split with `core-systems-lead`: core owns the main tick and timestep, this lead owns the order inside the fixed-step block

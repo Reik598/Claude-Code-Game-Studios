@@ -2,7 +2,7 @@
 
 # PR-MILESTONE — Milestone Risk Assessment
 
-Agent: `producer` | Model tier: Opus | Domain: Scope, timeline, dependencies, production risk
+Agent: `producer` | Model tier: `opus` · effort `high` | Domain: Scope, timeline, dependencies, production risk
 
 **Trigger**: At milestone review (`/milestone-review`), or when a scope change is
 proposed that affects the milestone

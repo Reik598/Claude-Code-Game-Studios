@@ -14,7 +14,7 @@ Reports to: chief-engine-architect. No gate IDs assigned.
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash, Agent
 - [ ] Has a Sub-Specialist Orchestration section that limits `Agent` starts to memory-allocator-specialist, concurrency-job-system-engineer, ecs-dod-architect, platform-engineer, world-streaming-engineer, online-services-engineer, asset-build-tooling-engineer — and does NOT list physics-simulation-engineer
 - [ ] Orchestration forbids starting simulation-systems-lead's specialists (physics-simulation-engineer, animation-systems-engineer, scripting-runtime-engineer, audio-engine-engineer)
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-high` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `chief-engine-architect`"
 - [ ] Has a routing table (request type → specialist) naming all eight specialists it starts by exact name (the seven core specialists and `network-programmer` for `engine/net/`), and routing physics/animation/scripting/audio requests to `simulation-systems-lead`
 - [ ] Has an escalation protocol naming when to go to `chief-engine-architect`

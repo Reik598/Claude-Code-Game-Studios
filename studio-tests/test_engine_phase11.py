@@ -14,10 +14,17 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from test_engine_support import (  # noqa: E402
-    CUSTOM_AGENT_SPEC_DIR, MIN_SPEC_CASES, MODEL_LINE, PRIMARY_DUTY_SECTION, PROTOCOL_SECTION, ROOT, SPEC_CASE_HEADING,
+    CUSTOM_AGENT_SPEC_DIR, MIN_SPEC_CASES, PRIMARY_DUTY_SECTION, PROTOCOL_SECTION, ROOT, SPEC_CASE_HEADING,
     TECHNICAL_SECTIONS,
     case_fixture_engines, duty_text, engine_names, frontmatter, ledger, read, section_text)
 from test_engine_scope import BASH, SCRIPT_ENV, SCRIPT_TIMEOUT_S  # noqa: E402
+from test_agent_models import TABLE, expected_frontmatter, frontmatter_fields, read_table  # noqa: E402
+
+
+def table_frontmatter():
+    """agent -> (model, effort) as .claude/agent-models.yaml sets them (AM38)."""
+    tiers, agents, overrides, _ = read_table((ROOT / TABLE).read_text(encoding="utf-8"))
+    return expected_frontmatter(tiers, agents, overrides)
 
 # AM32(c): the XR signal. /setup-engine resolves the target platforms in its
 # project.yaml step, which every entry path runs, and writes the whole
@@ -490,7 +497,6 @@ GRAPHICS_FEATURES = "graphics-features-engineer"
 RENDERING_LEAD = "rendering-lead"
 CATALOG = "studio-tests/catalog.yaml"
 ROSTER = ".claude/docs/agent-roster.md"
-INHERIT = "inherit"
 CUSTOM_DESCRIPTION = "Custom:"
 REPORTS_TO_HEADING = re.compile(r"^#+ Reports to:? (.*)$", re.M)
 # The partner table: one row per engine (design D1). Godot, Unity and Unreal
@@ -580,7 +586,7 @@ def catalog_spec(agent):
 
 def registration_problems(agent, section, director, director_units):
     """Design D1: what keeps `agent` from being an ordinary roster agent on
-    every engine: `model: inherit`, no `Custom:` description, a Reports to
+    every engine: the model and effort of .claude/agent-models.yaml (AM38), no `Custom:` description, a Reports to
     heading naming `director`, its section in TECHNICAL_SECTIONS, a spec under
     specialists/ with a case per engine route, a catalog entry, one roster row,
     and one of `director_units` (the director's line, AM32(b)) naming it."""
@@ -590,9 +596,12 @@ def registration_problems(agent, section, director, director_units):
     if not text:
         missing.append(f"{path} does not exist")
     head = frontmatter(text)
-    model = MODEL_LINE.search(head)
-    if not model or model[1] != INHERIT:
-        missing.append(f"{path}: model is {model[1] if model else 'unset'}, not {INHERIT}")
+    # Fix plan AM38 replaces design D1's `model: inherit`: the agent's model and
+    # effort are the ones .claude/agent-models.yaml gives it.
+    want = table_frontmatter().get(agent)
+    have = frontmatter_fields(text)
+    if want is None or have != want:
+        missing.append(f"{path}: model and effort are {have}, not the table's {want}")
     description = re.search(r"^description:\s*\"?(.*)$", head, re.M)
     if not description or description[1].startswith(CUSTOM_DESCRIPTION):
         missing.append(f"{path}: no description, or one that starts with {CUSTOM_DESCRIPTION!r}")

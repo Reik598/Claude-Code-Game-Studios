@@ -11,7 +11,7 @@ Reports to: narrative-director. No gate IDs assigned.
 
 - [ ] `description:` field is present and domain-specific (references shots / camera / previs / the edit / sequencer) and does not start with `Custom:`
 - [ ] `tools:` list includes Read, Write, Edit, Glob, Grep — does NOT include Bash (`disallowedTools: Bash`)
-- [ ] Model tier is `inherit` — frontmatter `model:` reads exactly `inherit` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-medium` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] "What This Agent Must NOT Do" names `narrative-director` for story and `writer` for dialogue
 - [ ] The Engine-Side Partners table has one row per engine: Custom (`cinematics-sequencer-engineer` through `editor-architect`), Godot, Unity and Unreal (that engine's own specialists and tool: AnimationPlayer, Timeline, Sequencer), Web (`lead-programmer`, with the reason); no Custom agent is named outside the Custom row
 

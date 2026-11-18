@@ -13,7 +13,7 @@ Verified by reading the agent's `.claude/agents/narrative-director.md` frontmatt
 
 - [ ] `description:` field is present and domain-specific (references story, character, world-building, consistency — not generic)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, WebSearch and `disallowedTools:` lists Bash
-- [ ] Model tier is `inherit` — frontmatter `model:` reads exactly `inherit` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `opus-medium` — frontmatter `model:` reads exactly `opus` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over visual style, technical systems, or production scheduling
 
 ---

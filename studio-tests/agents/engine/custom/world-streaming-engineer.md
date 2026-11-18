@@ -12,7 +12,7 @@ Reports to: core-systems-lead. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/world-streaming-engineer.md`
 - [ ] `description:` is present and domain-specific (open-world streaming runtime, async I/O queues, prioritization, partition cells at runtime, LOD/HLOD, pool budgets, load-time targets)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash (no `Agent`)
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `core-systems-lead`"
 - [ ] `## Collaboration Protocol` matches memory-allocator-specialist's verbatim except the four step-2 questions
 - [ ] Has a worked Correct vs Incorrect example in C++23 and Rust and a `## Module Layout` block that flags `engine/streaming/` as a boundary decision for `chief-engine-architect`

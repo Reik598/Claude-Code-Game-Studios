@@ -3,6 +3,7 @@ name: engine-technical-writer
 description: "Custom: engine documentation — API reference derived from public headers and traits, module overviews, ADR-based migration guides, editor user manual."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

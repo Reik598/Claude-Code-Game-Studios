@@ -12,7 +12,7 @@ Reports to: simulation-systems-lead. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/scripting-runtime-engineer.md`
 - [ ] `description:` is present and domain-specific (gameplay framework over ECS, embedded VM per ADR, visual scripting execution, bindings, hot reload, sandboxing)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash (no `Agent`)
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: `simulation-systems-lead`"
 - [ ] Has a worked Correct vs Incorrect example in both C++23 and Rust, and a module layout block
 - [ ] States the scripting language is an ADR decision with options, not a default

@@ -2,7 +2,8 @@
 name: xr-experience-designer
 description: "VR experience design on any engine — comfort and locomotion options, seated, standing and room-scale play, world scale and calibration, and hand and controller interaction, for projects that target XR."
 tools: Read, Glob, Grep, Write, Edit
-model: inherit
+model: sonnet
+effort: high
 maxTurns: 20
 disallowedTools: Bash
 ---

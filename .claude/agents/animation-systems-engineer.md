@@ -3,6 +3,7 @@ name: animation-systems-engineer
 description: "Custom: skeletal animation runtime — clip compression, pose sampling, anim graphs and blend trees, IK solvers, root motion, motion matching, ragdoll pose handoff."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

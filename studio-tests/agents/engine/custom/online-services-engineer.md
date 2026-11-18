@@ -12,7 +12,7 @@ Reports to: core-systems-lead (engine SDK layer). No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/online-services-engineer.md`
 - [ ] `description:` is present and domain-specific (accounts/identity, matchmaking and lobbies, entitlements, cloud saves, telemetry upload)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **core-systems-lead**"
 - [ ] Coordination names `network-programmer`, `analytics-engineer`, `security-engineer` and `release-manager`
 - [ ] Has a worked Correct vs Incorrect example in C++23 and Rust (entitlement check with timeout, retry, offline grace) and a module layout block

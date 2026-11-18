@@ -3,6 +3,7 @@ name: online-services-engineer
 description: "Custom: backend SDK abstraction — accounts/identity, matchmaking and lobbies, sessions, entitlements, cloud saves, telemetry upload across platforms."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

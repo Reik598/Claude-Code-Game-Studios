@@ -3,6 +3,7 @@ name: level-editor-engineer
 description: "Custom-engine world editing — scene viewport, ID-buffer picking, transform gizmos with snapping, outliner, prefab overrides, streaming cells and layers, terrain/foliage/spline hooks."
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+effort: high
 maxTurns: 20
 ---
 

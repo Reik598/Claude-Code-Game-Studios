@@ -2,7 +2,8 @@
 name: lighting-artist
 description: "Scene lighting and look-dev on any engine — light setup, exposure, tone mapping, colour grading and lightmap bake settings, set from the art director's lighting direction."
 tools: Read, Glob, Grep, Write, Edit
-model: inherit
+model: sonnet
+effort: medium
 maxTurns: 20
 disallowedTools: Bash
 ---

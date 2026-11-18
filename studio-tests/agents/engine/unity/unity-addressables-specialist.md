@@ -11,7 +11,7 @@ No gate IDs assigned.
 
 - [ ] `description:` field is present and domain-specific (references Addressables / asset loading / content catalogs / remote delivery)
 - [ ] `tools:` list includes Read, Write, Edit, Bash, Glob, Grep
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over rendering systems or gameplay using the loaded assets
 
 ---

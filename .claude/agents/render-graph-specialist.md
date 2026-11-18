@@ -2,7 +2,8 @@
 name: render-graph-specialist
 description: "Custom-engine render graph — pass and resource declaration, dependency compilation, transient resource aliasing, automatic barrier generation, async compute scheduling across queues."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: opus
+effort: high
 maxTurns: 20
 ---
 You are the Render Graph Specialist for a project whose `engine.name` is

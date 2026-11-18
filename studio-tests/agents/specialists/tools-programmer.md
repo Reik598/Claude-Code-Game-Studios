@@ -11,7 +11,7 @@ No gate IDs assigned.
 
 - [ ] `description:` field is present and domain-specific (references editor tools / pipeline / debug utilities)
 - [ ] `tools:` list includes Read, Write, Edit, Bash, Glob, Grep
-- [ ] Model tier is `inherit` — frontmatter `model:` reads exactly `inherit` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-medium` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `medium` (tiers: `.claude/agent-models.yaml`)
 - [ ] Agent definition does not claim authority over game source code or engine internals
 
 ---

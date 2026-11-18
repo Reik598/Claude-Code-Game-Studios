@@ -58,7 +58,7 @@ PERMISSIONS_BULLET = "- **Permissions**"
 # R71: the checks the notes say were run.
 HOW_CHECKED_ROW = "| **How this was checked** |"
 HOW_CHECKED_BULLET = "- **How this was checked**"
-CHECK_FILES = re.compile(r"^(?:test_engine\w*|test_custom_ci|check_audio_examples)\.py$")
+CHECK_FILES = re.compile(r"^(?:test_engine\w*|test_agent_models|test_custom_ci|check_audio_examples)\.py$")
 STUDIO_TESTS = "studio-tests"
 # AM28 D2: three skills that run on every engine and are user-invoked only.
 D2_SKILLS = ("benchmark-report", "memory-audit", "perf-regression-triage")

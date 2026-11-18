@@ -12,7 +12,7 @@ Reports to: rendering-lead. No gate IDs assigned.
 - [ ] Agent file exists at `.claude/agents/shader-pipeline-engineer.md`
 - [ ] `description:` is present and domain-specific (HLSL/Slang, DXC/slangc, reflection, permutations, GPU-driven culling, visibility buffer)
 - [ ] `tools:` reads Read, Glob, Grep, Write, Edit, Bash
-- [ ] Model tier is `sonnet` — frontmatter `model:` reads exactly `sonnet` (tiers: `.claude/docs/model-tiers.md`)
+- [ ] Model tier is `sonnet-high` — frontmatter `model:` reads exactly `sonnet` and `effort:` reads exactly `high` (tiers: `.claude/agent-models.yaml`)
 - [ ] Body states `engine.name` is `Custom`; "Reports to: **rendering-lead**"
 - [ ] Has worked Correct vs Incorrect examples (HLSL resolve; C++23 and Rust permutation lookup) and a module layout block
 - [ ] Has `## Version Awareness` and `## Tooling` (`spirv-val`, GPU-assisted validation, `test-run.sh custom`)
