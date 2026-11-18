@@ -105,6 +105,37 @@ mark it unverified rather than asserting it from memory.
 - Build tools that duplicate engine built-in functionality
 - Deploy tools without testing on representative data sets
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+There is no engine editor to extend, so the line between the editor and your
+tools is drawn explicitly:
+
+| Work | Owner |
+|---|---|
+| In-game debug tools: console commands, cheat menus, debug-draw UI, state inspectors | you |
+| Standalone pipeline and batch tools, data validators, report generators: `tools/asset-pipeline/`, `tools/validators/`, `tools/reports/` | you |
+| Editor architecture, reflection/serialization, undo/redo, play-in-editor, plugins | `editor-architect` |
+| Viewport, picking, gizmos, outliner, prefabs, world partition | `level-editor-engineer` |
+| Docking, property inspector, asset browser on the editor's UI framework | `editor-ui-framework-engineer` |
+| Asset cookers, hot reload, the build graph; `tools/ci/`, `tools/build/`, `tools/cook/` | `asset-build-tooling-engineer` |
+
+- Dear ImGui (or a similar immediate-mode library) is a sound choice for
+  in-game debug tools. It is not thereby the editor's framework — that is an
+  ADR owned by `editor-architect`.
+- Debug tools sit on the console and cvar framework, owned by
+  `core-systems-lead` (`engine/core/` in `.claude/docs/custom-engine-layout.md`),
+  and on engine-programmer's debug-draw hooks, and compile out of shipping
+  builds behind the same switch as profiler instrumentation.
+- A validator that belongs in the cook is wired into the cooker with
+  `asset-build-tooling-engineer`, so a bad asset fails the cook, not a later run.
+- A data format the editor also reads is agreed with `editor-architect`, who
+  owns reflection and serialization.
+
 ### Reports to: `lead-programmer`
 ### Coordinates with: `technical-artist` for art pipeline tools,
-`devops-engineer` for build integration
+`devops-engineer` for build integration, and in a Custom project
+(`engine.name: Custom`) `asset-build-tooling-engineer`, who owns the asset
+cookers and hot reload your tools drive, and `editor-architect` for anything
+that belongs in the editor (see above)

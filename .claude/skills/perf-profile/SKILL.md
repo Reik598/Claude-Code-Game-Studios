@@ -7,7 +7,7 @@ allowed-tools: Read, Glob, Grep, Write, Bash(bash "*/.claude/skills/perf-profile
 model: sonnet
 ---
 
-!`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys performance.enforce,automation,workflow`
+!`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys performance.enforce,automation,workflow,engine`
 
 Resolved above — use as-is. No block → defaults in
 `.claude/docs/config-resolution.md`.
@@ -142,6 +142,19 @@ the exact fabrication this skill's own header warns about.
 - Asset loading patterns (sync vs async)
 - Network message frequency and size
 
+**Custom engine** (`engine:` above reads `Custom` — a project that builds its own
+engine under `engine/`): the per-frame entry points are the engine's own tick
+stages and job graph, not an engine callback, so list those instead of
+`_process()`/`Update()`/`Tick()`. Add to the targets above: sync points that
+serialise the job graph, heap allocation on the tick where an arena exists,
+false sharing between job-written data, frame-graph barriers and CPU waits on
+GPU fences. The runtime profilers for this engine are Tracy, PIX, RenderDoc,
+Nsight, Superluminal, `perf` and VTune; this skill reads none of their captures.
+Every hotspot this phase names is a candidate until a capture confirms it — say
+so under **Requires Investigation**, and point to `/benchmark-report`, which
+reads those captures (frame-time percentiles, CPU vs GPU bound, cache-miss
+counters).
+
 ---
 
 ## Phase 4: Generate Profiling Report
@@ -227,6 +240,7 @@ other outcome is the `NOT ASSESSED — NO DATA` path above.
 - If bottlenecks require architectural change: run `/architecture-decision`.
 - If scope reduction is needed: run `/scope-check [feature]`.
 - To schedule optimizations: run `/sprint-plan update` (at `workflow: minimal`, which has no sprints, add them to the brief's build order instead).
+- On a Custom engine (`engine.name: Custom`), to measure a candidate from a profiler capture or benchmark output: run `/benchmark-report [capture-path]`.
 
 ### Rules
 - Never optimize without measuring first — gut feelings about performance are unreliable

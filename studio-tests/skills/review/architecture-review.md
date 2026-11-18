@@ -194,6 +194,72 @@ Fixture defaults.
 
 ---
 
+### Case 6: Custom Engine — the chief engine architect's lens
+
+**Fixture:**
+- As Case 1, except `project.yaml` has `engine.name: Custom` and the ADRs include:
+  - `ADR-0011` (engine-internal, job system) with no Latency and Frame Budget section and the claim "fits in budget" with no number in ms
+  - `ADR-0012` (renderer) that places manual barriers in each pass with no resource-state tracking
+  - `ADR-0013` (editor UI) that picks Dear ImGui without naming the alternatives
+- `performance.frame_budget_ms: 8.33`; `docs/engine-reference/custom/VERSION.md` exists and does not cover a Vulkan extension `ADR-0012` relies on
+- `tests/unit/`, `tests/integration/` and `.github/workflows/tests.yml` exist
+
+**Expected behavior:**
+1. Phase 5 resolves the lens from `engine.name`: the Custom (chief engine architect's) section of `references/lens-engine.md`; no agent is spawned
+2. Findings under `### Engine Specialist Findings`: ADR-0011 missing the engine-mode Latency and Frame Budget section and an unquantified budget claim; ADR-0012 manual barriers without state tracking; ADR-0013 UI framework chosen without trade-offs
+3. The Vulkan extension claim is written `NOT SOURCEABLE — <the extension> is not covered by docs/engine-reference/custom/` for `ADR-0012`, and is a named `NOT ASSESSED` line item for that ADR's engine compatibility
+4. The findings count toward the verdict (CONCERNS or FAIL, never PASS)
+5. Phase 9's pre-gate checklist checks `tests/unit/` and `tests/integration/` as Custom's test root and marks them ✅
+
+**Assertions:**
+- [ ] The Custom section is used — not Godot/Unity/Unreal, not the lead programmer's
+- [ ] All three ADR findings appear, each naming its ADR
+- [ ] The uncovered extension is `NOT SOURCEABLE`, not asserted or challenged from memory, and appears as a named `NOT ASSESSED` line item
+- [ ] Variant — the three structural findings are fixed and nothing else is wrong: the verdict is **NOT ASSESSED** (the NOT SOURCEABLE line keeps it from PASS), naming the Vulkan extension; with `docs/engine-reference/custom/VERSION.md` absent, the engine-compatibility check is `NOT ASSESSED — docs/engine-reference/custom/VERSION.md not found` and the verdict is likewise not PASS
+- [ ] Verdict is not PASS; no `Agent` call and no director gate
+
+---
+
+### Case 7: Non-Custom engine — lens unchanged
+
+**Fixture:** As Case 5a (`engine.name: Godot`).
+
+**Assertions:**
+- [ ] Case 5a's assertions all still hold
+- [ ] None of the Custom lens checks (engine-mode sections, dependency direction, bindless descriptors, editor UI framework) appears in `### Engine Specialist Findings`
+
+---
+
+### Case 8: Custom Engine — module-spec criteria registered and traced
+
+**Fixture:**
+- As Case 1, except `project.yaml` has `engine.name: Custom` and `docs/engine-reference/custom/VERSION.md` exists
+- `docs/architecture/modules/audio.md` and `docs/architecture/modules/jobs.md`, from `.claude/docs/templates/engine-module-spec.md`: audio's section 10 lists two "Done when" criteria; jobs's lists one "Done when" criterion and one benchmark threshold
+- `docs/architecture/modules/net.md` has no "10. Test Plan and Acceptance Criteria" section
+- `docs/architecture/modules/renderer.md`, from the template, has a section 10 that runs past 20 lines before `## 11`: the template's comment, 6 Unit cases, 4 Integration cases, 4 Benchmarks thresholds, then 5 "Done when" criteria, the last of them more than 20 lines below the heading
+- `docs/architecture/tr-registry.yaml` holds Case 1's GDD entries and `TR-audio-001` (`system: audio`, `gdd: docs/architecture/modules/audio.md`) for the first audio criterion
+- `adr-0004` (`Accepted`) names `TR-audio-001` under `## GDD Requirements Addressed`; no ADR names any other module criterion
+
+**Input:** `/architecture-review`
+
+**Expected behavior:**
+1. Phase 1 globs `docs/architecture/modules/*.md`, reports "Loaded [N] GDDs, 4 module specs, [M] ADRs, …", lists the specs' headings by Grep and Reads each spec's section 10 from its heading to the next `## ` heading: not whole files, and not a fixed `-A` window
+2. Phase 2 keeps `TR-audio-001` for the first audio criterion and numbers the others `TR-audio-002`, `TR-jobs-001`, `TR-jobs-002`, and `TR-renderer-001` to `TR-renderer-009` for renderer's four thresholds and five "Done when" criteria
+3. The matrix lists the module rows beside Case 1's GDD rows, the spec's file name in the GDD column: `TR-audio-001` ✅, the other twelve ❌ Gap
+4. `net.md` is the named line item `Module requirements: NOT ASSESSED — docs/architecture/modules/net.md`
+5. Phase 8's [A] appends the twelve new entries to `tr-registry.yaml` with `system:` the module and `gdd: docs/architecture/modules/<module>.md`, then runs `registry.sh validate`
+
+**Assertions:**
+- [ ] `TR-audio-001` keeps its ID; no registry entry is renumbered or deleted, and nothing is written before the Phase 8 ask
+- [ ] Each new module entry has `system: <module>` and `gdd: docs/architecture/modules/<module>.md`
+- [ ] The twelve unaddressed module criteria are ❌ Gap rows, so the verdict is not PASS
+- [ ] All five of renderer's "Done when" criteria are registered and traced, the fifth included: none is lost to a load that stops before `## 11`
+- [ ] `net.md` appears as a named `NOT ASSESSED` line item, never as a module with no requirements
+- [ ] The receipt lines include `docs/architecture/modules/*.md`
+- [ ] Variant — `engine.name: Godot` with the same `docs/architecture/modules/` files: no module requirement is extracted and the load line names no module specs
+
+---
+
 ## Protocol Compliance
 
 - [ ] Shows the full traceability matrix before any write approval (the Phase 1a freshness question and Phase 2's ambiguous-requirement questions may come earlier)

@@ -61,6 +61,26 @@ No gate IDs assigned.
 - Specifies input delay frames calculated from the 80ms budget (e.g., 2 frames at 60fps = 33ms buffer)
 - Flags that rollback netcode needs a deterministic, re-simulatable game state, and routes it to the roles its coordination line names: engine-programmer for physics and simulation determinism, gameplay-programmer for the gameplay code that rollback re-simulates
 
+### Case 6: Dedicated Server Target — server build that still opens a window
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the game has a client build and wants dedicated servers.
+**Input:** "Make a dedicated server build. Right now the server binary creates a window and a GPU device and ticks once per rendered frame."
+**Expected behavior:** Makes the server a `server` build configuration of the same engine: the null RHI backend (`rhi-backend-engineer`) and the null audio backend (`audio-engine-engineer`), no window or input device, a headless lifecycle from `platform-engineer`. The simulation advances in fixed steps from an accumulator at the tick rate the replication ADR sets, never per rendered frame, and logs overrunning ticks. Hosting and fleet go to `devops-engineer`, the server's content set to `asset-build-tooling-engineer`.
+**Assertions:**
+- [ ] The tick is fixed and independent of rendering
+- [ ] The null backends and the headless lifecycle are routed to their owners exactly
+- [ ] Hosting is handed to `devops-engineer`, not designed here
+
+### Case 7: Other engine — dedicated server without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unreal`; the game has a client build and wants dedicated servers.
+**Input:** "Make a dedicated server build. Right now the server binary creates a window and a GPU device and ticks once per rendered frame."
+**Expected behavior:**
+- Works with the engine's own dedicated-server build target
+- Does NOT add a `server` configuration to `build-files.md`'s CMake or Cargo build, and does NOT route null backends or a headless lifecycle to `rhi-backend-engineer`, `audio-engine-engineer` or `platform-engineer`, or the server content set to `asset-build-tooling-engineer`
+- Hosting and fleet still go to `devops-engineer`, as on every engine
+**Assertions:**
+- [ ] The Custom section and its Dedicated Server Target subsection are not applied: no Custom-only agent named
+- [ ] Hosting is handed to `devops-engineer`
+
 ---
 
 ## Protocol Compliance

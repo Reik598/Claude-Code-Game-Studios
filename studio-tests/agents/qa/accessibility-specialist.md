@@ -64,6 +64,25 @@ No gate IDs assigned.
 - Checks its own dialogue rules as well: subtitles with speaker identification, at least 3 subtitle size options
 - Does not report an AAA-only criterion (e.g., SC 1.4.6 Contrast (Enhanced) at 7:1, SC 2.2.3 No Timing) as a failure against the AA target; if it mentions one, it labels it AAA and outside the stated target, with Gate ADVISORY
 
+### Case 6: On a Custom Engine Project — screen reader support in an engine-drawn UI
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the game's menus are drawn by the engine's own runtime UI framework in `engine/ui/`.
+**Input:** "Make the main menu work with screen readers on Windows."
+**Expected behavior:** Treats every engine-drawn widget as a custom control that needs a UI Automation provider the framework implements; writes requirements for `ui-programmer`: name, role, value and state per widget, a focus order and change notifications (WCAG 2.2 SC 4.1.2), each with a test. On Xbox, text-to-speech goes through the GDK's publicly documented `XSpeechSynthesizerCreate`; only consoles whose SDK documentation is open to licensed developers alone are NOT SOURCEABLE outside the platform holder's licensed documentation.
+**Assertions:**
+- [ ] Routes the implementation to `ui-programmer`; does not assume an engine toolkit provides accessibility
+- [ ] The requirements name name, role, value, state, focus order and change notifications
+- [ ] No console accessibility API detail is asserted from memory, and the Xbox text-to-speech API is not called NDA material
+
+### Case 7: Other engine — screen reader support without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unity`; the game's menus are built with the engine's UI toolkit.
+**Input:** "Add screen reader support to the menus."
+**Expected behavior:**
+- Writes the requirements (name, role, value and state per widget, a focus order) for `ui-programmer` to meet with the engine's UI toolkit
+- Does NOT state that the engine draws its own UI or that no toolkit supplies accessibility, and does NOT name `engine/ui/` or require a UI Automation provider written into an in-house framework
+**Assertions:**
+- [ ] The Custom section is not applied: no in-house UI framework is assumed
+- [ ] Implementation still goes to `ui-programmer`
+
 ---
 
 ## Protocol Compliance

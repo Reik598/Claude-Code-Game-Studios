@@ -1,18 +1,20 @@
 # Claude Code Game Studios -- Game Studio Agent Architecture
 
-Indie game development managed through 49 coordinated Claude Code subagents.
+Indie game development managed through 77 coordinated Claude Code subagents.
 Each agent owns a specific domain, enforcing separation of concerns and quality.
 
 ## Technology Stack
 
-- **Engine**: [CHOOSE: Web / Godot 4 / Unity / Unreal Engine 5]
-- **Language**: [CHOOSE: TypeScript / GDScript / C# / C++ / Blueprint]
+- **Engine**: [CHOOSE: Web / Godot 4 / Unity / Unreal Engine 5 / Custom]
+- **Language**: [CHOOSE: TypeScript / GDScript / C# / C++ / Blueprint / C++23 / Rust]
 - **Version Control**: Git with trunk-based development
 - **Build System**: [SPECIFY after choosing engine]
 - **Asset Pipeline**: [SPECIFY after choosing engine]
 
 > **Note**: Engine-specialist agents exist for Godot, Unity, and Unreal with
-> dedicated sub-specialists. Use the set matching your engine.
+> dedicated sub-specialists. Use the set matching your engine. A Custom engine
+> (one you build yourself) has its own set, led by `chief-engine-architect`,
+> used only when `engine.name` is `Custom`.
 
 ## Project Structure
 

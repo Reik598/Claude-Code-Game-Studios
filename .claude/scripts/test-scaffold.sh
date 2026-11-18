@@ -13,7 +13,7 @@
 #
 # Usage: bash .claude/scripts/test-scaffold.sh ENGINE [--dry-run | --list] [--root DIR]
 #          [--module NAME] [--project NAME] [--date YYYY-MM-DD]
-#   ENGINE          godot, unity, unreal or web (the engine.name values, in any case;
+#   ENGINE          godot, unity, unreal, web or custom (the engine.name values, in any case;
 #                   UE5 is not one)
 #   --dry-run       print what would be created (WOULD_CREATE), write nothing
 #   --list          print the project-relative paths this engine's scaffold
@@ -36,6 +36,11 @@
 #   unreal   Source/<Module>/Private/Tests/README.md
 #   web      tests/unit/.gitkeep, tests/integration/.gitkeep, playwright.config.ts
 #            (the web scaffold's own, .claude/engines/web/scaffold/)
+#   custom   tests/unit/.gitkeep, tests/integration/.gitkeep,
+#            tests/benchmarks/.gitkeep (a project that builds its own engine;
+#            the README and CI use commands.build and commands.test, which
+#            /setup-engine custom writes; unset, they stay in square brackets
+#            and are listed as inputs still needed)
 #   all      .github/workflows/tests.yml, tests/smoke/critical-paths.md
 # The skill asks Godot's two test folders to hold a .gdignore_placeholder file;
 # Godot knows no such name (.gdignore would hide the folder from the editor and
@@ -93,11 +98,11 @@ while [ $# -gt 0 ]; do
     *) [ -z "$ENGINE" ] || usage "one engine at a time, got $ENGINE and $1"; ENGINE="$1"; shift ;;
   esac
 done
-[ -n "$ENGINE" ] || usage "no engine: godot, unity, unreal or web"
+[ -n "$ENGINE" ] || usage "no engine: godot, unity, unreal, web or custom"
 ENG=$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')
 case "$ENG" in
-  godot|unity|unreal|web) ;;
-  *) usage "engine must be godot, unity, unreal or web (the engine.name values), got $ENGINE" ;;
+  godot|unity|unreal|web|custom) ;;
+  *) usage "engine must be godot, unity, unreal, web or custom (the engine.name values), got $ENGINE" ;;
 esac
 # A module or project name goes into paths and file text: letters, digits and _ only.
 for _n in "$MODULE_ARG" "$PROJECT_ARG"; do
@@ -147,8 +152,12 @@ case "$ENG" in
   unity) ENGNAME=Unity ;;
   unreal) ENGNAME=Unreal ;;
   web) ENGNAME=Web ;;
+  custom) ENGNAME=Custom ;;
 esac
 if [ -n "$VER" ]; then ENGTXT="$ENGNAME $VER"; else ENGTXT="$ENGNAME [version]"; fi
+# Custom: /setup-engine leaves engine.version out when it read none and never
+# invents one (setup-engine/references/custom.md), so the line says so.
+[ "$ENG" != custom ] || [ -n "$VER" ] || ENGTXT="Custom (version NOT DETERMINED)"
 # Web's engine.version is the bundler's (Vite for a new project).
 [ "$ENG" != web ] || { if [ -n "$VER" ]; then ENGTXT="Web (Vite $VER)"; else ENGTXT="Web (Vite [version])"; fi; }
 # Godot CI needs a full release such as 4.7.2; "4.7" is not one.
@@ -157,6 +166,15 @@ case "$VER" in
   [0-9]*.[0-9]*.[0-9]*) [ "$ENG" != godot ] || GODOTVER="$VER" ;;
 esac
 DATE="${DATE_ARG:-$(date +%Y-%m-%d)}"
+# Custom: the project's own build and test commands (/setup-engine custom writes them).
+CBUILD=""; CTEST_CMD=""
+if [ "$ENG" = custom ] && [ -f "$HERE/yaml-get.awk" ] && [ -f project.yaml ]; then
+  CBUILD=$(YG_PATH=commands.build awk -f "$HERE/yaml-get.awk" project.yaml | tr -d '\r')
+  CTEST_CMD=$(YG_PATH=commands.test awk -f "$HERE/yaml-get.awk" project.yaml | tr -d '\r')
+fi
+# sed replacement text: \, & and the | delimiter escaped.
+sedesc() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }
+BUILDTXT=$(sedesc "${CBUILD:-[BUILD COMMAND]}"); TESTTXT=$(sedesc "${CTEST_CMD:-[TEST COMMAND]}")
 MODTXT="${MOD_NAME:-<Module>}"
 DOCPROJ="${PROJ_NAME:-<Project>}"
 CIPROJ="${PROJ_NAME:-[ProjectName]}"
@@ -175,6 +193,7 @@ list_paths() {
     unity) echo Assets/Tests/EditMode/EditModeTests.asmdef; echo Assets/Tests/PlayMode/PlayModeTests.asmdef ;;
     unreal) echo "$UNREAL_README" ;;
     web) echo tests/unit/.gitkeep; echo tests/integration/.gitkeep; echo playwright.config.ts ;;
+    custom) echo tests/unit/.gitkeep; echo tests/integration/.gitkeep; echo tests/benchmarks/.gitkeep ;;
   esac
   echo "$CI"
   echo "$SMOKE"
@@ -669,6 +688,127 @@ jobs:
 TPL_CI_WEB
 }
 
+tpl_readme_custom() {
+  cat <<'TPL_README_CUSTOM'
+# Test Infrastructure
+
+**Engine**: @ENGINE@ (this project builds its own engine)
+**Test Framework**: the project's own (CTest for C++, `cargo test` for Rust)
+**CI**: `.github/workflows/tests.yml`
+**Setup date**: @DATE@
+
+## Directory Layout
+
+```
+tests/
+  unit/           # one system at a time: allocators, job system, ECS queries, math
+  integration/    # several systems together: a headless frame, asset load, RHI on a null device
+  benchmarks/     # timed runs with thresholds that fail the run when exceeded
+  smoke/          # Critical path test list for /smoke-check gate
+```
+
+```
+production/qa/
+  evidence/       # Screenshots, captures and manual sign-off records
+```
+
+## Running Tests
+
+```bash
+@BUILD@
+@TEST@
+```
+
+Read the output, not only the exit code: CTest exits 0 when it found no test
+(`No tests were found!!!`), and `cargo test` exits 0 when every
+`test result:` line counts 0 tests. Neither is a pass;
+`bash .claude/scripts/test-run.sh custom` reads both.
+
+## Test Naming
+
+Names follow `.claude/rules/test-standards.md`:
+- **C++ (CTest)**: file `[system]_[feature]_test.cpp`, test executable and CTest
+  name `[system]_[feature]_test`, case `[scenario]_[expected]`
+- **Rust (cargo test)**: `#[test] fn [scenario]_[expected]()` in a `tests` module
+  or `tests/[system]_[feature].rs`
+- **Benchmarks**: `[system]_[feature]_bench`, with its threshold in the test
+
+## Story Type → Test Evidence
+
+| Story Type | Required Evidence | Location |
+|---|---|---|
+| Logic | Automated unit test — must pass | `tests/unit/[system]/` |
+| Integration | Integration test OR documented run | `tests/integration/[system]/` |
+| Visual/Feel | Retained screenshot or GPU capture + lead sign-off | `production/qa/evidence/` |
+| UI | Retained screenshot of each screen touched | `production/qa/evidence/` |
+| Config/Data | Smoke check pass | `production/qa/smoke-*.md` |
+
+A benchmark is not a story type of its own: it is part of a Logic or
+Integration story's evidence, in `tests/benchmarks/[system]/`, and passes only
+under the threshold it states (`.claude/rules/test-standards.md`, Custom,
+benchmarks).
+
+## CI
+
+Tests run automatically on every push to `main` and on every pull request.
+A failed test suite blocks merging when the project makes this CI check required.
+CI runs the build command, then the test helper, on Linux and Windows. Only
+nonempty CTest or Cargo passing results satisfy the generated CI check; unknown
+runners need an explicit count-aware adapter before being accepted. A runner
+read by exit code only (`make test`, a wrapper script) fails the check with
+`runner not recognised`: use ctest or cargo test in `commands.test`. The helper
+emits observations and exits zero even for failing tests, so CI checks its rule.
+GPU tests need a self-hosted runner with a GPU;
+on hosted runners they must be skipped by name and reported as not run.
+TPL_README_CUSTOM
+}
+
+tpl_ci_custom() {
+  cat <<'TPL_CI_CUSTOM'
+name: Automated Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Build and Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The hosted images carry CMake and a Rust toolchain. Pin compilers, the
+      # Vulkan SDK or shader compilers here as the project's ADRs require.
+      - name: Build
+        shell: bash
+        run: |
+          @BUILD@
+
+      - name: Run Tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          observations="${RUNNER_TEMP}/custom-test-observations.tsv"
+          bash .claude/scripts/test-run.sh custom --no-build | tee "$observations"
+          # A runner read by exit code only cannot show that any test ran, so
+          # the check below fails on it; say that the runner is why.
+          if awk -F '\t' '$1 == "runner" && $2 == "other" { found = 1 } END { exit !found }' "$observations"; then
+            echo "runner not recognised: CI cannot show that tests ran; use ctest or cargo test in commands.test"
+          fi
+          # The helper's exit code means it ran, not that tests passed.
+          awk -F '\t' '$1 == "rule" { count++; passed = ($2 == "custom:ctest-pass" || $2 == "custom:cargo-pass") } END { exit !(count == 1 && passed) }' "$observations"
+TPL_CI_CUSTOM
+}
+
 tpl_smoke() {
   cat <<'TPL_SMOKE'
 # Smoke Test: Critical Paths
@@ -763,15 +903,16 @@ TPL_UNREAL_TESTS
 
 render() {
   sed -e "s|@ENGINE@|$ENGTXT|g" -e "s|@DATE@|$DATE|g" -e "s|@GODOTVER@|$GODOTVER|g" \
-      -e "s|@MODULE@|$MODTXT|g" -e "s|@DOCPROJECT@|$DOCPROJ|g" -e "s|@CIPROJECT@|$CIPROJ|g"
+      -e "s|@MODULE@|$MODTXT|g" -e "s|@DOCPROJECT@|$DOCPROJ|g" -e "s|@CIPROJECT@|$CIPROJ|g" \
+      -e "s|@BUILD@|$BUILDTXT|g" -e "s|@TEST@|$TESTTXT|g"
 }
 # content_of <path> -- the file's text, ready to write.
 content_of() {
   case "$1" in
     "$README")
-      case "$ENG" in godot) tpl_readme_godot ;; unity) tpl_readme_unity ;; unreal) tpl_readme_unreal ;; web) tpl_readme_web ;; esac | render ;;
+      case "$ENG" in godot) tpl_readme_godot ;; unity) tpl_readme_unity ;; unreal) tpl_readme_unreal ;; web) tpl_readme_web ;; custom) tpl_readme_custom ;; esac | render ;;
     "$CI")
-      case "$ENG" in godot) tpl_ci_godot ;; unity) tpl_ci_unity ;; unreal) tpl_ci_unreal ;; web) tpl_ci_web ;; esac | render ;;
+      case "$ENG" in godot) tpl_ci_godot ;; unity) tpl_ci_unity ;; unreal) tpl_ci_unreal ;; web) tpl_ci_web ;; custom) tpl_ci_custom ;; esac | render ;;
     "$SMOKE") tpl_smoke ;;
     Assets/Tests/EditMode/EditModeTests.asmdef) tpl_asmdef_edit ;;
     Assets/Tests/PlayMode/PlayModeTests.asmdef) tpl_asmdef_play ;;
@@ -828,7 +969,7 @@ printf 'exists\t%d\nskipped\t%d\n' "$NEXIST" "$NSKIP"
 # is a check of the project that no file of ours can satisfy.
 made() { case "$CREATED_LIST" in *"|$1|"*) return 0 ;; esac; return 1; }
 need() { printf 'NEEDS\t%s\t%s\t%s\n' "$1" "$2" "$3"; }
-if made "$README" && [ -z "$VER" ]; then
+if made "$README" && [ -z "$VER" ] && [ "$ENG" != custom ]; then
   need engine_version "$README" "set the engine version on the Engine line (project.yaml has no engine.version)"
 fi
 case "$ENG" in
@@ -870,6 +1011,11 @@ case "$ENG" in
         grep -q "\"$_pk\"" package.json || need "$_pk" package.json "add $_pk at the version docs/engine-reference/web/VERSION.md pins"
       done
       [ -d node_modules ] || need npm_install node_modules "npm ci (it runs third-party install scripts and needs the network: ask first)"
+    fi ;;
+  custom)
+    if made "$README" || made "$CI"; then
+      [ -n "$CBUILD" ] || need build_command "$CI" "set commands.build in project.yaml (/setup-engine custom), then replace [BUILD COMMAND]"
+      [ -n "$CTEST_CMD" ] || need test_command "$CI" "set commands.test in project.yaml (/setup-engine custom), then replace [TEST COMMAND]"
     fi ;;
 esac
 

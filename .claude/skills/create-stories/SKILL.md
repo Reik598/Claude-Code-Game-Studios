@@ -90,6 +90,13 @@ named.
 
 ### `minimal`: build the epic from the brief
 
+**Custom with module specs** (`engine.name: Custom` and any
+`docs/architecture/modules/*.md`): stop before step 1, with "The engine module
+route needs workflow standard or full: run `/project-settings
+modes.workflow=standard`, then `/create-epics` and `/create-stories` again. At
+`minimal` no module spec becomes a story." A Custom project with no module spec
+takes this branch as any other engine does.
+
 1. **No `design/game-brief.md`:** stop. "There is no brief to build stories from
    yet: run `/prototype` and say the game in one line; it writes the one-page brief and a
    first build (`/brainstorm` first if you have no idea yet)." When the code root
@@ -153,6 +160,18 @@ Read no GDD, control manifest, TR registry or ADR at `minimal`. Go to Phase 3.
    and the same for `Formulas`, `Edge Cases` and `Detailed Design` (exit 3: try
    `Detailed Rules`, the design standard's name for the same section); at `full`
    the other required sections too (`list` shows the headings).
+
+   **Custom, a `Module:` epic** (`engine.name: Custom`; the epic names
+   `**Module**: docs/architecture/modules/<module>.md` where a game epic names
+   its GDD): the module spec stands in for the GDD. Read it by heading the same
+   way, `"2. Public Interface"`, `"6. Performance Budget"`,
+   `"10. Test Plan and Acceptance Criteria"` and
+   `"11. Consumer and Handoff Contracts"`. A named spec that does not exist
+   stops the epic as a missing GDD does. An epic that names both a GDD and a
+   module spec is reported, never guessed at: ask which one it decomposes.
+   A module epic's slug is `engine-<module>` (`/create-epics` names it so); a
+   typed bare module name that matches no epic folder is resolved to
+   `production/epics/engine-<module>/` and said, never to a game system's epic.
 3. **The control manifest:** the epic's layer only, and the version:
    `bash .claude/scripts/md-section.sh extract docs/architecture/control-manifest.md "[Layer] Layer Rules"`,
    plus its `Manifest Version` line.
@@ -216,6 +235,19 @@ UI last. For each story:
 - **Requirement:** the TR-ID from the registry, matched through the epic's GDD
   Requirements table. Only when no entry matches, write `TR-[system]-???` and say
   so.
+- **Custom, a `Module:` epic:** the same rule with the module as the system: the
+  registry entry whose `gdd:` is the module spec and whose requirement is the
+  criterion the story quotes (`/architecture-review` registers section 10's
+  criteria as `TR-[module]-NNN`). With no such entry, write `TR-[module]-???`
+  and the line `NOT ASSESSED — criterion not registered; run /architecture-review`;
+  the Phase 6 list and the verdict never count that story as Ready (the
+  closing block says how). The story names `**Module**: docs/architecture/modules/<module>.md` in place
+  of its `**GDD**:` line, one source only, and quotes its criteria from the
+  spec's section 10. It
+  also carries the line `Frame pipeline: yes | no`: `yes` when the spec's
+  section 6 (Performance Budget) assigns the module a slice of the frame budget,
+  `no` when it assigns none. Never leave the line out: `/story-done` reads an
+  absent line as `NOT ASSESSED — frame-pipeline scope not stated`.
 - **ADR:** the one that governs how to build it (the requirements table names it).
   - `Accepted`: embed it.
   - `Proposed`: `Status: Blocked`, with "BLOCKED: ADR-NNNN is Proposed — accept it
@@ -373,6 +405,15 @@ Review: [QL-STORY-READY skipped — Solo mode | skipped — Lean mode | its verd
 Index: [production/epics/index.md updated | Epics index not updated: production/epics/index.md absent]
 Next step: [/dev-story [first-story-path] | /story-readiness [first-story-path]]
 ```
+
+**Custom, a `Module:` epic** (`engine.name: Custom`): a story written with
+`TR-[module]-???` is counted apart, never as Ready, in the Phase 6 list (which
+shows `NOT ASSESSED (criterion not registered)` where it would show `Ready`)
+and in the verdict line, which then ends `([N] Ready, [N] Blocked, [N] with
+criteria not registered: NOT ASSESSED — run /architecture-review)`. A story that
+is also Blocked counts as Blocked. While that count is not zero, `Next step:` is
+`/architecture-review`: `/story-readiness` reports such a story NOT ASSESSED
+until its criterion is registered.
 
 When the user declines the write: `Verdict: BLOCKED — user declined. No story
 files written.`

@@ -315,6 +315,35 @@ Fixture defaults.
 
 ---
 
+### Case 9: Custom engine — perf evidence for a frame-pipeline story
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard`, `qa.level: standard`
+- Story A: `**Module**: docs/architecture/modules/renderer.md`, `Frame pipeline: yes`, every criterion passes; no `/team-frame-pipeline` record under `production/engine/` and no `/benchmark-report` report under `production/qa/benchmarks/` names it
+- Story B: as A, with `production/qa/benchmarks/benchmark-2026-11-16-1400-city.md` whose header reads `Module: docs/architecture/modules/renderer.md`
+- Story E: as A, with a report whose header reads `Story: <Story E's path>` and `Module: none`
+- Story F: as A, with a report whose header has neither line but whose title happens to contain `renderer`
+- Story C: as A, with no `Frame pipeline:` line
+- Story D: `Frame pipeline: no`
+
+**Input:** `/story-done` on each
+
+**Expected behavior:**
+1. The tier is keyed on the module name (`renderer`)
+2. A: `NOT ASSESSED — no perf evidence`; the verdict is NOT ASSESSED, naming what would settle it
+3. B and E: the report's `Module:` (B) or `Story:` (E) header line matches, so it is the perf evidence; no perf line holds the verdict back
+3a. F: no `Story:`/`Module:` line matches → `NOT ASSESSED — no perf evidence`; a name in the title is not a match
+4. C: `NOT ASSESSED — frame-pipeline scope not stated`; never read as `no`
+5. D: no perf evidence needed, and the report says so
+
+**Assertions:**
+- [ ] A and C are never COMPLETE or COMPLETE WITH NOTES
+- [ ] C's line is the literal `NOT ASSESSED — frame-pipeline scope not stated`
+- [ ] D is not held back for perf evidence
+- [ ] Perf evidence is matched only on a report's or record's `Story:` or `Module:` header line
+
+---
+
 ## Protocol Compliance
 
 - [ ] Reads a `references/*.md` file only on the branch that needs it, before that branch's step begins

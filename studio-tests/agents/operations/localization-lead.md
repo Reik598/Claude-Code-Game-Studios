@@ -62,6 +62,28 @@
 - Covers the Arabic/Hebrew font needs (RTL shaping, ligatures, contextual forms) and plural rules through ICU MessageFormat for every locale
 - Includes all five locales: a fallback chain, and its Locale-Specific Testing Requirements (dates, numbers, currency, time, sorting, input, text rendering) applied to each language, not just the default (en)
 
+### Case 6: On a Custom Engine Project — adding Arabic and Japanese
+**Fixture**: `project.yaml` sets `engine.name: Custom`; the engine has no text shaping or bidi support yet.
+**Input**: "We are adding Arabic and Japanese. What does the engine need, and who does it?"
+**Expected behavior**:
+- Uses its split table: it owns the locale requirements (plural rules, number/date formats, RTL, the font coverage matrix, pseudo-localization)
+- Hands the engine text runtime — ICU or the ADR's equivalent, shaping (e.g. HarfBuzz) and bidi, font loading and fallback — to `ui-programmer`, whose `engine/ui/` holds it, and the HUD and menus to `ui-programmer`; `editor-ui-framework-engineer` consumes that runtime for the editor through an ADR and does not own it
+- Treats the named libraries as ADR options whose versions come from `docs/engine-reference/custom/`, otherwise `NOT SOURCEABLE`
+- Reports Arabic as NOT ASSESSED, not supported, until its shaping, bidi and font coverage have run in the engine
+**Assertions**:
+- [ ] The text runtime is routed to `ui-programmer`, not to `editor-ui-framework-engineer`
+- [ ] An unrun locale is NOT ASSESSED
+
+### Case 7: Other engine — the same languages without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Unity`.
+**Input**: "We are adding Arabic and Japanese. What does the engine need, and who does it?"
+**Expected behavior**:
+- Writes the locale requirements as usual
+- Does NOT treat shaping, bidi or font fallback as an engine text runtime to build, and does NOT hand it to `editor-ui-framework-engineer`
+- Does NOT mark library versions `NOT SOURCEABLE` for lack of `docs/engine-reference/custom/`
+**Assertions**:
+- [ ] The Custom section is not applied: no text-runtime split and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

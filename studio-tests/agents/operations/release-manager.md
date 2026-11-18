@@ -63,6 +63,47 @@
 - Plans for at least one certification iteration (Cert is "Submit to platform certification, track feedback, iterate") and flags that a single rejection would consume the remaining buffer
 - Recommends an order but hands the schedule call to `producer` — it reports to producer for scheduling and prioritization, and cutting scope is producer's ("Decide what features to include or exclude (escalate to producer)")
 
+### Case 6: On a Custom Engine Project — first console submission
+**Fixture**: `project.yaml` sets `engine.name: Custom`; the game ships on PC and one console; `docs/engine-reference/custom/` does not cover the console's certification requirements.
+**Input**: "Plan our first console submission for 1.0."
+**Expected behavior**:
+- Plans console SDK integration, certification requirements and submission tooling early with `chief-engine-architect` and `devops-engineer`: no engine vendor does that work
+- Writes NOT SOURCEABLE for certification details instead of asserting them, since they are under NDA and not in `docs/engine-reference/custom/`
+- Routes platform technical requirements (suspend/resume, user handling, save integrity) to `platform-engineer`, packages and patches to `asset-build-tooling-engineer`, and keeps the release, the depot upload and the submission
+- Uploads symbols for every release build and versions engine and game together
+**Assertions**:
+- [ ] No certification requirement is asserted from memory
+- [ ] Platform requirements go to `platform-engineer`, not `technical-director`
+
+### Case 7: Other engine — the same submission without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Unreal`.
+**Input**: "Plan our first console submission for 1.0."
+**Expected behavior**:
+- Plans the submission with its normal certification workflow
+- Does NOT plan console SDK integration as the project's own engine work, and does NOT route platform requirements to `platform-engineer` or packages to `asset-build-tooling-engineer`
+- Does NOT plan a separate engine release or `/engine-release`
+**Assertions**:
+- [ ] The Custom section is not applied: no Custom-only agent or engine release named
+
+### Case 8: VR Store Certification — a Steam game that also ships on Quest
+**Fixture**: `project.yaml` sets `engine.name: Unreal`, `platform.cert_tier: steam` and `platform.targets: [PC, XR]`; the user says the game also ships on the Meta Horizon Store.
+**Input**: "Build the release checklist for 1.0."
+**Expected behavior**:
+- Keeps the Steamworks block that `platform.cert_tier: steam` selects, and adds the VR store requirements to it, not in its place
+- For the Meta Horizon Store, tracks each Virtual Reality Check by its ID with pass/fail/not-applicable, citing the VRC page with the date it was read; takes the refresh rates of VRC.Quest.Performance.1 from that page, not from memory
+- Copies no threshold from memory into the checklist; marks any store whose requirements it cannot read `NOT SOURCEABLE`, leaving that store's item NOT ASSESSED
+**Assertions**:
+- [ ] Both the Steamworks block and the VR store requirements are present, each citing its source page
+- [ ] No refresh rate or other threshold is stated without the page it was read from
+
+### Case 9: VR Store Certification — XR with `cert_tier: none`
+**Fixture**: `project.yaml` sets `engine.name: Web`, `platform.cert_tier: none` and `platform.targets: [Web, XR]`.
+**Input**: "Prepare the release for our jam build."
+**Expected behavior**:
+- Emits no certification section and no VR store block, and says why: `cert_tier` is `none`
+**Assertions**:
+- [ ] No VR store requirement is listed for a `none` release
+
 ---
 
 ## Protocol Compliance

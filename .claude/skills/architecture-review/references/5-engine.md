@@ -53,7 +53,7 @@ Post-Cutoff API Conflicts:
 ### Engine Specialist Look
 
 After completing the engine audit above, take the **primary engine specialist's** second look yourself, here. Spawn no agent for it, even when the person asks for "the Godot specialist's" view: what the specialist checked is in `references/lens-engine.md`.
-- Resolve the engine from `engine.name` in `project.yaml` (Godot, Unity, Unreal, or Web, which uses the lead programmer's section); if `engine.name` is absent or empty, read the Primary line of the `## Engine Specialists` section in `.claude/docs/technical-preferences.md`
+- Resolve the engine from `engine.name` in `project.yaml` (Godot, Unity, Unreal, Web, which uses the lead programmer's section, or Custom, which uses the chief engine architect's section); if `engine.name` is absent or empty, read the Primary line of the `## Engine Specialists` section in `.claude/docs/technical-preferences.md`
 - If no engine is configured (neither source yields an engine), skip this look **Record ``Engine validation: NOT ASSESSED — no engine configured (`engine.name` unset in `project.yaml`)`` in this run's output.** A skipped check that says nothing is indistinguishable from a check that passed; the reader cannot tell engine guidance was never sought.
 - Otherwise read `references/lens-engine.md` and apply its section for the engine to all ADRs that contain engine-specific decisions or `Post-Cutoff APIs Used` fields, with the engine reference docs and the audit findings: confirm or challenge each finding, find the engine anti-patterns the audit missed (e.g., using the wrong Godot node type, Unity component coupling, Unreal subsystem misuse), and flag ADRs that assume engine behaviour the pinned version does not have.
 

@@ -73,6 +73,22 @@ Verified by reading the agent's `.claude/agents/lead-programmer.md` frontmatter:
 - [ ] Does not infer the GDD rules from the code or the story and judge correctness against them
 - [ ] Variant — had the calling skill reported that no inventory GDD exists, that is a finding, not a missing input: the verdict is CONCERNS or REJECT, not NOT ASSESSED
 
+### Case 7: On a Custom Engine Project — review routing across leads
+**Fixture:** `project.yaml` sets `engine.name: Custom`; `.claude/docs/custom-engine-layout.md` gives `game/src/` the Lead `lead-programmer` and `engine/renderer/` the Lead `rendering-lead`.
+**Scenario:** A change touches `game/src/ui/hud.cpp`, `engine/renderer/pass_ui.cpp` and `engine/foo/bar.cpp` (no layout row covers `engine/foo/`). The user asks lead-programmer to review and approve it.
+**Expected:** Routes review to the Lead of each path from the layout: it reviews `game/src/ui/hud.cpp` itself and sends `engine/renderer/pass_ui.cpp` to `rendering-lead`, since a change that crosses leads is reviewed by each of them. It does not approve `engine/foo/bar.cpp`: a path with no row is not assigned and blocks until the module map is agreed, raised with `chief-engine-architect`.
+**Assertions:**
+- [ ] Each path's reviewer is taken from the layout's Lead column (the Owner where the Lead is `none`)
+- [ ] The unmapped path blocks rather than being reviewed by default
+- [ ] lead-programmer does not approve the renderer path itself
+
+### Case 8: Other engine — review without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unity`.
+**Scenario:** A change touches `Assets/Scripts/UI/Hud.cs` and `Assets/Scripts/Rendering/UiPass.cs`. The user asks lead-programmer to review and approve it.
+**Expected:** Reviews the change through its normal code-review duty. It does NOT consult `.claude/docs/custom-engine-layout.md`, route any path to `rendering-lead` or `chief-engine-architect`, or block a path for lacking a layout row.
+**Assertions:**
+- [ ] The Custom section is not applied: no layout routing and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

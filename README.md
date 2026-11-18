@@ -73,7 +73,8 @@ is, so it can be changed and grown the same way.
 - **Growing.** One game was grown from its first build through six stories
   into a game the tester would keep building. That is one game, not yet a
   pattern.
-- **Not yet shown:** the engine route (Godot, Unity, Unreal) and deepening one
+- **Not yet shown:** the engine route (Godot, Unity, Unreal, and a Custom engine
+  you build yourself) and deepening one
   system with a design document. Both are built and pass the framework's own
   checks, but neither has had a test like the two above.
 
@@ -148,6 +149,7 @@ Hooks fail gracefully if optional tools are missing — you just lose validation
 | **Godot 4** | `Godot` | `src/` | GDScript, C# or GDExtension |
 | **Unity** | `Unity` | `Assets/` | Unity compiles only `Assets/` and `Packages/` |
 | **Unreal Engine 5** | `Unreal` | `Source/<Module>/` | C++ and Blueprints |
+| **Custom** (your own engine) | `Custom` | `.` (`engine/` + `game/`) | C++23 with CMake/CTest, or Rust with Cargo. No engine code is shipped; see [Build your own engine](#build-your-own-engine) |
 
 `/setup-engine` pins the engine version and writes its reference docs
 (`docs/engine-reference/<engine>/`). With no engine set, `/prototype` builds
@@ -155,6 +157,80 @@ in the browser first; you pick an engine after you have played the game. Each
 engine's folders and default commands come from one table,
 `.claude/engines/engines.tsv`. If your code or tests live somewhere else, set
 `engine.code_root` or `engine.test_root` in `project.yaml`.
+
+### Build your own engine
+
+`/setup-engine custom` sets up a project that writes its own engine and a game
+on top of it, in one repo: `engine/` (one module per folder, for example
+`core`, `memory`, `jobs`, `ecs`, `rhi`, `renderer`, `physics`, `audio` and
+`editor`; the full list, with each module's rule and owner, is
+`.claude/docs/custom-engine-layout.md`), `game/`, and `tests/unit/`,
+`tests/integration/`, `tests/benchmarks/`. It asks for the stack (C++23 + CMake/CTest, or Rust +
+Cargo), the graphics APIs, the shader language and the frame budget (8.33 ms or
+16.6 ms), writes `commands.build`, `commands.test` and `commands.smoke` to
+`project.yaml` (you set `commands.run` once a game executable exists), and records your toolchain facts in
+`docs/engine-reference/custom/`.
+
+What the Custom route adds:
+
+- **25 agents**, used only when `engine.name` is `Custom`:
+  `chief-engine-architect` (beside `technical-director`; owns engine internals
+  and the frame budget), four leads and twenty specialists, in teams:
+  - **Core** (`core-systems-lead`): memory allocators, the job system, ECS,
+    the platform layer, world streaming, online services, and build/tooling
+    (`asset-build-tooling-engineer`).
+  - **Rendering** (`rendering-lead`): the RHI backend, the render graph, the
+    shader pipeline, graphics features (lighting, GI, shadows, ray tracing,
+    post, upscalers) and VFX runtime.
+  - **Simulation** (`simulation-systems-lead`): physics, animation, the
+    scripting runtime and gameplay framework, and the audio engine.
+  - **Editor** (`editor-architect`): the level editor, the editor UI
+    framework, and cameras and the cinematics runtime
+    (`cinematics-sequencer-engineer`).
+  - **Docs**: `engine-technical-writer`, reporting to `chief-engine-architect`,
+    writes API references, module overviews and migration guides from the code
+    and the ADRs.
+- **An editor like Unreal's**: `editor-architect` owns reflection and
+  serialization, undo/redo transactions, play-in-editor and plugins;
+  `level-editor-engineer` the viewport, picking, gizmos, outliner, prefabs and
+  world partition; `editor-ui-framework-engineer` docking, the property
+  inspector and the asset browser. The editor UI framework is an ADR choice —
+  your own retained-mode UI, Qt 6, Dear ImGui or a web UI — not a default.
+  `tools-programmer` keeps in-game debug tools and the standalone pipeline and
+  batch tools (`tools/asset-pipeline/`); `tools/ci/`, `tools/build/` and
+  `tools/cook/` are `asset-build-tooling-engineer`'s.
+- **Rules** for `engine/core/**`, `engine/memory/**`, `engine/jobs/**`,
+  `engine/platform/**`; `engine/rhi/**`, `engine/renderer/**`, `engine/vfx/**`;
+  `engine/ecs/**`, `engine/math/**`; `engine/physics/**`,
+  `engine/animation/**`; `engine/audio/**`; `engine/streaming/**`,
+  `engine/assets/**`, `engine/io/**`; `engine/scripting/**`,
+  `game/scripts/**`; `engine/editor/**`, `tools/editor/**`;
+  `engine/shaders/**` (and `**/*.slang`, which loads on every engine);
+  `game/src/**`; and CTest/cargo test naming with benchmarks.
+- **Templates**: `memory-invariants.md`, `frame-budget.md` and
+  `engine-module-spec.md` in `.claude/docs/templates/`.
+- **Skills**: `/benchmark-report` (frame-time percentiles, CPU or GPU bound, from
+  a profiler capture or benchmark output), `/memory-audit` (allocators, leaks,
+  use-after-free risks, from sanitizer or Miri output), and
+  `/team-frame-pipeline` (a change to the main tick or frame graph, across the
+  core, ECS, simulation and rendering agents). The two reports say `NOT
+  ASSESSED` when there is no capture or sanitizer run to read. Also
+  `/api-review` (a change to the engine's public surface: C++ headers, Rust
+  `pub` API, C ABI), `/perf-regression-triage` (confirm, bisect and attribute a
+  `/benchmark-report` regression) and `/engine-release` (cut an engine version
+  for the game teams: semver plan, changelog, migration guide, sign-off).
+  `/benchmark-report`, `/memory-audit` and `/perf-regression-triage` are Any
+  engine (Custom-oriented): they also run on Web, Godot, Unity and Unreal; the
+  other three stop with `NOT ASSESSED` unless `engine.name` is `Custom`.
+- **`/architecture-decision`** has an engine mode with memory, threading,
+  latency and ABI trade-off sections.
+- **Tests**: `test-run.sh` reads CTest and `cargo test` results; zero tests run
+  is never a pass.
+- **Context after a compaction**: `session-start.sh` re-prints the frame budget,
+  the Accepted ADR titles and `docs/architecture/memory-invariants.md`.
+
+No engine code is shipped — no scaffold and no sample engine. The framework
+supports writing an engine; you write it.
 
 ## Configuration
 
@@ -218,25 +294,26 @@ CLAUDE.md                           # Master configuration
 project.yaml                        # Project settings: engine, modes, goal
 .claude/
   settings.json                     # Hooks, permissions, safety rules
-  agents/                           # 49 agent definitions (markdown + YAML frontmatter)
-  skills/                           # 75 skills, plus three old names (a subdirectory each)
+  agents/                           # 77 agent definitions (markdown + YAML frontmatter)
+  skills/                           # 81 skills, plus three old names (a subdirectory each)
   hooks/                            # 18 scripts (bash) — 15 event hooks, two helpers they
                                     #   source (yaml-helper.sh, update-check.sh), and one
                                     #   opt-in diagnostic you wire yourself
   scripts/                          # Helper scripts the skills and hooks run; each .sh has --help
-  rules/                            # 14 path-scoped coding standards
+  rules/                            # 25 path-scoped coding standards
   genres/                           # Genre sheets and look guidance /prototype asks and
                                     #   builds from
   engines/                          # The engine table (engines.tsv) and the web starter
   statusline.sh                     # Status line script (context%, model, stage, epic breadcrumb)
   docs/
     workflow-catalog.yaml           # 7-phase pipeline definition (read by /next-step)
-    templates/                      # 62 document templates (+ per-section guidance)
+    templates/                      # 65 document templates (+ per-section guidance)
 prototypes/                         # One-shots, one folder each (isolated from src/)
 references/                         # Optional: images and sounds you like, for /prototype
 src/                                # Game source code (Godot, Web). The code root is
                                     #   ENGINE-SPECIFIC: Unity compiles only
-                                    #   Assets/, Unreal builds from Source/<Module>/
+                                    #   Assets/, Unreal builds from Source/<Module>/,
+                                    #   Custom uses engine/ and game/
 assets/                             # Art, audio, VFX, shaders, data files
 design/                             # The game brief, GDDs, narrative docs, level designs
 docs/                               # Technical documentation, ADRs, engine references
@@ -250,7 +327,7 @@ studio-tests/                       # QA for the skills and agents themselves �
 
 Claude Code Game Studios is a template you are meant to edit. `studio-tests/` is how
 you check that an edited or newly written skill still holds up — a catalog of all
-75 skills and 49 agents, per-category quality rubrics, behavioral specs, and
+81 skills and 77 agents, per-category quality rubrics, behavioral specs, and
 templates for writing specs of your own.
 
 ```
@@ -275,9 +352,9 @@ It tests the *framework*, never your game — game tests live in `tests/`.
 | `validate-write.sh` | PreToolUse (Write/Edit) | Warns, never blocks, when a write would break a rule the skills state: a file they never overwrite, the config guard, the prototype boundary, a localization freeze |
 | `validate-registry.sh` | PreToolUse (Write/Edit) | Warns when a write to the entity or TR-ID registry would delete or renumber an entry, or set a status its header does not list |
 | `validate-assets.sh` | PostToolUse (Write/Edit) | Checks data-file JSON under `assets/`, `Assets/` or `Content/`, and asset naming in Godot's `assets/` only — exits early if the file is under none of them |
-| `session-start.sh` | Session open | Shows current branch and recent commits for orientation |
+| `session-start.sh` | Session open | Shows current branch and recent commits for orientation; after a compaction or `/clear` on a Custom-engine project, re-prints the frame budget, Accepted ADR titles and memory invariants |
 | `detect-gaps.sh` | Session open | Detects fresh projects (suggests `/start`) and missing design docs when code or prototypes exist |
-| `pre-compact.sh` | Before compaction | Logs the compaction (its output does not reach Claude — `session-start.sh` restores context afterwards) |
+| `pre-compact.sh` | Before compaction | Logs the compaction, and on a Custom-engine project the engine context (its output does not reach Claude — `session-start.sh` restores context afterwards, with an engine-context block on a Custom project) |
 | `notify.sh` | Permission prompt, or idle about a minute | Shows Windows toast notification via PowerShell |
 | `session-stop.sh` | Every response end, in the background | Archives `active.md` to session log and records git activity |
 | `log-agent.sh` | Agent spawned | Audit trail start — logs subagent invocation |
@@ -296,7 +373,8 @@ below are Godot's. Each rule also matches the Unity and Unreal layouts: the code
 rules match C# under `Assets/**/Gameplay/` and C++ under `Source/**/Gameplay/` (and `Core`,
 `AI`, `Networking`, `UI`), data matches JSON under `Assets/**/Data/` and
 `Content/**/Data/`, shaders match by file type, and tests match
-C# under `Assets/Tests/` and C++ under `Source/**/Tests/`.
+C# under `Assets/Tests/` and C++ under `Source/**/Tests/`. A Custom-engine
+project adds the `engine/**` and `game/src/**` rows at the end.
 
 | Path | Enforces |
 |------|----------|
@@ -312,12 +390,23 @@ C# under `Assets/Tests/` and C++ under `Source/**/Tests/`.
 | `**/*.tscn`, `**/*.tres` | Scene and resource files changed in the editor where possible; safe hand-edit rules |
 | `tests/**` | Test naming, coverage requirements, fixture patterns |
 | `prototypes/**` | A one-shot's tuning values in `config.js` and seeded randomness; relaxed standards for engine and paper prototypes |
+| `engine/core/**`, `engine/memory/**`, `engine/jobs/**`, `engine/platform/**` | Custom engine: no heap in hot paths, thread-safety annotations, explicit ownership |
+| `engine/rhi/**`, `engine/renderer/**`, `engine/vfx/**` | Custom engine: RHI and renderer code |
+| `engine/ecs/**`, `engine/math/**` | Custom engine: ECS and math code |
+| `engine/physics/**`, `engine/animation/**` | Custom engine: simulation code, determinism |
+| `engine/audio/**` | Custom engine: audio engine code; the audio callback is real-time |
+| `engine/streaming/**`, `engine/assets/**`, `engine/io/**` | Custom engine: streaming, asset and I/O code |
+| `engine/scripting/**`, `game/scripts/**` | Custom engine: scripting runtime and scripts |
+| `engine/editor/**`, `tools/editor/**` | Custom engine: editor code |
+| `engine/shaders/**` | Custom engine: shader rules |
+| `**/*.slang` | Any engine: a Slang shader file takes the shader rules |
+| `game/src/**` | Custom engine: the game's gameplay rules |
 
 ## Studio Mode
 
 Everything above is the light path: one brief, a game you play, one feature a
 sitting as it grows. For a team, a long project, or a person who wants the paperwork, the
-same project also has **studio mode**: 49 specialized agents in a studio
+same project also has **studio mode**: 77 specialized agents in a studio
 hierarchy, a design document per system, architecture decisions, epics and
 sprints, phase gates, and `team-*` pipelines that coordinate several agents on
 one feature. `/next-step` suggests it once when a grown game gets big (about
@@ -327,11 +416,11 @@ nine stories or features).
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| **Agents** | 49 | Specialized subagents across design, programming, art, audio, narrative, QA, and production |
-| **Skills** | 75 | Slash commands for every workflow phase (`/prototype`, `/start`, `/design-system`, `/create-epics`, `/create-stories`, `/dev-story`, `/story-done`, etc.) |
+| **Agents** | 77 | Specialized subagents across design, programming, art, audio, narrative, QA, and production, plus 25 for a Custom engine |
+| **Skills** | 81 | Slash commands for every workflow phase (`/prototype`, `/start`, `/design-system`, `/create-epics`, `/create-stories`, `/dev-story`, `/story-done`, etc.) |
 | **Hooks** | 15 | Automated validation on commits, pushes, asset changes, design-doc reads, writes and registries, session lifecycle, agent audit trail, and gap detection |
-| **Rules** | 14 | Path-scoped coding standards enforced when editing gameplay, engine, AI, UI, network code, scene and asset files, and more |
-| **Templates** | 62 | Document templates for GDDs, UX specs, ADRs, sprint plans, HUD design, accessibility, and more |
+| **Rules** | 25 | Path-scoped coding standards enforced when editing gameplay, engine, AI, UI, network code, scene and asset files, and more |
+| **Templates** | 65 | Document templates for GDDs, UX specs, ADRs, sprint plans, HUD design, accessibility, and more |
 
 ### Studio Hierarchy
 
@@ -354,28 +443,59 @@ Tier 3 — Specialists
   world-builder        ux-designer           prototyper
   performance-analyst  devops-engineer       analytics-engineer
   security-engineer    qa-tester             accessibility-specialist
-  live-ops-designer    community-manager
+  live-ops-designer    community-manager     lighting-artist
+  cinematic-designer   xr-experience-designer
+
+Custom engine projects only (engine.name: Custom)
+  Tier 1  chief-engine-architect    beside technical-director; engine internals only
+  Tier 2  core-systems-lead   rendering-lead   simulation-systems-lead   editor-architect
+  Tier 3  under core-systems-lead:        memory-allocator-specialist
+                                          concurrency-job-system-engineer
+                                          ecs-dod-architect
+                                          platform-engineer
+                                          world-streaming-engineer
+                                          online-services-engineer
+                                          asset-build-tooling-engineer
+                                          network-programmer (engine/net/ only; its game/src/net/
+                                            work is under lead-programmer)
+          under rendering-lead:           rhi-backend-engineer
+                                          render-graph-specialist
+                                          shader-pipeline-engineer
+                                          graphics-features-engineer
+                                          vfx-runtime-engineer
+          under simulation-systems-lead:  physics-simulation-engineer
+                                          animation-systems-engineer
+                                          scripting-runtime-engineer
+                                          audio-engine-engineer
+          under editor-architect:         level-editor-engineer
+                                          editor-ui-framework-engineer
+                                          cinematics-sequencer-engineer
+          under chief-engine-architect:   engine-technical-writer
 ```
 
-Each agent declares a model in its frontmatter: the three directors ask for
-Opus, `lead-programmer` and fifteen specialists name Sonnet, and the remaining thirty
+Each agent declares a model in its frontmatter: the three directors and
+`chief-engine-architect` ask for Opus, `lead-programmer`, the four engine leads
+and thirty-five specialists name Sonnet, and the remaining thirty-three
 **inherit your session's model**. Treat the tiers as seniority of role, not as
-a billing plan — most of the studio runs on whatever model you are already using.
+a billing plan — outside the Custom-engine set, most of the studio runs on
+whatever model you are already using.
 
 ### Engine Specialists
 
-The template includes agent sets for the three major engines. Use the set that
-matches your project (a web project uses the general programmers):
+The template includes agent sets for the three major engines and for an engine
+you build yourself. Use the set that matches your project (a web project uses
+the general programmers):
 
 | Engine | Lead Agent | Sub-Specialists |
 |--------|-----------|-----------------|
 | **Godot 4** | `godot-specialist` | GDScript, Shaders, GDExtension |
 | **Unity** | `unity-specialist` | DOTS/ECS, Shaders/VFX, Addressables, UI Toolkit |
 | **Unreal Engine 5** | `unreal-specialist` | GAS, Blueprints, Replication, UMG/CommonUI |
+| **Custom** | `chief-engine-architect` | `core-systems-lead` (memory allocators, job system, ECS, platform, world streaming, online services, asset/build tooling), `rendering-lead` (RHI backend, render graph, shader pipeline, graphics features, VFX runtime), `simulation-systems-lead` (physics, animation, scripting runtime, audio engine), `editor-architect` (level editor, editor UI framework, cinematics and camera), `engine-technical-writer` |
 
 ### Slash Commands
 
-Type `/` in Claude Code to access all 75 skills (plus three old names that point to their new ones):
+Type `/` in Claude Code to access all 81 skills (plus three old names that point to their new ones):
 
 **Make a Game**
 `/prototype` `/cut`
@@ -399,7 +519,7 @@ Type `/` in Claude Code to access all 75 skills (plus three old names that point
 `/create-epics` `/create-stories` `/dev-story` `/sprint-plan` `/sprint-status` `/story-readiness` `/story-done` `/estimate`
 
 **Reviews & Analysis**
-`/design-review` `/code-review` `/balance-check` `/content-audit` `/scope-check` `/perf-profile` `/tech-debt` `/gate-check` `/consistency-check` `/security-audit`
+`/design-review` `/code-review` `/balance-check` `/content-audit` `/scope-check` `/perf-profile` `/benchmark-report` `/memory-audit` `/perf-regression-triage` `/api-review` `/tech-debt` `/gate-check` `/consistency-check` `/security-audit`
 
 **QA & Testing**
 `/qa-plan` `/smoke-check` `/soak-test` `/regression-suite` `/test-setup` `/test-helpers` `/test-evidence-review` `/test-flakiness` `/skill-test` `/skill-improve`
@@ -408,13 +528,13 @@ Type `/` in Claude Code to access all 75 skills (plus three old names that point
 `/milestone-review` `/retrospective` `/bug-report` `/bug-triage` `/reverse-document` `/playtest-report`
 
 **Release**
-`/release-checklist` `/launch-checklist` `/write-changelog` `/patch-notes` `/hotfix` `/day-one-patch`
+`/release-checklist` `/launch-checklist` `/write-changelog` `/patch-notes` `/hotfix` `/day-one-patch` `/engine-release`
 
 **Creative & Content**
 `/vertical-slice` `/onboard` `/localize`
 
 **Team Orchestration** (coordinate multiple agents on a single feature)
-`/team-combat` `/team-narrative` `/team-ui` `/team-release` `/team-polish` `/team-audio` `/team-level` `/team-live-ops` `/team-qa`
+`/team-combat` `/team-narrative` `/team-ui` `/team-release` `/team-polish` `/team-audio` `/team-level` `/team-live-ops` `/team-qa` `/team-frame-pipeline`
 
 ### Does studio mode produce games, or documents?
 
@@ -489,7 +609,7 @@ This is a **template**, not a locked framework. Everything is meant to be custom
 - **Modify skills** — adjust workflows to match your team's process
 - **Add rules** — create new path-scoped rules for your project's directory structure
 - **Tune hooks** — adjust validation strictness, add new checks
-- **Pick your engine** — web, Godot, Unity or Unreal (see [Engines](#engines)); use the matching agent set, or none
+- **Pick your engine** — web, Godot, Unity, Unreal, or your own (Custom) (see [Engines](#engines)); use the matching agent set, or none
 - **Tune process weight** — `modes.rigor` and its underlying knobs in `project.yaml` (see [Configuration](#configuration)). Override per-run with `--review solo` on any skill that runs a review gate.
 
 ## Platform Support

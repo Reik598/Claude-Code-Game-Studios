@@ -277,4 +277,34 @@ with no test file exits 1: Vitest prints `No test files found` and Playwright
 `No tests found`. That is not a failing test and not a pass: report it as not
 assessed, no tests found.
 
+#### Custom (`Engine: Custom`)
+
+**Run the helper; do not write these files by hand** — the README and CI text
+are its own:
+
+```bash
+bash .claude/scripts/test-scaffold.sh custom --dry-run   # Phase 2: the plan
+bash .claude/scripts/test-scaffold.sh custom             # after the approval
+```
+
+It creates `tests/README.md`, `production/qa/evidence/.gitkeep`,
+`tests/unit/.gitkeep`, `tests/integration/.gitkeep`,
+`tests/benchmarks/.gitkeep`, `.github/workflows/tests.yml` (Phase 4) and
+`tests/smoke/critical-paths.md` (Phase 5), and leaves every file that exists
+(`EXISTS`). The README and the CI workflow use `commands.build` and
+`commands.test`; report each `NEEDS` row — `build_command` or `test_command`
+means `/setup-engine custom` has not written that command, and the file keeps a
+`[BUILD COMMAND]` or `[TEST COMMAND]` placeholder until it is set.
+
+Test naming for CTest and `cargo test` is in `.claude/rules/test-standards.md`.
+Run the tests through the helper, which reads CTest and `cargo test` output:
+
+```bash
+bash .claude/scripts/test-run.sh custom
+```
+
+Both runners exit 0 when they found no tests; the helper reads that as
+`custom:ctest-zero` or `custom:cargo-zero`, which is not a pass: report it as
+not assessed, no tests found.
+
 ---

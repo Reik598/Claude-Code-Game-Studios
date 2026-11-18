@@ -14,19 +14,30 @@
 # particular this script never says PASS or FAIL, and never decides that an
 # ABSENT artifact is a blocker — at `minimal` most of them are not.
 #
-# Usage: bash .claude/scripts/artifact-check.sh [--phase <id> | --path <id>] [project-root]
+# Usage: bash .claude/scripts/artifact-check.sh [--phase <id> | --path <id>] [--engine <name>] [project-root]
 #   --phase <id>  restrict output to one phase (concept, systems-design, ...)
 #   --path <id>   report one tier path instead of the phase ladder (`minimal`).
 #                 Paths live under the catalog's top-level `paths:` key with the
 #                 same step schema. Without --path they are never reported, so
 #                 the ladder's consumers see exactly what they saw before paths.
+#   --engine <n>  the engine to scope steps by, instead of the project's own
+#                 (engine.name, else the legacy technical-preferences.md line)
 #   project-root  defaults to the repo root; an explicit path is taken as-is
 #                 (used by the test suite against fixtures).
+#
+# Engine-scoped steps: a step with `engine: <name>` in the catalog applies only
+# when the project's engine is that name (any case). On any other engine, or
+# with no engine resolved, its row is still printed, with
+# status=ENGINE_SKIPPED and the engine it needs, and the header's
+# ENGINE_SKIPPED count says how many there are — a skipped step is named, never
+# silently absent. ENGINE_SKIPPED is not ABSENT: the step does not apply.
 #
 # Output:
 #   CATALOG: <path>            the catalog actually read
 #   ROOT: <path>               the tree evaluated against
+#   ENGINE: <name|unset> (<source>)  the engine engine-scoped steps were read for
 #   PHASES: <n> / STEPS: <n>   denominators — see below (PATHS: with --path)
+#   NO_CHECK: <n> / ENGINE_SKIPPED: <n>
 #   PHASE: <id>                (PATH: <id> with --path)
 #     STEP: <id> required=<bool> repeatable=<bool> check=<kind> status=<status> ...
 #
@@ -38,6 +49,8 @@
 #   NO_CHECK      the step declares no artifact — completion is not detectable
 #                 from disk. NOT the same as ABSENT. A `note=` field carries the
 #                 catalog's human-readable fallback where one exists.
+#   ENGINE_SKIPPED  the step declares `engine: <name>` and the project's engine
+#                 is another one, or unresolved; `engine=` names the one needed.
 #
 # DENOMINATOR DISCIPLINE (mirrors create-control-manifest / adr-dep-graph.sh):
 # STEPS is printed before any per-step line so a caller can tell "0 steps
@@ -54,6 +67,9 @@ set -u
 PHASE_FILTER=""
 PATH_FILTER=""
 ROOT_ARG=""
+ENGINE_ARG=""
+ENGINE_GIVEN=0
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 while [ $# -gt 0 ]; do
   case "$1" in
     # A trailing flag with no value used to loop forever: `shift 2` with one
@@ -62,6 +78,10 @@ while [ $# -gt 0 ]; do
       [ $# -ge 2 ] || { echo "artifact-check: $1 needs a value" >&2; exit 2; }
       if [ "$1" = "--phase" ]; then PHASE_FILTER="$2"; else PATH_FILTER="$2"; fi
       shift 2 ;;
+    --engine)
+      [ $# -ge 2 ] || { echo "artifact-check: --engine needs a value" >&2; exit 2; }
+      ENGINE_ARG="$2"; ENGINE_GIVEN=1; shift 2 ;;
+    --engine=*) ENGINE_ARG="${1#--engine=}"; ENGINE_GIVEN=1; shift ;;
     --phase=*) PHASE_FILTER="${1#--phase=}"; shift ;;
     --path=*) PATH_FILTER="${1#--path=}"; shift ;;
     -h|--help) sed -n '2,/^$/p' "$0"; exit 0 ;;
@@ -88,6 +108,25 @@ if [ ! -f "$CATALOG" ]; then
   exit 1
 fi
 
+# The engine that engine-scoped steps (`engine: Custom`) are read for. Resolved
+# by yaml-helper.sh's own chain (project.local.yaml, project.yaml engine.name,
+# then the legacy technical-preferences.md line) so this script and the hooks
+# never disagree about which engine the project has.
+ENGINE_NAME=""
+ENGINE_SRC="unset"
+if [ "$ENGINE_GIVEN" = 1 ]; then
+  ENGINE_NAME="$ENGINE_ARG"; ENGINE_SRC="--engine"
+elif [ -f "$SCRIPT_DIR/../hooks/yaml-helper.sh" ]; then
+  # shellcheck source=/dev/null
+  . "$SCRIPT_DIR/../hooks/yaml-helper.sh"
+  _YH_ROOT="$ROOT"
+  _yh_engine_name
+  ENGINE_NAME="${_YH_ENAME:-}"
+  [ -n "$ENGINE_NAME" ] && ENGINE_SRC="${_YH_ESRC:-engine.name}"
+else
+  ENGINE_SRC="unresolved: yaml-helper.sh not found"
+fi
+
 # Python fallback chain: python -> python3 -> py (matches yaml-helper.sh:65).
 PYBIN=""
 for candidate in python python3 py; do
@@ -102,14 +141,14 @@ if [ -z "$PYBIN" ]; then
   exit 1
 fi
 
-"$PYBIN" - "$CATALOG" "$ROOT" "$PHASE_FILTER" "$PATH_FILTER" <<'PYEOF'
+"$PYBIN" - "$CATALOG" "$ROOT" "$PHASE_FILTER" "$PATH_FILTER" "$ENGINE_NAME" "$ENGINE_SRC" <<'PYEOF'
 import glob as globmod
 import os
 import subprocess
 import sys
 import tempfile
 
-catalog_path, root, phase_filter, path_filter = sys.argv[1:5]
+catalog_path, root, phase_filter, path_filter, engine_name, engine_src = sys.argv[1:7]
 
 # A gate's own output path is part of the gate: the catalog's `note:` fields
 # contain em-dashes, and on a cp1252 console an unreconfigured stdout raises
@@ -171,7 +210,8 @@ for raw in lines:
 
     if ind == 6 and s.startswith("- id:"):
         cur_step = {"id": strip_val(s[len("- id:"):]), "required": False,
-                    "repeatable": False, "artifact": None, "note": None}
+                    "repeatable": False, "artifact": None, "note": None,
+                    "engine": None}
         cur_phase[1].append(cur_step)
         ctx = None
         continue
@@ -188,6 +228,8 @@ for raw in lines:
             cur_step["required"] = strip_val(s[len("required:"):]).lower() == "true"
         elif s.startswith("repeatable:"):
             cur_step["repeatable"] = strip_val(s[len("repeatable:"):]).lower() == "true"
+        elif s.startswith("engine:"):
+            cur_step["engine"] = strip_val(s[len("engine:"):]) or None
         continue
 
     art = cur_step["artifact"]
@@ -320,13 +362,24 @@ print("CATALOG: %s" % os.path.relpath(catalog_path, root).replace(os.sep, "/"))
 print("ROOT: %s" % root.replace(os.sep, "/"))
 print("%sS: %d" % (label, len(sel)))
 print("STEPS: %d" % total_steps)
+print("ENGINE: %s (%s)" % (engine_name or "unset", engine_src))
 
 no_check = 0
+engine_skipped = 0
 rows = []
 for pid, steps in sel:
     rows.append("%s: %s" % (label, pid))
     for st in steps:
-        status, kind, det = evaluate(st["artifact"])
+        need = st["engine"]
+        if need and need.lower() != (engine_name or "").lower():
+            # Printed, not dropped: a step that does not apply to this engine
+            # is named so a reader can tell it from one that was never listed.
+            engine_skipped += 1
+            status, kind, det = "ENGINE_SKIPPED", "engine", {"engine": need}
+        else:
+            status, kind, det = evaluate(st["artifact"])
+            if need:
+                det = dict(det, engine=need)
         if status == "NO_CHECK":
             no_check += 1
         extra = "".join(" %s=%s" % (k, v) for k, v in sorted(det.items()) if v is not None)
@@ -337,6 +390,7 @@ for pid, steps in sel:
 # Printed BEFORE the rows so a caller reading top-down knows how much of what
 # follows is undetectable-from-disk before it reads any of it.
 print("NO_CHECK: %d" % no_check)
+print("ENGINE_SKIPPED: %d" % engine_skipped)
 for r in rows:
     print(r)
 PYEOF

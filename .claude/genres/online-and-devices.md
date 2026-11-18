@@ -30,8 +30,9 @@ line, its stand-in is the one for that genre; this table names the level.
 
 ## VR
 
-`Platform: VR: Claude Code Game Studios has no route for VR: no checks and no proof that a VR
-game works. Build it makes a flat-screen game for the browser instead.`
+`Platform: VR: the one-shot does not build VR: it has no checks and no proof that a VR game
+works. Build it makes a flat-screen game for the browser instead; a VR game starts with
+/setup-engine and the target XR.`
 
 It is built flat only on Build it with this line on the card; Change something asks what they
 would like instead. With nobody there, it is built flat and the line is *provisional*.

@@ -301,6 +301,17 @@ skills:
     priority: medium
     category: team
 
+  - name: team-frame-pipeline
+    spec: studio-tests/skills/team/team-frame-pipeline.md
+    last_static: ""
+    last_static_result: ""
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    priority: medium
+    category: team
+
   # Medium, then low — skill testing first, then authoring, analysis, sprint reporting and utility skills
   - name: skill-test
     spec: studio-tests/skills/utility/skill-test.md
@@ -521,6 +532,61 @@ skills:
     last_category_result: ""
     priority: low
     category: analysis
+
+  - name: benchmark-report
+    spec: studio-tests/skills/analysis/benchmark-report.md
+    last_static: ""
+    last_static_result: ""
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    priority: low
+    category: analysis
+
+  - name: memory-audit
+    spec: studio-tests/skills/analysis/memory-audit.md
+    last_static: ""
+    last_static_result: ""
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    priority: low
+    category: analysis
+
+  - name: perf-regression-triage
+    spec: studio-tests/skills/analysis/perf-regression-triage.md
+    last_static: ""
+    last_static_result: ""
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    priority: low
+    category: analysis
+
+  - name: api-review
+    spec: studio-tests/skills/review/api-review.md
+    last_static: ""
+    last_static_result: ""
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    priority: low
+    category: review
+
+  - name: engine-release
+    spec: studio-tests/skills/utility/engine-release.md
+    last_static: ""
+    last_static_result: ""
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    priority: low
+    category: utility
 
   - name: security-audit
     spec: studio-tests/skills/analysis/security-audit.md
@@ -946,6 +1012,14 @@ agents:
     last_category_result: ""
     category: specialist
 
+  - name: lighting-artist
+    spec: studio-tests/agents/specialists/lighting-artist.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: specialist
+
   - name: sound-designer
     spec: studio-tests/agents/specialists/sound-designer.md
     last_spec: ""
@@ -996,6 +1070,14 @@ agents:
 
   - name: ux-designer
     spec: studio-tests/agents/specialists/ux-designer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: specialist
+
+  - name: xr-experience-designer
+    spec: studio-tests/agents/specialists/xr-experience-designer.md
     last_spec: ""
     last_spec_result: ""
     last_category: ""
@@ -1141,6 +1223,199 @@ agents:
     last_category_result: ""
     category: engine
 
+  # Engine Specialists — Custom (build your own engine)
+  - name: chief-engine-architect
+    spec: studio-tests/agents/engine/custom/chief-engine-architect.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: director
+
+  - name: core-systems-lead
+    spec: studio-tests/agents/engine/custom/core-systems-lead.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: lead
+
+  - name: memory-allocator-specialist
+    spec: studio-tests/agents/engine/custom/memory-allocator-specialist.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: concurrency-job-system-engineer
+    spec: studio-tests/agents/engine/custom/concurrency-job-system-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: ecs-dod-architect
+    spec: studio-tests/agents/engine/custom/ecs-dod-architect.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: physics-simulation-engineer
+    spec: studio-tests/agents/engine/custom/physics-simulation-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: rendering-lead
+    spec: studio-tests/agents/engine/custom/rendering-lead.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: lead
+
+  - name: rhi-backend-engineer
+    spec: studio-tests/agents/engine/custom/rhi-backend-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: render-graph-specialist
+    spec: studio-tests/agents/engine/custom/render-graph-specialist.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: shader-pipeline-engineer
+    spec: studio-tests/agents/engine/custom/shader-pipeline-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: asset-build-tooling-engineer
+    spec: studio-tests/agents/engine/custom/asset-build-tooling-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: editor-architect
+    spec: studio-tests/agents/engine/custom/editor-architect.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: lead
+
+  - name: level-editor-engineer
+    spec: studio-tests/agents/engine/custom/level-editor-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: editor-ui-framework-engineer
+    spec: studio-tests/agents/engine/custom/editor-ui-framework-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: simulation-systems-lead
+    spec: studio-tests/agents/engine/custom/simulation-systems-lead.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: lead
+
+  - name: platform-engineer
+    spec: studio-tests/agents/engine/custom/platform-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: world-streaming-engineer
+    spec: studio-tests/agents/engine/custom/world-streaming-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: online-services-engineer
+    spec: studio-tests/agents/engine/custom/online-services-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: graphics-features-engineer
+    spec: studio-tests/agents/engine/custom/graphics-features-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: vfx-runtime-engineer
+    spec: studio-tests/agents/engine/custom/vfx-runtime-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: animation-systems-engineer
+    spec: studio-tests/agents/engine/custom/animation-systems-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: scripting-runtime-engineer
+    spec: studio-tests/agents/engine/custom/scripting-runtime-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: audio-engine-engineer
+    spec: studio-tests/agents/engine/custom/audio-engine-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
+  - name: engine-technical-writer
+    spec: studio-tests/agents/engine/custom/engine-technical-writer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine
+
   # Operations
   - name: devops-engineer
     spec: studio-tests/agents/operations/devops-engineer.md
@@ -1223,6 +1498,14 @@ agents:
     last_category_result: ""
     category: specialist
 
+  - name: cinematic-designer
+    spec: studio-tests/agents/specialists/cinematic-designer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: specialist
+
   - name: world-builder
     spec: studio-tests/agents/specialists/world-builder.md
     last_spec: ""
@@ -1230,3 +1513,11 @@ agents:
     last_category: ""
     last_category_result: ""
     category: specialist
+
+  - name: cinematics-sequencer-engineer
+    spec: studio-tests/agents/engine/custom/cinematics-sequencer-engineer.md
+    last_spec: ""
+    last_spec_result: ""
+    last_category: ""
+    last_category_result: ""
+    category: engine

@@ -13,6 +13,29 @@
 # required: true → blocks progression to next phase (shown as REQUIRED)
 # required: false → optional enhancement (shown as OPTIONAL)
 # repeatable: true → runs multiple times (one per system, story, etc.)
+# engine: <name> → the step applies only when the project's engine is <name>
+#   (any case; engine.name, else the legacy technical-preferences.md line).
+#   On any other engine, or with no engine set, artifact-check.sh still prints
+#   the step, with status=ENGINE_SKIPPED, and counts it on its ENGINE_SKIPPED
+#   header line — /next-step and /gate-check name it as not applying rather than
+#   reporting it missing. Steps without the key apply to every engine.
+#
+# Custom engine path (engine: Custom — a project that builds its own engine):
+#   Technical Setup adds the engine module map, the core engine ADRs
+#   (/architecture-decision in engine mode), frame-budget.md, memory-invariants.md
+#   and /test-setup's custom scaffold; Pre-Production adds the first
+#   /benchmark-report baseline and a /memory-audit sanitizer run. The game's own
+#   steps still apply. The matching gate items are each gate file's
+#   "Custom engine additions" block in .claude/skills/gate-check/references/.
+#
+# `required:` is a step's status at `workflow: full`. The catalog has no per-tier
+# key, and artifact-check.sh reports only what is on disk, so the CONSUMER
+# applies the tier: /gate-check from its gate file's tier reductions, /next-step
+# from the same reductions (its Step 4 "Tier reductions" note). For the Custom
+# steps that means, at `workflow: standard`, the engine module map and
+# memory-invariants.md are recommended, not required (gate-pre-production.md
+# "Tier reductions (Custom)"); a description that says "recommended at
+# standard" is that reduction, not a second rule.
 #
 # Phase gates (/gate-check): a FAIL or NOT ASSESSED never advances the stage.
 # Otherwise the verdict is advice: the user decides whether to proceed.
@@ -38,7 +61,7 @@ paths:
         artifact:
           any_of:
             - glob: "project.yaml"
-              pattern: 'name:[[:space:]]*"?(Godot|Unity|Unreal|Web)'
+              pattern: 'name:[[:space:]]*"?(Godot|Unity|Unreal|Web|Custom)'
             - glob: ".claude/docs/technical-preferences.md"
               pattern: '\*\*Engine\*\*: [^[]'
         description: "Configure the engine and pin its version"
@@ -112,7 +135,7 @@ phases:
         artifact:
           any_of:
             - glob: "project.yaml"
-              pattern: 'name:[[:space:]]*"?(Godot|Unity|Unreal|Web)'
+              pattern: 'name:[[:space:]]*"?(Godot|Unity|Unreal|Web|Custom)'
             # technical-preferences.md writes "- **Engine**: Godot 4.7", so the
             # pattern must clear the bold markers. The [^[] guard rejects the
             # "[TO BE CONFIGURED]" placeholder.
@@ -241,6 +264,53 @@ phases:
           glob: ".github/workflows/tests.yml"
         description: "Scaffold the test framework, the CI workflow and an example test. The Technical Setup → Pre-Production gate requires all three at `standard` and `full`. Leads to /test-helpers for fixture generation, /qa-plan per epic, and /smoke-check per sprint."
 
+      - id: engine-module-map
+        name: "Engine Module Map"
+        required: true
+        repeatable: true
+        engine: Custom
+        artifact:
+          glob: "docs/architecture/modules/*.md"
+        description: "One module spec per MVP engine module at docs/architecture/modules/<module>.md, from .claude/docs/templates/engine-module-spec.md — no skill writes it: the module's specialist fills the template, reviewed by its lead and chief-engine-architect. The MVP modules are the ones architecture.md or the module-layout ADR names. Required at `full`; recommended at `standard` (gate-pre-production.md tier reductions)"
+
+      - id: engine-adrs
+        name: "Core Engine ADRs"
+        command: /architecture-decision
+        required: true
+        repeatable: true
+        engine: Custom
+        artifact:
+          glob: "docs/architecture/adr-*.md"
+          pattern: '^## Platform / Graphics-API Matrix'
+        description: "/architecture-decision in engine mode, reviewed by CEA-ADR: memory and allocators, threading, job system, ECS, RHI and graphics API, render graph, platform layer, editor UI framework. Detected by the engine-mode section; /gate-check checks coverage and Accepted status"
+
+      - id: frame-budget
+        name: "Frame Budget"
+        required: true
+        engine: Custom
+        artifact:
+          glob: "docs/architecture/frame-budget.md"
+        description: "Split performance.frame_budget_ms across CPU phases and GPU passes, from .claude/docs/templates/frame-budget.md — no skill writes it: chief-engine-architect owns it, each lead its rows. Set the total first: /project-settings performance.frame_budget_ms"
+
+      - id: memory-invariants
+        name: "Memory Invariants"
+        required: true
+        engine: Custom
+        artifact:
+          glob: "docs/architecture/memory-invariants.md"
+        description: "The engine's memory rules — allocators, ownership, hot-path limits — from .claude/docs/templates/memory-invariants.md — no skill writes it: memory-allocator-specialist fills the template, reviewed by core-systems-lead; a change to it needs an engine-mode ADR. Required at `full`; recommended at `standard` (gate-pre-production.md tier reductions)"
+
+      - id: test-setup-custom
+        name: "Engine Test Setup"
+        command: /test-setup
+        required: true
+        engine: Custom
+        artifact:
+          any_of:
+            - glob: "tests/benchmarks/.gitkeep"
+            - glob: "tests/benchmarks/*"
+        description: "/test-setup on a Custom engine (test-scaffold.sh custom): tests/unit, tests/integration, tests/benchmarks and CI from commands.build and commands.test. Check with `bash .claude/scripts/test-run.sh custom` — zero tests are never a pass"
+
   pre-production:
     label: "Pre-Production"
     description: "Visual entity inventory, UX specs, asset specs, prototype the core mechanic, define stories, validate fun"
@@ -337,6 +407,25 @@ phases:
           glob: "prototypes/*-vertical-slice/REPORT.md"
           min_count: 1
         description: "Build and playtest a vertical slice — a complete end-to-end pass through the core loop. Recommended before committing epics and stories to production. Skipping is a valid solo dev call but increases risk of late-stage design pivots. If built, must be played and documented before advancing."
+
+      - id: benchmark-baseline
+        name: "Benchmark Baseline"
+        command: /benchmark-report
+        required: true
+        engine: Custom
+        artifact:
+          glob: "production/qa/benchmarks/benchmark-*.md"
+        description: "First frame-time baseline (P50/P95/P99, CPU vs GPU) from an optimized build on the reference hardware in frame-budget.md. A report whose verdict is NOT ASSESSED is not a baseline"
+
+      - id: memory-audit
+        name: "Memory Audit (sanitizers)"
+        command: /memory-audit
+        required: true
+        repeatable: true
+        engine: Custom
+        artifact:
+          glob: "production/qa/memory/memory-audit-*.md"
+        description: "Sanitizer run (ASan/LSan/UBSan/TSan, Miri or Valgrind) read by /memory-audit. The Pre-Production → Production gate needs a verdict other than DEFECTS FOUND; NOT ASSESSED means no run"
 
   production:
     label: "Production"

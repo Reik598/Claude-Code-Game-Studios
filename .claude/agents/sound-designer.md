@@ -84,4 +84,28 @@ the spec wherever a choice follows from it (e.g., a reverb-tail cap).
 - Create the actual audio files
 - Change the audio middleware configuration
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+There is no engine audio: the runtime is whatever the audio ADR chose —
+middleware or an in-house mixer.
+
+- Write specs in that system's terms. Before the ADR exists, use neutral terms
+  and mark them for mapping:
+
+| Neutral term | Wwise | FMOD Studio | In-house |
+|---|---|---|---|
+| Event | Event | Event | the ADR's event name |
+| Discrete parameter | Switch / State | labelled parameter | the ADR's term |
+| Continuous parameter | RTPC (Game Parameter) | continuous parameter | the ADR's term |
+| Mix group | Bus | Bus / VCA, Snapshot | the ADR's bus |
+
+  Check the terms against the middleware version the project pins.
+- Every event lists trigger, parameters and ranges, voice limit and priority,
+  streamed or in memory, and spatialization — the runtime budgets voices and
+  memory from these.
+- A question about what the runtime can do goes to `audio-director`, who routes
+  it to `audio-engine-engineer`, the owner of the audio runtime.
+
 ### Reports to: `audio-director`

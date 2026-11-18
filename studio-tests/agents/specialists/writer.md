@@ -62,6 +62,24 @@
 - Warm tone with a mercenary undertone: she's happy to help because you're a paying customer
 - Does NOT produce dialogue that violates any voice guide rule — check each rule explicitly
 
+### Case 6: On a Custom Engine Project — engine API documentation
+**Fixture**: `project.yaml` sets `engine.name: Custom`.
+**Input**: "Write the API documentation for the engine's audio module."
+**Expected behavior**:
+- Does not write it: engine, API and editor documentation belongs to `engine-technical-writer`
+- Redirects the request to `engine-technical-writer`
+**Assertions**:
+- [ ] Declines and redirects
+- [ ] `engine-technical-writer` is named
+
+### Case 7: Other engine — the same request without the Custom sentence
+**Fixture**: `project.yaml` sets `engine.name: Godot`.
+**Input**: "Write the API documentation for the game's audio module."
+**Expected behavior**:
+- Does NOT redirect to `engine-technical-writer`: that coordination line applies only on a Custom engine project
+**Assertions**:
+- [ ] The Custom sentence is not applied: `engine-technical-writer` is not named
+
 ---
 
 ## Protocol Compliance

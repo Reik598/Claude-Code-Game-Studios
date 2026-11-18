@@ -292,6 +292,20 @@ iteration of a struggling one.
 
 ---
 
+## On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- On Custom, follow `/prototype`'s Phase 3: recommend the engine path when the
+  in-house engine can run the mechanic; when it cannot yet, say so and offer
+  the browser sketch Phase 3 lists, with that reason.
+- Port proven mechanics to `game/` on the engine as production work, through
+  `lead-programmer` — never by copying prototype code.
+- Engine technology spikes (`/prototype --spike`) stay in `prototypes/` and
+  never touch `engine/`.
+
+---
+
 ## Delegation Map
 
 Reports to:

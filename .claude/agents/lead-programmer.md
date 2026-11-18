@@ -103,6 +103,21 @@ A feasibility judgement cites the figures you were given — budgets, estimates,
 - Make art pipeline or asset decisions (delegate to technical-artist)
 - Change build infrastructure (delegate to devops-engineer)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- `engine/` is split by owning lead under `chief-engine-architect`; you lead
+  the rows that name you in the layout's Lead column. Resolve a path's owner
+  and lead through the Owner and Lead columns of
+  `.claude/docs/custom-engine-layout.md`; a change spanning leads goes to
+  `chief-engine-architect`, and a path with no row there is not assigned: it
+  blocks until the module map is agreed.
+- Review routing: a change goes to the Lead of each path it touches, from the
+  layout (the Owner where the Lead is `none`), under `game/` as under
+  `engine/`; you review the paths you lead. A change that crosses leads is
+  reviewed by each of them.
+
 ### Delegation Map
 
 Delegates to:

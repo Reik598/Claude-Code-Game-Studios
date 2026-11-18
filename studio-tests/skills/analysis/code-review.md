@@ -239,6 +239,73 @@ Fixture defaults.
 
 ---
 
+### Case 7: Custom Engine — the engine helper is chosen by module; path rules are the checklist
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `specialists.code: core-systems-lead`
+- `engine/jobs/src/scheduler.cpp` (reviewed in Run A), `engine/rhi/src/vulkan/vk_device.cpp` (Run B), and both files together (Run C)
+- `scheduler.cpp` line 120 takes a `std::mutex` inside the per-job dispatch loop; the module's ADR does not allow locks on the hot path
+- `.claude/rules/engine-code.md` and `.claude/rules/rhi-renderer-code.md` exist
+- `docs/engine-reference/custom/VERSION.md` does not mention a Vulkan feature the RHI file's comment claims is core in 1.4
+
+**Input:** `/code-review engine/jobs/src/scheduler.cpp` (A), `/code-review engine/rhi/src/vulkan/vk_device.cpp` (B), `/code-review engine/jobs/src/scheduler.cpp engine/rhi/src/vulkan/vk_device.cpp` (C)
+
+**Expected behavior:**
+1. The engine helper is chosen by the files' module: A → `core-systems-lead`; B → `rendering-lead`; C (spans modules) → `chief-engine-architect`. Still one helper per run (Phase 7)
+2. The checklist comes from the rule file for the paths (`engine-code.md` for A, `rhi-renderer-code.md` for B), read by heading — not from memory
+3. A: the lock in the dispatch loop is a hot-path finding with `file:line`, citing the module ADR
+4. B: the Vulkan claim not covered by `docs/engine-reference/custom/` is written `NOT SOURCEABLE — <the feature> is not covered by docs/engine-reference/custom/` with its file:line, never asserted; the helper returns `status: not_assessed` with that line in `caveats`, `### Engine Specialist Findings` reads `NOT ASSESSED`, and the verdict is NOT ASSESSED (or CHANGES REQUIRED if B also has a required change)
+5. Read-only; no director gate
+
+**Assertions:**
+- [ ] A, B and C each start exactly one helper, the one named above — never `godot-specialist`/`unity-specialist`/`unreal-specialist`
+- [ ] The rule file for the path is cited for the checklist
+- [ ] The hot-path lock is reported with file/line and evidence
+- [ ] The uncovered Vulkan claim is NOT SOURCEABLE, and it reaches the verdict: B is never APPROVED or APPROVED WITH SUGGESTIONS while the line stands
+- [ ] Variant — `.claude/rules/rhi-renderer-code.md` is missing: B reports `engine/rhi/src/vulkan/vk_device.cpp: NOT ASSESSED — .claude/rules/rhi-renderer-code.md not found`, and the verdict is not APPROVED
+
+---
+
+### Case 7b: Custom Engine — the rule file comes from the layout, for every module
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`
+- `engine/audio/src/mixer.cpp` (Run A): the mixer callback takes a `std::mutex` and logs with `printf` on every buffer
+- `engine/telemetry/src/upload.cpp` (Run B): `engine/telemetry/` has no row in `.claude/docs/custom-engine-layout.md`
+- `engine/audio/tests/mixer_test.cpp` (Run C): a module-local test that takes a lock in the audio callback it drives
+- `.claude/rules/audio-code.md`, `.claude/rules/test-standards.md` and `.claude/rules/engine-api-code.md` exist
+
+**Input:** `/code-review engine/audio/src/mixer.cpp` (A), `/code-review engine/telemetry/src/upload.cpp` (B), `/code-review engine/audio/tests/mixer_test.cpp` (C)
+
+**Expected behavior:**
+1. A: the path resolves to the `engine/audio/` row; its Path rule `audio-code.md` and the engine-wide rule the layout names above its tables are read by heading and cited; the helper is that row's Lead, `simulation-systems-lead`
+2. A: the lock and the logging inside the audio callback are findings with `file:line`, citing `audio-code.md`
+3. B: the result names `engine/telemetry/src/upload.cpp: NOT ASSESSED — no layout row`; no rule file is chosen by guess and no checklist from memory stands in; the verdict is not APPROVED or APPROVED WITH SUGGESTIONS
+4. C: the path is covered by both the `engine/audio/` row and the tests row; by the layout's precedence rule it takes both rules (`audio-code.md` and `test-standards.md`) and the Owner and Lead of the more specific `engine/audio/` row, so the helper is `simulation-systems-lead`, not `qa-lead`
+5. Read-only; no director gate
+
+**Assertions:**
+- [ ] A cites `.claude/rules/audio-code.md` — a module the old five-row table did not list
+- [ ] A starts exactly one helper, `simulation-systems-lead`
+- [ ] B carries the literal `NOT ASSESSED — no layout row` for its path, and the verdict is never an approval while it stands
+- [ ] C cites both `audio-code.md` and `test-standards.md`, and starts exactly one helper, `simulation-systems-lead`
+
+---
+
+### Case 8: Non-Custom Engine — Primary specialist unchanged
+
+**Fixture:** As Case 1 (`engine.name: godot`).
+
+**Input:** As Case 1.
+
+**Expected behavior:** The Primary specialist is `godot-specialist` from `engine.name`; no Custom module routing, no `engine/` rule-file table, no Custom lead is started.
+
+**Assertions:**
+- [ ] Case 1's assertions all still hold
+- [ ] None of `core-systems-lead`, `rendering-lead`, `ecs-dod-architect`, `editor-architect`, `chief-engine-architect` is started or named as the helper
+
+---
+
 ## Protocol Compliance
 
 - [ ] Reads the target file(s) and the coding standards before reviewing (Phase 1)

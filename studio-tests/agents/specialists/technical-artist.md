@@ -61,6 +61,50 @@ No gate IDs assigned.
 - Calls out any optimization that helps one budget at the other's expense (e.g., merged meshes cut draw calls but can defeat occlusion and raise GPU time past 2ms) instead of presenting it as a free win
 - Proposes the approach before implementing and asks before writing files
 
+### Case 6: On a Custom Engine Project — water material and its editor
+**Fixture:** `project.yaml` sets `engine.name: Custom`.
+**Input:** "Set up a stylised water material, a material editor for artists to tweak it, and the foam particles."
+**Expected behavior:**
+- Builds the material on the in-house shader pipeline: parameters, permutations and authoring workflow with `shader-pipeline-engineer`, pass budget with `rendering-lead`
+- States there is no engine material editor: its UI is `editor-ui-framework-engineer`'s and its architecture `editor-architect`'s
+- Leaves the foam particles' runtime to `vfx-runtime-engineer` and authors the effect itself
+**Assertions:**
+- [ ] The material editor is routed to `editor-ui-framework-engineer` and `editor-architect`
+- [ ] The particle runtime is routed to `vfx-runtime-engineer`
+
+### Case 7: Other engine — the same request without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unreal`.
+**Input:** "Set up a stylised water material, a material editor for artists to tweak it, and the foam particles."
+**Expected behavior:**
+- Uses the engine's own material editor and particle system, checking version-specific facts against `docs/engine-reference/unreal/`
+- Does NOT state that there is no material editor, and does NOT route work to `shader-pipeline-engineer`, `rendering-lead`, `editor-ui-framework-engineer`, `editor-architect` or `vfx-runtime-engineer`
+**Assertions:**
+- [ ] The Custom section is not applied: no Custom-only agent named
+
+### Case 8: DCC Interchange — Z-up characters in centimetres
+**Fixture:** `project.yaml` sets `engine.name: Godot`; the interchange contract names glTF 2.0 for skinned characters.
+**Input:** "Our characters come out of the DCC tool Z-up and in centimetres. Just rotate and scale them in the engine after import."
+**Expected behavior:**
+- Takes the convention from the format: glTF 2.0 is right-handed with +Y up and linear distances in meters, so the export must write those; the fix is in the exporter, not a hand correction in the engine
+- Adds export validation: the Khronos glTF-Validator, then the contract's own checks (up-axis, unit, a reference object at its known size)
+- Records the DCC tool and exporter plugin versions as project settings, and re-validates a reference asset when they change
+- Refers to Key Responsibilities 4 and 6 for the pipeline and naming instead of restating them
+**Assertions:**
+- [ ] The up-axis and unit come from the glTF 2.0 definition, not from memory of a DCC default
+- [ ] The fix is in the export; no rotate-and-scale step in the engine
+- [ ] No Custom-only agent is named
+
+### Case 9: Character Technology — facial rig over the runtime budget
+**Fixture:** `project.yaml` sets `engine.name: Custom`; `animation-systems-engineer`'s Character Data Contract budgets the hero class's joints and active blendshapes in an ADR.
+**Input:** "The hero's facial rig has more joints and blendshapes than the budget allows. Ask the runtime to raise it."
+**Expected behavior:**
+- States that the budget is the runtime owner's, `animation-systems-engineer`'s Character Data Contract, and fits the rig to it: fewer facial joints, blendshapes merged or dropped, influences per vertex within the budget
+- Does not change the runtime or the budget; a budget change is the runtime owner's ADR, asked for with a measurement
+- Exports the blendshapes as glTF morph targets or UsdSkel `BlendShape` prims, as the contract's formats allow
+**Assertions:**
+- [ ] The rig is brought within the stated budget; the runtime is not changed to fit it
+- [ ] `animation-systems-engineer` is named as the budget's owner
+
 ---
 
 ## Protocol Compliance

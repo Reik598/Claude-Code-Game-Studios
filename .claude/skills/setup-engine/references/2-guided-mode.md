@@ -24,7 +24,10 @@ never a change to an existing one.
   `/setup-engine <engine>`.
 - **No engine set, but its files are on disk:** `project.godot` is Godot,
   `ProjectSettings/ProjectVersion.txt` is Unity, a `*.uproject` is Unreal, and a
-  `package.json` is Web (`references/web.md` W1 records it as it is). Say what
+  `package.json` is Web (`references/web.md` W1 records it as it is). A
+  `CMakeLists.txt` or `Cargo.toml` with none of those may be an engine of the
+  project's own: ask "Is this your own engine?" and on yes carry on as Custom
+  (`references/custom.md` C1); on no, carry on below. Say what
   you found and carry on with that engine; offer no other first.
 
 Only a project with neither goes on below.
@@ -48,12 +51,14 @@ with it (Section 1, Engine only). Otherwise no engine is named.
 ### No engine named: offer web first
 
 Say one line first: "Godot, Unity or Unreal fit better for a big 3D game, a
-console or phone-store release, or an engine you already know."
+console or phone-store release, or an engine you already know. You can also
+build your own engine (Custom)."
 
 Ask with the question tool: "Which engine? Web is the quickest start: the game
 runs in any browser, and Node is the only install." Options, Web always first:
 `Web (Recommended)` / `Godot` / `Unity` / `Unreal Engine 5`. The user may also
-type "help me choose" (without the question tool, list it as option 5).
+type "help me choose" or "build my own engine (Custom)" (without the question
+tool, list them as options 5 and 6).
 
 When the concept or brief needs what web does not do (a console or phone-store
 release, a large 3D open world, photoreal 3D), Web stays first but loses
@@ -62,6 +67,8 @@ their words ("Your brief says console: Unity or Unreal fit that better").
 
 - **Web:** read `references/web.md` and follow it, as `/setup-engine web`.
 - **Godot, Unity or Unreal:** go on with it (Section 1, Engine only).
+- **Build my own engine (Custom):** read `references/custom.md` and follow it,
+  as `/setup-engine custom`. Never recommended unasked: it is the person's call.
 - **Help me choose:** the questions below.
 
 ### Help me choose
@@ -73,7 +80,11 @@ before?" Options: `Web (TypeScript or JavaScript)` / `Godot` / `Unity` /
 - None or several → continue below.
 
 **Question 2 — Target platform.** Ask: "Where should the game be played?" Options:
-`Browser or PC` / `Phone` / `Console` / `Several`. Platform weighs engines before
+`Browser or PC` / `Phone` / `Console` / `Several`; a typed `VR headset (XR)` is
+an answer too (the question tool takes four options; without it, list this as
+option 5). `Several` is followed by one multi-select of `PC` / `Mobile` / `Web`
+/ `Console` whose question says `XR` can be typed under Other. Section 5.5.4
+writes the answer to `platform.targets`. Platform weighs engines before
 any other factor:
   - Browser → Web; Godot exports to the web too; Unity's web build works; Unreal has no web build
   - Mobile → Unity strongly preferred; Unreal is a poor fit; Godot is viable for simple mobile; Web needs a wrapper for the stores
@@ -116,6 +127,11 @@ Do not use a simple scoring matrix that eliminates engines. Instead, reason thro
 - Real limitations: Steepest learning curve; heaviest editor (slow compile times, large project sizes); overkill for stylized/2D/small-scope games; C++ is genuinely hard; not suitable for mobile or web; 5% royalty past USD 1M gross revenue
 - Licensing reality: 5% royalty only applies AFTER USD 1M gross revenue per title. For a first game or any game that doesn't reach USD 1M, it costs nothing. This threshold is high enough that most indie developers will never pay it.
 - Best fit: AAA-quality 3D; large open-world games; photorealistic visuals; developers with C++ experience or willing to use Blueprint; games targeting high-end PC/console where visual fidelity is a core selling point
+
+**Custom — build your own engine** (C++23 with CMake or Rust with Cargo; `references/custom.md`)
+- Genuine strengths: full control of memory, threading, the frame pipeline and the graphics API (Vulkan 1.4, Direct3D 12, Metal); no licence terms but your own
+- Real limitations: the framework ships no engine code, so there is nothing to play until the engine runs; no editor, asset store or community answers for your API; years of work before a game of the scope the other engines give on day one
+- Best fit: a team whose goal includes the engine itself, or a game an existing engine cannot express. Offered only when the person asks for it, never as the recommendation
 
 **Genre-specific guidance** (factor this into the recommendation):
 - Small 2D, puzzle, arcade or jam game, or one to share by link → Web

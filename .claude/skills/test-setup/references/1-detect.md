@@ -20,7 +20,8 @@
    - Glob `.github/workflows/` — does a CI workflow file exist?
    - Glob `addons/gdUnit4/bin/GdUnitCmdTool.gd` (Godot — note the capital U) or
      `Assets/Tests/EditMode/` (Unity) or `Source/*/Private/Tests/` (Unreal) or
-     `package.json` and `playwright.config.ts` (Web) for
+     `package.json` and `playwright.config.ts` (Web) or `CMakeLists.txt` /
+     `Cargo.toml` and `tests/benchmarks/` (Custom) for
      engine-specific artifacts. These are the **test roots** in
      `.claude/docs/directory-structure.md`; tests anywhere else are never compiled
      on Unity or Unreal.

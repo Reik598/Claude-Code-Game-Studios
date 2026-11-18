@@ -84,3 +84,62 @@ only thing that adds one.
 > its validation items is NO (at `minimal`, if the current build fails either of
 > its two checks), the verdict is FAIL regardless of tier — tier reductions relax
 > what must *exist*, never what must *work*.
+
+## Custom engine additions
+
+**Applies only when the resolved `engine` line reads `Custom`** (any case). On
+any other engine, or with no engine set, skip this block and print one line in
+the report's checklist: `Custom engine additions: skipped — engine is <name |
+unset>`. On Custom these items are added to the checklist above; the game's
+Vertical Slice items keep their own status. Reviewer for this block:
+`chief-engine-architect`, through gate **CEA-FRAME-BUDGET** on the baseline
+(Section 4b, "Custom engine: chief-engine-architect").
+
+**Required Artifacts (Custom):**
+- [ ] **Engine vertical slice runs headless.** An integration test boots the
+      engine with no window, ticks frames through the main loop and shuts down
+      cleanly, and it ran and passed in `bash .claude/scripts/test-run.sh custom`
+      (rule `custom:ctest-pass` or `custom:cargo-pass`, and the test's name in the
+      run's log). Ask the person which test it is when the log does not make it
+      plain — MANUAL CHECK NEEDED until answered. The zero-test and exit-code-only
+      rules (`custom:*-zero`, `custom:0`, `custom:no-test-command`) are NOT
+      ASSESSED, as at the Technical Setup gate.
+- [ ] **One rendered frame, retained.** A frame rendered by the engine's own
+      renderer, captured as an image in `production/qa/evidence/`
+      (`.claude/docs/run-and-observe.md`), with the build, graphics API and date.
+      Not waived at any `qa.level` — the look is not a test item (Section 2b). A
+      frame from each other supported graphics API is recommended.
+- [ ] **First `/benchmark-report` baseline on reference hardware.** A report in
+      `production/qa/benchmarks/benchmark-*.md` from an optimized build (release
+      or profile preset) on the reference hardware `frame-budget.md` names.
+      - Report verdict `NOT ASSESSED` (no capture, binary capture, budget unset)
+        → this item is NOT ASSESSED, with the report's reason
+      - Captured on other hardware, or from a debug build → NOT ASSESSED: "not a
+        baseline on the reference hardware"
+      - `OVER BUDGET` → a breach, handled by `performance.enforce` (Section 3:
+        CONCERNS at `warn`; `block` makes breaches Blockers only from the Polish
+        gate on, so CONCERNS here too; informational at `off`)
+      - `Regression result: NOT ASSESSED — no baseline` is the first-baseline
+        exemption (`/benchmark-report` Phase 4) and is not carried into this
+        gate's verdict
+- [ ] **Sanitizer run via `/memory-audit`.** The newest
+      `production/qa/memory/memory-audit-*.md`:
+      - `DEFECTS FOUND` → **Blocker**
+      - `RISKS FOUND` → CONCERNS, naming each risk
+      - `NOT ASSESSED` → this item is NOT ASSESSED, with the sections it names
+      - `CLEAN` → passes; any section its verdict line names as NOT ASSESSED is
+        listed beside it
+
+**Tier reductions (Custom).** Reductions only relax:
+- **`full`** — every item above required
+- **`standard`** — the headless slice, the rendered frame and the
+  `/memory-audit` run required; the benchmark baseline required, its
+  reference-hardware match → recommended (an optimized-build capture on any
+  named machine counts, and the report says which)
+- **`minimal`** — the headless slice and the rendered frame required (they are
+  this tier's "it runs end to end" for the engine); the benchmark baseline and
+  `/memory-audit` → recommended
+
+At every tier, a report that exists still counts: a `DEFECTS FOUND`
+`/memory-audit` is a Blocker even where the audit is only recommended — tier
+reductions relax what must exist, never what must work.

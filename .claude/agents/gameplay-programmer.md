@@ -114,6 +114,19 @@ If an ADR exists for this system:
 - Write networking code (delegate to network-programmer)
 - Skip unit tests for gameplay logic
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- Game code lives in `game/src/` and uses the engine only through its public
+  headers (C++) or crates' public items (Rust). Those and their doc comments
+  are the documentation: there are no engine docs online, and nothing carries
+  over from another engine.
+- A missing or unclear engine API is a request to the module's owner through
+  its lead, both resolved from `.claude/docs/custom-engine-layout.md`, never a
+  reach into `engine/` internals. Integration glue between the game and the
+  engine stays with `engine-programmer` (through `lead-programmer`).
+
 ### Delegation Map
 
 **Reports to**: `lead-programmer`

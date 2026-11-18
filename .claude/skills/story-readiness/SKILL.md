@@ -34,6 +34,8 @@ fixes in the conversation.
    cannot be found. Name what could not be read. It is never READY: a story
    nobody could check has not been shown ready. It ranks below the two failures,
    because a known blocker is more useful than an unknown.
+   On Custom (`engine.name: Custom`) it also covers an engine story whose
+   criterion is not registered, `TR-[module]-???` (the TR-ID item).
 4. **READY**: every item passes, is N/A with a reason, or is advisory. Advisory
    gaps are still listed.
 
@@ -87,6 +89,8 @@ Say "Checking [N] story files." before going on.
 4. **TR registry.** Look up each story's TR-IDs, with their `status`, in
    `docs/architecture/tr-registry.yaml`. Missing file: note it once; the TR-ID
    item passes for every story.
+   On Custom (`engine.name: Custom`), never for an engine story whose
+   requirement is `TR-[module]-???`: the TR-ID item below says why.
 5. **Sprint priority** (`sprint` scope): which stories are Must Have and Should
    Have, from the newest plan in `production/sprints/`.
 
@@ -111,12 +115,25 @@ Check every item for every story. The tier decides which groups block:
 An **advisory** item that fails is listed under Gaps with its Fix, and never
 lowers READY by itself.
 
+On Custom (`engine.name: Custom`), for an engine story, one that names
+`**Module**: docs/architecture/modules/<module>.md`, the module spec stands in
+for the GDD in Design Completeness at every tier, as the brief does at
+`minimal`; "the GDD" in the items below means that story's module spec. A game
+story on Custom, sourced from `design/gdd/` (or the brief at `minimal`), is
+judged exactly as on any other engine.
+
 ### Design Completeness
 
 - [ ] **Requirement traced**: the story names its `design/gdd/` file and quotes or
   links a specific rule or criterion from it, not just the file name. At
   `minimal`: `design/game-brief.md` and the Features item the story implements.
   A named design document that does not exist: NOT ASSESSED.
+  **Custom** (`engine.name: Custom`): an engine story's source is its module
+  spec, `**Module**: docs/architecture/modules/<module>.md`, which stands in for
+  the GDD. The item is met when the story names that spec and quotes a
+  criterion from its section 10 (Test Plan and Acceptance Criteria). A named
+  spec that does not exist is not traced: NOT ASSESSED, as for a missing GDD. A
+  story that names both a GDD and a module spec is reported, never guessed at.
 - [ ] **Self-contained**: the acceptance criteria say what done means without
   opening the GDD.
 - [ ] **Testable**: each criterion is a specific, observable condition. Not:
@@ -149,6 +166,12 @@ lowers READY by itself.
   the story at the current requirement. Not in the registry: NEEDS WORK (the story
   may predate it, or the registry needs `/architecture-review`). Passes with no
   TR-ID, or no registry.
+  **Custom** (`engine.name: Custom`): an engine story whose requirement is
+  `TR-[module]-???`, or that carries `NOT ASSESSED — criterion not registered`,
+  is NOT ASSESSED for this item whether or not a registry exists: no ADR has
+  been traced against its criterion. The story's verdict is NOT ASSESSED unless
+  a failure outranks it. Fix: run `/architecture-review`, then point the story
+  at the registered `TR-[module]-NNN`.
 - [ ] **Manifest Version current**: the story's `Manifest Version` against the
   manifest's. Older: a gap, because rules added since may apply. It stays a gap
   even when the new rules look unrelated: say what changed, and leave the call to

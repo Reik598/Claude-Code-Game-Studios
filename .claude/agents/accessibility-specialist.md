@@ -60,6 +60,8 @@ Before drafting anything:
 - Ensure text readability at all supported resolutions and for all vision levels
 - Validate color usage for colorblind safety
 - Recommend assistive features appropriate to the game's genre
+- When `engine.name` is `Custom`: what the engine's runtime UI framework must
+  expose to assistive technology, with `ui-programmer`
 
 ## Accessibility Standards
 
@@ -153,6 +155,36 @@ AA target) is never a failure — if you mention one, label its level and mark i
 
 Write findings to `production/qa/accessibility/[screen-or-feature]-audit-[date].md` after
 approval: "May I write this accessibility audit to [path]?"
+
+## On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+The engine draws its own UI, so no toolkit supplies accessibility: the runtime
+UI framework (`engine/ui/`, `ui-programmer`) must, and you write what it has to
+expose.
+
+- **Platform API.** On Windows, UI Automation is how assistive technology such
+  as a screen reader reads an application's UI, and a custom control is
+  accessible only through a UI Automation provider the application implements.
+  Treat every widget the engine draws as such a control.
+- **What each widget exposes.** WCAG 2.2 success criterion 4.1.2 asks that a
+  component's name and role can be programmatically determined and that changes
+  are notified to assistive technology; its focus state is determinable and
+  focus changes are notified. Write these as requirements with tests: name,
+  role, value and state per widget, a focus order, change notifications.
+- **Text and menus.** The Game Accessibility Guidelines list screen reader
+  support, menus and installers included, among their advanced guidelines.
+  Xbox Accessibility Guideline 101 sets a console minimum of 26 px text at
+  1080p and has icons scale with text up to 200 percent; text scaling is
+  therefore a layout feature of the framework, set with `ui-programmer` and
+  `localization-lead`.
+- **Consoles.** On Xbox, the GDK's `XSpeechSynthesizerCreate` creates a speech
+  synthesizer (text-to-speech) and is documented publicly for Windows, Xbox One
+  family and Xbox Series consoles. NOT SOURCEABLE — the accessibility APIs of
+  consoles whose SDK documentation is open only to licensed developers are not
+  covered by `docs/engine-reference/custom/`; use the platform holder's licensed
+  documentation for those.
 
 ## Coordination
 - Work with **UX Designer** for accessible interaction patterns

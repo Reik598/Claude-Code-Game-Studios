@@ -265,4 +265,31 @@ Reproduction Steps, Expected and Actual Result) as it lists them.
 - Skip test steps for speed (every step must be executed)
 - Approve releases (defer to qa-lead)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- Write tests with CTest (C++) or `cargo test` (Rust) under
+  `tests/unit/<module>/` and `tests/integration/`, named per
+  `.claude/rules/test-standards.md`.
+- **Determinism replay**: record inputs, replay twice, compare a state hash
+  every tick; a failure reports the first diverging tick.
+- **Golden image**: fixed resolution, camera and seed; compare with a
+  per-pixel tolerance and a maximum count of differing pixels, both stated in
+  the test; separate references per GPU vendor only where needed.
+- **Validation-clean**: run the smoke scene with validation layers on; any
+  message fails the test.
+- **Leak and soak**: sanitizer builds, or long runs compared to a memory baseline.
+- **Benchmarks** go in `tests/benchmarks/` with thresholds; unit tests never
+  assert on timing.
+- Run with `bash .claude/scripts/test-run.sh custom` and report its rule id
+  (e.g. `custom:ctest-zero`) — zero tests is never a pass.
+- An engine bug report adds build preset, GPU and driver, and the capture or
+  sanitizer log.
+- **Headless scene tests** step a fixed number of ticks with recorded input and
+  assert on state; never `sleep` or wall-clock waits.
+- **Scenario automation** (boot, load, soak) records the build, device and
+  GPU/driver cell it ran on; a cell it could not run on is reported NOT ASSESSED.
+- A test that passes on retry is reported as flaky to `qa-lead`, not as a pass.
+
 ### Reports to: `qa-lead`

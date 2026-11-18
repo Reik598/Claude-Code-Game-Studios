@@ -248,7 +248,7 @@ not be read or parsed, or its checks could not run — name the reason).
 
 For `static all`, produce a summary table then list any non-compliant skills:
 ```
-=== Skill Static Check: All 75 Skills ===
+=== Skill Static Check: All 81 Skills ===
 
 Skill                  | Result       | Issues
 -----------------------|--------------|-------
@@ -260,7 +260,7 @@ story-readiness        | WARNINGS     | Check 5: no handoff
 Summary: 48 COMPLIANT, 3 WARNINGS, 1 NON-COMPLIANT, 1 NOT ASSESSED
 Aggregate Verdict: N WARNINGS / N FAILURES / N NOT ASSESSED
 
-Agents (observations, not scored): 49 read
+Agents (observations, not scored): 77 read
   asks-user: N agents · agent-type-list: N · preload-off: N · frontmatter: N
   Overlap pairs: [each pair, with whether both are still singled out]
   Delegation blocks: N in N skills; [the ones whose brief lacks a part]
@@ -278,7 +278,7 @@ whose frontmatter does not parse is a different case: Check 1 fails on it (see
 above), so it is reported **NON-COMPLIANT**, not NOT ASSESSED — the defect is in
 the skill, not in the linter's access to it.
 
-**And state the denominator.** `All 75 Skills` in the header must be the number
+**And state the denominator.** `All 81 Skills` in the header must be the number
 actually examined, not the number that exist: report `[N] of [M] skills checked`
 whenever they differ. A summary whose counts silently sum to less than its own
 title is the failure this skill is supposed to catch in others.
@@ -566,8 +566,8 @@ For each agent in catalog's `agents:` section:
 === Skill Test Coverage Audit ===
 Date: [date]
 
-SKILLS (75 total)
-Specs written: 75 (100%) | Never static tested: 75 | Never category tested: 75
+SKILLS (81 total)
+Specs written: 81 (100%) | Never static tested: 81 | Never category tested: 81
 
 Skill                  | Cat      | Has Spec | Last Static | S.Result | Last Cat | C.Result | Priority
 -----------------------|----------|----------|-------------|----------|----------|----------|----------
@@ -575,8 +575,8 @@ gate-check             | gate     | YES      | never       | —        | never 
 design-review          | review   | YES      | never       | —        | never    | —        | critical
 ...
 
-AGENTS (49 total)
-Agent specs written: 49 (100%)
+AGENTS (77 total)
+Agent specs written: 77 (100%)
 
 Agent                  | Category   | Has Spec | Last Spec   | Result | Last Cat | C.Result
 -----------------------|------------|----------|-------------|--------|----------|----------
@@ -587,8 +587,8 @@ technical-director     | director   | YES      | never       | —      | never 
 Top 5 Priority Gaps (skills with no spec, critical/high priority):
 (none if all specs are written)
 
-Skill coverage:  75/75 specs (100%)
-Agent coverage:  49/49 specs (100%)
+Skill coverage:  81/81 specs (100%)
+Agent coverage:  77/77 specs (100%)
 ```
 
 No file writes in audit mode.

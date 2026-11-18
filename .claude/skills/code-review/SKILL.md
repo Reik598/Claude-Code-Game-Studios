@@ -56,7 +56,7 @@ Read the target file(s) in full. Read CLAUDE.md for project coding standards.
 
 Read the `specialists` block from `project.yaml`; if it is absent, fall back to the `## Engine Specialists` section of `.claude/docs/technical-preferences.md`. Note:
 
-- The **Primary** specialist — `<engine>-specialist` derived from `engine.name` (Godot→`godot-specialist`, Unity→`unity-specialist`, Unreal→`unreal-specialist`, Web→`lead-programmer`); used for architecture and broad engine concerns
+- The **Primary** specialist — `<engine>-specialist` derived from `engine.name` (Godot→`godot-specialist`, Unity→`unity-specialist`, Unreal→`unreal-specialist`, Web→`lead-programmer`); used for architecture and broad engine concerns. **Custom** (a project building its own engine) → by the files under review, resolved through `.claude/docs/custom-engine-layout.md` (including `crates/<module>/`): the Lead of the file's most specific row (the layout's precedence rule), or its Owner where the Lead is `chief-engine-architect` or `none`; `chief-engine-architect` when the files resolve to different helpers; a file with no row is reported as `<path>: NOT ASSESSED — no layout row`, never routed by guess: no helper reviews it, so the review itself writes that line under Engine Specialist Findings, which then read NOT ASSESSED (whether or not a helper runs for the other files). Still one helper (Phase 7).
 - The **Language/Code Specialist** — `specialists.code` — used when reviewing the project's primary language files
 - The **Shader Specialist** — `specialists.shader` — used when reviewing shader files
 - The **UI Specialist** — `specialists.ui` — used when reviewing UI code
@@ -206,8 +206,9 @@ step, is the state the manual checker needs to reach actually reachable, and how
 ```
 ## Code Review: [File/System Name]
 
-### Engine Specialist Findings: [N/A — no engine configured / CLEAN / ISSUES FOUND]
+### Engine Specialist Findings: [N/A — no engine configured / NOT ASSESSED / CLEAN / ISSUES FOUND]
 [Findings from the engine review, or "No engine configured." if skipped]
+[NOT ASSESSED: the helper's `status` was `not_assessed` — each NOT SOURCEABLE or missing-rule-file line it returned, by file]
 
 ### Testability: [N/A — no story path given / N/A — Visual/Feel or Config story / TESTABLE / GAPS / BLOCKING]
 [Testability findings: test hooks, coverage gaps, untestable paths, new edge cases]
@@ -245,7 +246,10 @@ Choose the verdict, first match wins:
 - **NOT ASSESSED** — nothing to review (the no-data path above), the engine
   specialist review did not run — no engine configured, or an engine helper
   result that was empty or malformed — or any report section reads `NOT ASSESSED` (ADR
-  Compliance with a referenced ADR that could not be read, Architecture, SOLID);
+  Compliance with a referenced ADR that could not be read, Architecture, SOLID,
+  Engine Specialist Findings — a helper `status` of `not_assessed`, such as a
+  Custom `NOT SOURCEABLE` claim, a missing rule file or a file with no layout
+  row, `<path>: NOT ASSESSED — no layout row`);
   name which. NOT ASSESSED ranks below CHANGES REQUIRED, because a known
   defect is more actionable than a skipped check, and above both approvals: a
   review that skipped the engine check has not approved the code. (`NO ADRS

@@ -31,6 +31,9 @@ Check whether the engine version is likely beyond the LLM's training data.
 **Web** is HIGH RISK: every version the scaffold pins is newer than the model's
 training (`references/web.md`, W4).
 
+**Custom** is HIGH RISK by definition: the engine is the project's own, and its
+source and ADRs are the reference (`references/custom.md`, C4).
+
 Compare the user's chosen version against these baselines:
 
 - **Within training data** → `LOW RISK` — reference docs optional but recommended

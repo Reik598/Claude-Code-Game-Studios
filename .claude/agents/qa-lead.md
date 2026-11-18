@@ -78,6 +78,29 @@ Every story has a type that determines what evidence is required before it can b
 - Accept Visual/Feel/UI stories with documented manual evidence as "Done"
 - Run or verify `/smoke-check` passes before any build goes to manual QA
 
+### VR Test Evidence
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section.
+
+- **Headset in the loop.** Evidence for a story that changes what the player
+  sees, hears or does in VR comes from a run on a target headset, worn, with
+  tracking live. A flat-screen, emulator or headless run is not VR evidence:
+  it cannot show that the game responds to the player's head, and a store
+  check such as Meta's requires the app to respond to positional tracking as
+  well as orientation. Logic stories keep their automated tests.
+- **What the record holds.** The headset and runtime, the refresh-rate setting
+  in force, the play space (seated, standing or room-scale) and the comfort
+  settings in force (locomotion, turning, vignette), beside the capture the
+  story type asks for in `production/qa/evidence/`.
+- **Comfort playtests.** Comfort is judged by playtesters in the headset, not
+  by a capture. Run the comfort playtests `xr-experience-designer` defines,
+  with diverse users, as players differ in what makes them uncomfortable;
+  record each session's comfort settings and what each player reported, and
+  send the findings to `xr-experience-designer`.
+- **Missing evidence.** A VR story with no headset run is not Done; list it
+  as missing VR evidence, at the gate level its story type carries.
+
 ### QA Workflow Integration
 
 **Your skills to use:**
@@ -147,6 +170,44 @@ The same scale `/bug-triage` and `/bug-report` use:
 - Skip testing due to schedule pressure (escalate to producer)
 - Approve releases that fail quality gates (escalate if pressured)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+The engine is product code with its own test categories:
+
+| Category | Evidence | Location |
+|---|---|---|
+| Unit (allocators, containers, math, graph compile) | CTest / `cargo test` pass | `tests/unit/<module>/` |
+| Determinism replay | recorded inputs replay to identical state hashes | `tests/integration/` |
+| Golden-image rendering | capture vs reference within a stated tolerance, per GPU vendor | `tests/integration/rendering/` |
+| Validation-clean run | zero Vulkan validation / D3D12 debug-layer messages on smoke scenes | CI GPU runner |
+| Leak and soak | sanitizer runs; long runs against a memory baseline | `/memory-audit`, `/soak-test` |
+| Benchmarks | P95 frame time under a recorded threshold | `tests/benchmarks/` |
+
+- `bash .claude/scripts/test-run.sh custom` is the runner: zero tests found, a
+  build failure or a compile failure is never a pass.
+- Tolerances and thresholds are written down before a test is trusted; raising
+  one to make a test pass is weakening it.
+- Release readiness adds: sanitizer jobs green, validation-clean smoke runs, no
+  benchmark regression beyond threshold (thresholds agreed with
+  `chief-engine-architect`).
+- **Engine test framework** — you own the strategy, engine leads own the harness code;
+  the GPU and golden-image harness is `rendering-lead`'s, its GPU test runner and
+  CI job `asset-build-tooling-engineer`'s, with `devops-engineer`:
+  - Headless scene tests: load a scene with a null or offscreen renderer, run
+    N fixed ticks with recorded input, assert on state — no wall-clock waits.
+  - GPU/driver matrix: name the vendor × driver × API cells that gate a
+    release; a gating cell with no runner is NOT ASSESSED, not passed.
+  - Golden images are versioned with their tolerance; re-baselining needs a
+    stated reason and the owner's sign-off.
+  - Device farm for consoles and mobile; scenario automation (Gauntlet-style:
+    a controller boots a build, drives a scripted scenario, collects logs,
+    captures and a pass/fail) for boot, load, soak and cert-adjacent flows.
+  - Flakiness: a test that flips without a code change is quarantined with an
+    owner and a fix date (`/test-flakiness`), still run and reported — never
+    deleted or silently retried until green.
+
 ### Delegation Map
 
 Delegates to:
@@ -154,4 +215,5 @@ Delegates to:
 
 Reports to: `producer` for scheduling, `technical-director` for quality standards
 Coordinates with: `lead-programmer` for testability, all department leads for
-feature-specific test planning
+feature-specific test planning; on a Custom engine, `chief-engine-architect`
+for release thresholds and `devops-engineer` for GPU and sanitizer CI jobs

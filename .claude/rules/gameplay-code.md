@@ -4,6 +4,7 @@ paths:
   - "src/game/**"
   - "Assets/**/{Gameplay,gameplay}/**/*.cs"
   - "Source/**/{Gameplay,gameplay}/**/*.{h,cpp}"
+  - "game/src/**"
 ---
 
 # Gameplay Code Rules
@@ -17,6 +18,18 @@ paths:
 - Write unit tests for all gameplay logic — separate logic from presentation
 - Document which design doc each feature implements in code comments
 - No static singletons for game state — use dependency injection
+
+## Custom engine (`engine.name: Custom`)
+
+For a project that builds its own engine (`engine.name: Custom`), where
+`game/src/**` loads this file; on any other engine, ignore this section.
+
+- Gameplay and domain systems publish events and expose read-only state that
+  UI observes. UI code under `game/src/ui/` also matches this rule's
+  `game/src/**` glob; it follows `ui-code.md`: it reads that state and sends
+  commands, never the reverse
+- `game/src/` uses the engine only through its public headers or crate APIs,
+  never `engine/*/src/` internals; values come from `game/data/`
 
 ## Examples
 

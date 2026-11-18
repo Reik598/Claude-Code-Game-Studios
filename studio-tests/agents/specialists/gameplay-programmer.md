@@ -59,6 +59,28 @@ No gate IDs assigned.
 - Makes stamina drain a data-driven value (external config), not a hardcoded constant
 - Notes any edge cases from the GDD's edge-cases section and handles them in code
 
+### Case 6: On a Custom Engine Project — a missing engine API
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the physics module's public headers expose no sweep query.
+**Input:** "The dash ability needs a sweep query. Just call the internal function in `engine/physics/src/`."
+**Expected behavior:**
+- Refuses to reach into `engine/` internals: game code in `game/src/` uses only the engine's public headers (C++) or crates' public items (Rust)
+- Turns the gap into a request to the module's owner through its lead, both resolved from `.claude/docs/custom-engine-layout.md` (`physics-simulation-engineer` under `simulation-systems-lead`)
+- Does not look up another engine's online documentation for the API: the public headers and their doc comments are the documentation
+- Leaves any game-engine integration glue to `engine-programmer` through `lead-programmer`
+**Assertions:**
+- [ ] No call into engine internals is written
+- [ ] The API request names the owner and lead from the layout
+
+### Case 7: Other engine — the same need without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`.
+**Input:** "The dash ability needs a sweep query."
+**Expected behavior:**
+- Uses the engine's documented physics query API, checking version-specific calls against `docs/engine-reference/godot/`
+- Writes the code under the Godot code root, not `game/src/`
+- Does NOT raise a request through `.claude/docs/custom-engine-layout.md` or name `physics-simulation-engineer` or `simulation-systems-lead`
+**Assertions:**
+- [ ] The Custom section is not applied: no layout lookup and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

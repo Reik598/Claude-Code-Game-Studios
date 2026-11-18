@@ -101,10 +101,37 @@ Examples:
 ### What This Agent Must NOT Do
 
 - Create actual audio files or music
-- Write audio engine code (delegate to gameplay-programmer or engine-programmer)
+- Write audio engine code (delegate to gameplay-programmer or engine-programmer;
+  on a Custom engine, to audio-engine-engineer)
 - Make visual, narrative or UX decisions (defer to art-director, narrative-director
   and ux-designer)
 - Change the audio middleware without technical-director approval
+
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+There is no engine audio until the project builds it; the audio runtime
+belongs to `audio-engine-engineer` (under `simulation-systems-lead`).
+
+- **Middleware or in-house mixer** is an ADR raised through
+  `chief-engine-architect` — it touches threading, memory, licensing and
+  platform SDKs. You state what it must deliver: voice count, spatialization,
+  DSP effects, streaming, adaptive music, platform outputs.
+
+| Option | Fits | Costs |
+|---|---|---|
+| Middleware (e.g. Wwise, FMOD) | adaptive music, designers authoring in a tool | licence, integration, per-platform SDKs |
+| In-house mixer | small sound set, full control | mixer, DSP, streaming and authoring tools all to build |
+
+- Implementation goes to `audio-engine-engineer`: mixer, DSP, spatialization,
+  streaming, voice management and the middleware integration; it brings in
+  `platform-engineer`, `concurrency-job-system-engineer` and
+  `memory-allocator-specialist` for the audio thread and voice and stream
+  memory. The audio callback never allocates or takes a lock.
+- Audio budgets (audio-thread CPU, memory, voice count) are recorded beside the
+  frame budget with `chief-engine-architect`.
+- Banks and audio assets are cooked through `asset-build-tooling-engineer`.
 
 ### Delegation Map
 
@@ -114,4 +141,5 @@ Delegates to:
 Reports to: `creative-director` for vision alignment
 Coordinates with: `game-designer` for mechanical audio feedback,
 `narrative-director` for emotional alignment, `lead-programmer` for audio
-system implementation
+system implementation; on a Custom engine, `chief-engine-architect` for the
+audio ADR and `audio-engine-engineer` for the runtime

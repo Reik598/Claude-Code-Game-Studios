@@ -29,6 +29,12 @@ part of each is used:
 4. `docs/engine-reference/[engine]/current-best-practices.md`
    → Extract: post-cutoff best practices that differ from training data
 
+An absent `breaking-changes.md`, `deprecated-apis.md` or
+`current-best-practices.md` is named in the output, on any engine, as
+`NOT SOURCEABLE — <file> is not present`, and 0d's knowledge-gap inventory
+carries the line. Nothing it would have said is filled in from training data.
+(A Custom project's `/setup-engine custom` writes only `VERSION.md` there.)
+
 Then read **only the module docs whose domain this game actually uses** —
 not the whole `modules/` directory:
 
@@ -105,6 +111,16 @@ everything downstream rather than re-checked.
    - Cross-system communication patterns (what talks to what, how)
    - State that must persist (save/load implications)
    - Threading or timing requirements
+
+**Custom** (`engine.name: Custom`): the engine's own modules are layered too,
+from their module specs, as well as the systems of `systems-index.md`. Glob
+`docs/architecture/modules/*.md` (one spec per engine module, from
+`.claude/docs/templates/engine-module-spec.md`) and read each by heading:
+"1. Purpose", "3. Dependencies", "6. Performance Budget" and
+"10. Test Plan and Acceptance Criteria". Phase 1 places each module in the layer
+map beside the systems, and the baseline numbers its requirements
+`TR-[module]-[NNN]` by the registry rule below. No module spec yet: say so in the
+output; no layer is invented for a module that has none.
 
 Build a **Technical Requirements Baseline** — a flat list of all extracted
 requirements across all GDDs, numbered `TR-[system]-[NNN]`, the TR registry's

@@ -48,6 +48,11 @@ It reads `workflow-catalog.yaml` — which already encodes each step's `glob`,
 | `SHORT` | matched but fewer than `min_count` (`count=` and `min=` given) |
 | `PATTERN_MISS` | files exist but none contains the required marker |
 | `NO_CHECK` | the step declares no artifact — **not detectable from disk** |
+| `ENGINE_SKIPPED` | the step is scoped to another engine (`engine=` names it) — **not applicable**, never a blocker; the header's `ENGINE_SKIPPED:` count is printed in the report as one line |
+
+The `ENGINE:` header line names the engine those steps were scoped by. On
+`Custom` the `engine=Custom` rows are evaluated like any other and feed the gate
+file's `## Custom engine additions` block.
 
 It emits observations, never a verdict: **you** apply the workflow tier and the
 required/optional split from Section 2. An `ABSENT` required artifact is a

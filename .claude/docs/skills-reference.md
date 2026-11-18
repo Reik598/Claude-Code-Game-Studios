@@ -1,6 +1,6 @@
 # Available Skills (Slash Commands)
 
-75 slash commands organized by phase. Type `/` in Claude Code to access any of them.
+81 slash commands organized by phase. Type `/` in Claude Code to access any of them.
 
 > **Renamed in 1.3.0:** `/help` is now `/next-step`, `/settings` is now
 > `/project-settings` and `/changelog` is now `/write-changelog`, because other
@@ -49,7 +49,7 @@
 | Command | Purpose |
 |---------|---------|
 | `/create-architecture` | Guided authoring of the master architecture document |
-| `/architecture-decision` | Create an Architecture Decision Record (ADR) |
+| `/architecture-decision` | Create an Architecture Decision Record (ADR); on a Custom engine, an engine mode adds memory, threading, latency and ABI trade-off sections |
 | `/architecture-review` | Validate all ADRs for completeness, dependency ordering, and GDD coverage |
 | `/create-control-manifest` | Generate flat programmer rules sheet from accepted ADRs |
 
@@ -76,6 +76,10 @@
 | `/content-audit` | Audit GDD-specified content counts against implemented content |
 | `/scope-check` | Analyze feature or sprint scope against original plan, flag scope creep |
 | `/perf-profile` | Structured performance profiling with bottleneck identification |
+| `/benchmark-report` | Any engine (Custom-oriented): frame-time P50/P95/P99, CPU vs GPU bound and cache-miss telemetry from Tracy, PIX, RenderDoc, Nsight, perf, VTune or Superluminal captures or benchmark output; NOT ASSESSED with no capture |
+| `/memory-audit` | Any engine (Custom-oriented): allocator arenas, alignment padding, leaks and use-after-free risks from ASan/LSan/UBSan/TSan, Miri or Valgrind output; NOT ASSESSED with no sanitizer run |
+| `/perf-regression-triage` | Any engine (Custom-oriented): triage a `/benchmark-report` regression — confirm with a re-run, plan a bisect over builds and commits, attribute it to a subsystem and owner, open a bug in `/bug-report` format, track it to a measured fix |
+| `/api-review` | Custom engine: review a change to the engine's public surface — C++ headers, Rust `pub` API, C ABI; classifies breaking, additive and deprecation, and checks the deprecation window, migration note and sign-off |
 | `/tech-debt` | Scan, track, prioritize, and report on technical debt |
 | `/gate-check` | Validate readiness to advance between development phases (PASS/CONCERNS/NOT ASSESSED/FAIL) |
 | `/consistency-check` | Scan all GDDs against the entity registry to detect cross-document inconsistencies (stats, names, rules that contradict each other) |
@@ -118,6 +122,7 @@
 | `/patch-notes` | Generate player-facing patch notes from git history and internal data |
 | `/hotfix` | Emergency fix workflow with audit trail, bypassing normal sprint process |
 | `/day-one-patch` | Prepare a focused day-one patch for known issues discovered after gold master but before or at public launch |
+| `/engine-release` | Custom engine: cut an engine version for the game teams — semver plan from ADRs and API reviews, changelog, migration guide, integration test of `game/`, game-team sign-off, tag and LTS/hotfix branch plan as text |
 
 ## Creative & Content
 
@@ -143,6 +148,7 @@ Coordinate multiple agents on a single feature area:
 | `/team-level` | level-designer + narrative-director + world-builder + art-director + systems-designer + qa-tester |
 | `/team-live-ops` | live-ops-designer + economy-designer + community-manager + analytics-engineer |
 | `/team-qa` | qa-lead + qa-tester + gameplay-programmer + producer |
+| `/team-frame-pipeline` | Custom engine: chief-engine-architect over core-systems-lead + ecs-dod-architect + simulation-systems-lead + rendering-lead, for a change to the main tick or frame graph |
 
 ## Overlap with Claude Code's bundled skills
 

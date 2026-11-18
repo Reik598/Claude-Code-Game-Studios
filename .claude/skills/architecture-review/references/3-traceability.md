@@ -58,6 +58,14 @@ Build the full matrix:
 
 Count the totals: X covered, Y partial, Z gaps.
 
+**Custom engine** (`engine.name: Custom`): module requirements
+(`TR-[module]-NNN`, Phase 2) go through the same matrix and statuses. An ADR
+covers one when its `## GDD Requirements Addressed` section names the TR-ID or
+the module spec (the section keeps its name on Custom); the GDD column holds
+the spec's file name and the System column the module. A module criterion no
+ADR addresses is a ❌ Gap like any other, so the matrix shows which engine
+criterion lacks a decision.
+
 ---
 
 ## Phase 3b: Story and Test Linkage (RTM mode only)

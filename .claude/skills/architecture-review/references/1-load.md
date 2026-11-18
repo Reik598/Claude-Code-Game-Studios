@@ -138,6 +138,22 @@ cross-references material outside itself, or when a GDD matched zero sections
 
 - `design/gdd/systems-index.md` — the authoritative list of systems; read whole (small, and it is an index)
 
+**Custom engine** (`engine.name: Custom`): the module specs under
+`docs/architecture/modules/` stand in for GDDs, as they do in the story skills.
+Glob `docs/architecture/modules/*.md`, count **N_module** and report it beside
+N_gdd ("Loaded [N] GDDs, [K] module specs, [M] ADRs, …"). Load each spec's
+"10. Test Plan and Acceptance Criteria" section whole: list the specs' headings
+with `Grep pattern="^## " glob="docs/architecture/modules/*.md" output_mode="content" -n`,
+then Read each spec from its `## 10. Test Plan and Acceptance Criteria` line
+to the line before the next `## ` heading (offset and limit; to the end of the
+file when section 10 is the last). Never a fixed `-A` window: section 10 lists
+Unit, Integration and Benchmarks before the `Done when` criteria, so a window
+that stops short loses the criteria first. A spec whose headings have no
+section 10 is a named structural gap in the Phase 7 report, never an absent
+module. Add `docs/architecture/modules/*.md`
+after `design/gdd/*.md` in Phase 1a's `review-receipts.sh check` list, as
+Phase 8 does in its hash list.
+
 ### Architecture Documents
 
 Phases 3–5 need the traceability table, the decision itself, engine claims, and

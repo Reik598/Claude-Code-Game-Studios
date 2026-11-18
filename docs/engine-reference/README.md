@@ -17,7 +17,17 @@ suggest outdated code.
 
 Each engine gets its own directory: `godot/`, `unity/`, `unreal/` and `web/`,
 named as `engine.name` in lower case. The web folder pins a toolchain rather
-than one engine, and has a page per library instead of `modules/`:
+than one engine, and has a page per library instead of `modules/`.
+
+A **Custom** engine (one the project builds itself, `engine.name: Custom`) has
+no shipped reference. `/setup-engine custom` writes the project's own
+`custom/` folder: the pinned compiler and build toolchain (C++23 with CMake, or
+Rust with Cargo), the graphics API and SDK versions, the shader compiler, and
+each third-party dependency with its version. Agents treat it like any other
+reference: a fact it does not cover is written as `NOT SOURCEABLE — … not
+covered by docs/engine-reference/custom/`, not filled in from training data.
+
+The layout of an engine folder:
 
 ```
 <engine>/

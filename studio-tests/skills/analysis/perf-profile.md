@@ -250,6 +250,47 @@ Fixture defaults.
 
 ---
 
+### Case 8: Custom engine — tick stages as entry points, candidates handed to /benchmark-report
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `performance.frame_budget_ms: 8.33`, the other three budgets set
+- `engine/core/src/tick.cpp` runs the simulation phases on the job graph; `engine/jobs/src/scheduler.cpp` waits on every job before transform propagation (a full sync point); `engine/physics/src/broadphase.cpp:57` calls `new Pair[...]` per step although `engine/memory/` has a frame arena; `engine/renderer/src/frame.cpp:90` waits on the GPU fence every frame
+- `production/qa/benchmarks/` holds no capture
+
+**Input:** `/perf-profile full`
+
+**Expected behavior:**
+1. The resolved block includes `engine: Custom`
+2. Phase 3 lists the engine's tick stages and job graph as the per-frame entry points — not `_process()`, `Update()` or `Tick()`
+3. Hotspot candidates include the job-graph sync point, the heap allocation on the tick where an arena exists, and the per-frame CPU wait on the GPU fence, each with `file:line`
+4. Every candidate is stated as unconfirmed under **Requires Investigation**, naming Tracy, PIX, RenderDoc, Nsight, Superluminal, `perf` or VTune as the capture that would confirm it — the skill reads none of them
+5. Phase 6 includes `/benchmark-report [capture-path]` to measure a candidate
+6. "May I write" before the report; verdict COMPLETE
+
+**Assertions:**
+- [ ] No engine-callback entry point (`_process`/`Update`/`Tick`) is named for a Custom project
+- [ ] The three Custom-specific candidates are found with `file:line`
+- [ ] No candidate is reported as measured; Requires Investigation names the capture needed
+- [ ] `/benchmark-report` appears in the next steps
+- [ ] Verdict COMPLETE
+
+---
+
+### Case 9: Non-Custom engine — no Custom targets leak in
+
+**Fixture:** As Case 1 (`engine.name: godot`).
+
+**Input:** `/perf-profile combat`
+
+**Expected behavior:** Phase 3 uses `_process()` as in Case 1; the report does not list job-graph sync points, frame-graph barriers or GPU-fence waits as targets and does not name the Custom profiler list as this engine's profilers. Phase 6 does not list `/benchmark-report`: that next step is Custom only.
+
+**Assertions:**
+- [ ] Case 1's assertions all still hold
+- [ ] No Custom-only target or `engine/` path appears in the report
+- [ ] `/benchmark-report` does not appear in the next steps
+
+---
+
 ## Protocol Compliance
 
 - [ ] Records each input as FOUND or ABSENT before producing any report

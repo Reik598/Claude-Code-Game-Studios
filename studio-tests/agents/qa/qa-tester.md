@@ -68,6 +68,27 @@
 - States the story type (UI), output location and gate level (BLOCKING) at the start of the test cases, as its Test Evidence Routing section requires for every test case it produces
 - Does not drop or downgrade the screenshot evidence because the project runs `qa.level: minimal` — coding-standards.md: "Not waived at `qa.level: minimal` — tests are, the look is not"
 
+### Case 6: On a Custom Engine Project — determinism replay test
+**Fixture**: `project.yaml` sets `engine.name: Custom`; a C++ engine built with CMake.
+**Input**: "Write a test that the physics simulation replays deterministically."
+**Expected behavior**:
+- Writes a CTest test under `tests/integration/`, named per `.claude/rules/test-standards.md`
+- Records inputs, replays twice and compares a state hash every tick; a failure reports the first diverging tick
+- Steps a fixed number of ticks; never `sleep` or a wall-clock wait
+- Runs it with `bash .claude/scripts/test-run.sh custom` and reports the rule id; zero tests found is never a pass
+**Assertions**:
+- [ ] The test compares a per-tick state hash and reports the first diverging tick
+- [ ] The run goes through `test-run.sh custom`
+
+### Case 7: Other engine — the same test without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Godot`.
+**Input**: "Write a test that the physics simulation replays deterministically."
+**Expected behavior**:
+- Writes the test with the engine's test framework under the Godot test root, named per `.claude/rules/test-standards.md`
+- Does NOT use CTest or `cargo test`, and does NOT run `test-run.sh custom` or report a `custom:` rule id
+**Assertions**:
+- [ ] The Custom section is not applied: no CTest, `cargo test` or Custom runner
+
 ---
 
 ## Protocol Compliance

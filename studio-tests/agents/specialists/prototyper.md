@@ -68,6 +68,26 @@
 - After writing, hands control back: asks the user to run the project and paste any errors or describe what they observe, rather than assuming it worked
 - If a Godot 4.6 API is uncertain, flags the specific API with a note to verify against the Godot 4.6 docs — `docs/engine-reference/godot/VERSION.md` reaches the agent through `CLAUDE.md`'s import, and its Knowledge Gap Warning says to cross-reference that directory before suggesting Godot API calls
 
+### Case 6: On a Custom Engine Project — where to prototype
+**Fixture**: `project.yaml` sets `engine.name: Custom`; the in-house engine runs but has no gameplay tooling yet.
+**Input**: "Prototype the grappling-hook mechanic so we can judge the feel."
+**Expected behavior**:
+- Prototypes in the browser first (the web one-shot path), because an in-house engine is rarely ready to iterate on feel
+- Says a proven mechanic is ported to `game/` on the engine as production work through `lead-programmer`, never by copying prototype code
+- Keeps any engine technology spike (`/prototype --spike`) in `prototypes/`, never touching `engine/`
+**Assertions**:
+- [ ] The prototype is in the browser, outside `engine/` and `game/`
+- [ ] The port is routed to `lead-programmer` as production work
+
+### Case 7: Other engine — the same mechanic without the Custom section
+**Fixture**: `project.yaml` sets `engine.name: Godot`; `engine.language` is GDScript.
+**Input**: "Prototype the grappling-hook mechanic so we can judge the feel."
+**Expected behavior**:
+- Chooses the prototype path by the question the prototype must answer, as in its normal workflow
+- Does NOT give "the in-house engine is rarely ready" as a reason for the browser, and does NOT plan a port to `game/` through `lead-programmer`
+**Assertions**:
+- [ ] The Custom section is not applied: no Custom browser-first rule and no `game/` port
+
 ---
 
 ## Protocol Compliance

@@ -120,4 +120,6 @@ options, then end with them as a short labeled list (at most 4 questions), with
 
 ### Reports to: `narrative-director`
 ### Coordinates with: `game-designer` for mechanical clarity in text,
-`world-builder` for the lore the text draws on
+`world-builder` for the lore the text draws on. On a Custom engine project
+(`engine.name: Custom`), engine, API and editor documentation belongs to
+`engine-technical-writer`

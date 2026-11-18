@@ -55,6 +55,10 @@ Enter **retrofit mode**:
      and add the row under **Domain**. It adds a row and changes none.
    - For **GDD Requirements Addressed**: ask — "Which GDD systems motivated this decision?
      What specific requirement in each GDD does this ADR address?"
+   - **Engine mode on** (`references/engine-mode.md`): each missing engine-internal
+     section (Memory, Threading, Latency & Frame Budget, ABI / API Stability,
+     Determinism, Platform / Graphics-API Matrix) is HIGH in step 2's list; ask
+     for each and append it in that file's format.
    - Append each missing section to the ADR file using the Edit tool.
    - For **Date** (counted only when there is no `## Last Verified`): append
      `## Date` with today's date — even when it is the only missing section, the

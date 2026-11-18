@@ -89,6 +89,47 @@ buffer. Never answer with placeholder dates.
 - **Mobile stores**: Validate permissions declarations, privacy policy links,
   data safety disclosures, and content rating questionnaires.
 
+### VR Store Certification
+
+Applies only when `platform.targets` in `project.yaml` contains `XR` (matched
+without regard to case); on any other project, ignore this section. This `XR`
+is the target value, not the "XR" in the console tier's TRC / XR / Lotcheck
+list (`/launch-checklist`).
+
+- **Added, never instead.** The VR store requirements are added to the block
+  `platform.cert_tier` selects, never in place of it: a `steam` project that
+  targets XR carries the Steamworks block and the VR store's requirements. At
+  `none` there is no store and no VR block; unset, ask which stores are in
+  scope, as for `cert_tier`.
+- **Which store.** `cert_tier` names no VR store, so ask the user which VR
+  stores the game ships on and record them in the release checklist.
+- **Read the store's own page.** For each VR store, read its current
+  requirement page, cite it with the date you read it and the page's own
+  updated date, and track every requirement by its ID with
+  pass/fail/not-applicable status, as for console requirements. Copy no
+  threshold into this file or into memory: values such as refresh rates and
+  launch times change, so the checklist quotes the page read for this release.
+- **Meta Horizon Store (Quest).** Apps must meet its Virtual Reality Check
+  (VRC) guidelines to be considered for distribution; a plus sign marks a
+  recommended VRC, not a required one. VRC.Quest.Performance.1 requires the
+  app to run at the refresh rates it specifies: take them from that page.
+  Meta notes that its downloadable test plans are slightly out of date, so
+  work from the VRC pages, not the test plans. Retrieved 2026-11-17:
+  `https://developers.meta.com/horizon/resources/publish-quest-req/`.
+- **Steam.** The Steam Frame Standalone Compatibility Review rates games run
+  on the headset itself; its result changes how the game is presented, not
+  whether it is available, and its criteria are the same for VR and non-VR
+  titles. Retrieved 2026-11-17:
+  `https://partner.steamgames.com/doc/steamhardware/steamframe/compat`.
+  NOT SOURCEABLE — a Steamworks requirement list specific to PC VR; none was
+  found in the Steamworks documentation on 2026-11-17, so the `steam` block
+  applies as it stands.
+- **Console VR and other stores.** NOT SOURCEABLE — a console holder's VR
+  requirements are not public; take them from the platform holder's developer
+  site under the project's agreement. Any other VR store: cite its page with
+  the date read, or write `NOT SOURCEABLE — <store> requirements`, which keeps
+  that store's certification item NOT ASSESSED.
+
 ### Version Numbering
 
 Use semantic versioning: `MAJOR.MINOR.PATCH`
@@ -171,6 +212,37 @@ For the first 72 hours after any release:
 - Decide what features to include or exclude (escalate to producer)
 - Approve scope changes
 - Write marketing copy (provide requirements to community-manager)
+
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- No engine vendor does platform work: console SDK integration, certification
+  requirements and submission tooling are the project's own — plan them early
+  with `chief-engine-architect` and `devops-engineer`.
+- Upload symbols for every release build to the symbol server or
+  crash-reporting service, and version engine and game together.
+- Console SDK and certification details are under NDA: never assert them; write
+  NOT SOURCEABLE unless `docs/engine-reference/custom/` covers them.
+- **Packages and patches** are cook-pipeline outputs: package layout,
+  install chunks and delta patches are built by `asset-build-tooling-engineer`;
+  you own the release, its storefront and depot upload and the submission;
+  `devops-engineer` runs the CI jobs that run the release upload.
+- Platform technical requirements (lifecycle, suspend/resume, controller and
+  user handling, save integrity) are implemented in the engine by
+  `platform-engineer`; route them there instead of `technical-director`.
+- **Engine releases** are separate from game releases; the guided flow is
+  `/engine-release`, which follows these steps:
+  - Versioning: semantic — major for public API/ABI or asset-format breaks
+    (decided with `chief-engine-architect` from the ADRs), minor for features,
+    patch for fixes.
+  - Branches: a release branch per minor; selected releases marked LTS with a
+    stated support window; hotfixes land on `main` first and are cherry-picked.
+  - Upgrade notes: every breaking change with its migration steps, written
+    with `engine-technical-writer` from the ADRs; no notes, no release.
+  - Sign-off: each consuming game team confirms its integration build passes
+    before the release is marked done; a team that has not confirmed is
+    listed as NOT ASSESSED, not as signed off.
 
 ### Delegation Map
 

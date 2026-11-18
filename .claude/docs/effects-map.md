@@ -777,7 +777,7 @@ recommend and proceed — the tradeoff between user control and speed
 **Values:** `collaborative` | `guided` | `autonomous`  
 **Default:** `collaborative`  
 **Set by:** `/start`, `/project-settings`  
-**Read by:** All 69 skills that use `AskUserQuestion` or write files
+**Read by:** All 75 skills that use `AskUserQuestion` or write files
 
 **Priority chain:** `modes.automation` in `project.yaml` → hardcoded default
 
@@ -1299,7 +1299,7 @@ closing, or produces a warning and lets work continue — per test type
 
 > **Different axis from `workflow`.** `workflow` controls *what docs are required.*
 > `team.size` controls *which agents exist to make them.* A solo dev on
-> `workflow: full` still doesn't need all 49 agents — they need the same coverage
+> `workflow: full` still doesn't need all 77 agents — they need the same coverage
 > from a smaller active set.
 
 ---
@@ -1310,7 +1310,7 @@ closing, or produces a warning and lets work continue — per test type
 |-------|-----------|-------|
 | `individual` | Core 8: `producer`, `game-designer`, `gameplay-programmer`, engine-specialist (engine-driven), `technical-artist`, `sound-designer`, `qa-tester`, `writer`. **Default.** | Directors and lead-* run only on explicit invocation (e.g. via `/architecture-decision`). Specialists outside the core 8 routed through their nearest core agent. Each `team-*` skill names its own set per value, which can sit outside the core 8 (`team-release` runs `release-manager`); each skill's own `team.size` list is authoritative, and the Affected skills table below mirrors it. |
 | `small` | Core 15: directors (CD, TD, PR) + leads (LP, AD, QL, ND) + game-designer + systems-designer + engine-specialist + technical-artist + sound-designer + qa-tester + ux-designer + writer | `team-*` skills add their `small` set (below); most reach their full pipeline only at `studio`. |
-| `studio` | All 49 agents available. Engine sub-specialists (e.g. `unity-dots-specialist` separate from `unity-specialist`) routed when relevant. The adversarial review pass in `team-combat`, `team-ui` and `team-polish`. | Commercial titles, learning the full org chart, large teams with parallel work. |
+| `studio` | All 77 agents available (the 25 Custom-engine agents only when `engine.name` is `Custom`). Engine sub-specialists (e.g. `unity-dots-specialist` separate from `unity-specialist`) routed when relevant. The adversarial review pass in `team-combat`, `team-ui` and `team-polish`. | Commercial titles, learning the full org chart, large teams with parallel work. |
 
 ---
 
@@ -1749,7 +1749,7 @@ nothing and look clean.
 ## engine.test_root
 
 **Controls:** The folder that holds the tests, when it is not the engine's usual
-one (Godot and Web `tests/`, Unity `Assets/Tests/`, Unreal
+one (Godot, Web and Custom `tests/`, Unity `Assets/Tests/`, Unreal
 `Source/<Module>/Private/Tests/`; the engine table, `.claude/engines/engines.tsv`)
 **Values:** a folder path relative to the project root, with `/`, such as `spec`;
 the code root itself for a project whose tests sit beside its code
@@ -1768,7 +1768,7 @@ is **invalid** with the reason, and never falls back to the engine's folder.
 
 **Controls:** Which engine-specific specialist agents are routed to for code
 implementation, review, and architecture validation  
-**Values:** `Godot` | `Unity` | `Unreal` | `Web` (with the capital: the check is case-sensitive, so `web` reads as unset)  
+**Values:** `Godot` | `Unity` | `Unreal` | `Web` | `Custom` (with the capital: the check is case-sensitive, so `web` or `custom` reads as unset; `Custom` is a project that builds its own engine, `/setup-engine custom`)
 **Default:** `[UNSET]` — must be configured via `/setup-engine`  
 **Set by:** `/setup-engine`; `/prototype`'s grow step (One-shot 5) writes `Web` and `engine.version` when it is unset, and never changes a set one  
 **Read by:** `dev-story`, `code-review`, `architecture-decision`, `create-architecture`, `team-combat`, `team-ui`, `team-audio`
@@ -1792,6 +1792,7 @@ implementation, review, and architecture validation
 | **Unity** | `unity-specialist` | `unity-shader-specialist` | `unity-ui-specialist` | `unity-addressables-specialist`, `unity-dots-specialist` |
 | **Unreal** | `unreal-specialist` | `unreal-specialist` | `ue-umg-specialist` | `ue-gas-specialist`, `ue-blueprint-specialist`, `ue-replication-specialist` |
 | **Web** | `lead-programmer` (no web specialist agent; engine checks go against `docs/engine-reference/web/`) | `lead-programmer` | `lead-programmer` | None |
+| **Custom** | `core-systems-lead` (primary: `chief-engine-architect`, from technical-preferences.md's Primary line) | `shader-pipeline-engineer` | `ui-programmer` | `rendering-lead`, `simulation-systems-lead`, `editor-architect`, `memory-allocator-specialist`, `concurrency-job-system-engineer`, `ecs-dod-architect`, `platform-engineer`, `world-streaming-engineer`, `online-services-engineer`, `asset-build-tooling-engineer`, `rhi-backend-engineer`, `render-graph-specialist`, `graphics-features-engineer`, `vfx-runtime-engineer`, `physics-simulation-engineer`, `animation-systems-engineer`, `scripting-runtime-engineer`, `audio-engine-engineer`, `level-editor-engineer`, `editor-ui-framework-engineer`, `cinematics-sequencer-engineer`, `engine-technical-writer` |
 | **[UNSET]** | No specialist spawned — warning emitted | No specialist spawned | No specialist spawned | None |
 
 ---
@@ -2509,14 +2510,14 @@ team:
 platform:
   multiplayer: false         # real-time multiplayer
   online: false              # any online features (leaderboards, cloud, telemetry)
-  targets: [PC]              # [PC, Mobile, Web, Console]
+  targets: [PC]              # [PC, Mobile, Web, Console, XR]; /setup-engine writes the block
   primary_input: "Keyboard/Mouse"
   gamepad_support: "Full"    # Full | Partial | None
   touch_support: "None"      # Full | Partial | None
   cert_tier: none            # none | itch | steam | console
 
 engine:
-  name: "Godot"              # Godot | Unity | Unreal | Web — set by /setup-engine
+  name: "Godot"              # Godot | Unity | Unreal | Web | Custom — set by /setup-engine
   version: "4.7"
   language: "GDScript"       # GDScript | C# | C++ | Blueprint
   rendering: "Forward+"

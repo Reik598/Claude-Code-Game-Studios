@@ -24,6 +24,10 @@ a **confirm/adjust** prompt using `AskUserQuestion` — not open-ended questions
   prompt; it is a prompt state, never a value written to the file
 - **GDD linkage**: Extract which GDD systems the title directly relates to
 - **Status**: Always `Proposed` for new ADRs — never ask the user what the status is
+- **Engine mode only** (`references/engine-mode.md`): the frame budget, from the
+  `perf_budgets` line (`frame_budget_ms`, else derived from `target_framerate`,
+  else `NOT ASSESSED — unset`, never a guessed 8.33 or 16.6 ms), and the threads
+  or GPU queues the decision runs on. Add both lines to the prompt below.
 
 **Scope of assumptions tab**: Assumptions cover only: problem framing, alternative approaches, upstream dependencies, GDD linkage, and status. Schema design questions (e.g., "How should spawn timing work?", "Should data be inline or external?") are NOT assumptions — they are design decisions belonging to a separate step after the assumptions are confirmed. Do not include schema design questions in the assumptions AskUserQuestion widget.
 

@@ -13,7 +13,8 @@
 - If BEYOND training data (MEDIUM or HIGH RISK):
 
 **Web:** the reference ships complete; compare it with the scaffold and write
-nothing (`references/web.md`, W4).
+nothing (`references/web.md`, W4). **Custom:** nothing ships; `VERSION.md` is
+written for the project from probes (`references/custom.md`, C4).
 
 ### First: does a reference set already exist for this engine?
 

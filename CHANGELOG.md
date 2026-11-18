@@ -8,6 +8,352 @@ existing project on the older config files.
 
 ---
 
+## [Unreleased]
+
+**A Custom engine route: a project that builds its own engine.** Set
+`engine.name: Custom` with `/setup-engine custom` to write a game engine and the
+game on it in one repo — `engine/` (one module per folder), `game/`, and
+`tests/unit/`, `tests/integration/`, `tests/benchmarks/`. It asks for C++23 with
+CMake/CTest or Rust with Cargo, the graphics APIs, the shader language and an
+8.33 ms or 16.6 ms frame budget, writes `commands.build`/`test`/`smoke` (the
+project sets `commands.run` once a game executable exists), and records
+your toolchain in `docs/engine-reference/custom/`. On Web, Godot, Unity and
+Unreal behaviour and verdicts are unchanged except as listed here and under
+"Also on every engine" below: `/gate-check` and
+`artifact-check.sh` output gain an `ENGINE:` line, an `ENGINE_SKIPPED` count and
+seven rows that read `status=ENGINE_SKIPPED` (included in the `STEPS:` count),
+one per Custom step: `engine-module-map`, `engine-adrs`, `frame-budget`,
+`memory-invariants`, `test-setup-custom`, `benchmark-baseline` and
+`memory-audit`. `/next-step` and `/project-stage-detect` name that
+`ENGINE_SKIPPED:` count once, in one line of their output. From the Technical
+Setup → Pre-Production gate on, the `/gate-check` report's checklist also gains
+one line, `Custom engine additions: skipped — engine is <name | unset>`; the
+Systems Design and Technical Setup gates print nothing for it. "Also on every
+engine" also lists what this release adds wherever it is valid: the
+`lighting-artist`, `cinematic-designer` and `xr-experience-designer` agents and
+their reporting lines in `art-director`, `narrative-director` and
+`game-designer`; new sections in `technical-artist`, `qa-lead`,
+`release-manager` and `performance-analyst`; the `/setup-engine` XR option and
+the `platform` block it writes; and the one-shot's reworded VR card. The engine
+spike in `/prototype`, the tech-demo path in `/vertical-slice` and
+`engine-industry-lessons.md` are Custom only: other engines see no change from
+them.
+
+No engine code is shipped: no scaffold and no sample engine. The framework
+supports writing one.
+
+Also on every engine:
+- `/create-architecture` and `/create-control-manifest` name an absent
+  `breaking-changes.md`, `deprecated-apis.md` or `current-best-practices.md` as
+  `NOT SOURCEABLE — <file> is not present` instead of passing over it (no
+  verdict changes), and `/start` names `/setup-engine custom` beside the other
+  engines.
+- Guided `/setup-engine`, with no engine named, offers "build my own engine
+  (Custom)" beside the others, and in a repo with a `CMakeLists.txt` or
+  `Cargo.toml` and no Godot, Unity, Unreal or Web project file it asks "Is this
+  your own engine?" before going on.
+- `/setup-engine` writes a `platform` block to `project.yaml` on every engine
+  (its step 5.5.4): `targets` (`PC`, `Mobile`, `Web`, `Console`, `XR`),
+  `gamepad_support`, `touch_support` and `primary_input`, written together so
+  `input_methods` resolves as before. When Section 5's Gamepad or Touch Support
+  line and its Input Methods line disagree, the step asks once which is right
+  and writes the answer to both files. When the Input Methods line lists a
+  method the four keys cannot give (keyboard/mouse with no `PC` or `Web`
+  target, or the template's `Mixed`), it asks once: add the target that
+  carries it, drop it from the line, or, for `Mixed`, name the methods. On a
+  re-run it keeps the `platform` keys
+  already in `project.yaml`; a key changes only on the user's answer. Its
+  "May I write" question names `technical-preferences.md` when it changes lines
+  there. Guided Question 2 accepts a typed
+  `VR headset (XR)`, and its `Several` follow-up takes `XR` typed under
+  Other; the Custom Platforms question keeps its four options and takes a
+  typed `XR headset`. When no platform
+  question ran and the design artifact names no platform, the step asks guided
+  Question 2. On Godot, the project-shape question asks only 2D or 3D: web or
+  not comes from those targets, so the route asks one platform question.
+  `/ux-design` and `/ux-review` read `platform.targets` as prose and are
+  unchanged. `/security-audit` reads it the same way; its note on
+  `platform.multiplayer` and `platform.online` now says `/setup-engine` writes a
+  `platform` block but never those two keys, and its Category 2 rule is
+  unchanged.
+- `/architecture-decision --engine-internal` on another engine (opt-in) adds the
+  six engine-mode ADR sections and asks Step 4's frame-budget and threads
+  assumptions; that engine keeps its own specialist, and the run prints
+  `CEA-ADR not run — engine.name is <engine>, not Custom`; without the flag
+  nothing changes.
+- `/code-review` reads an engine helper result whose `status` is `not_assessed`
+  as NOT ASSESSED on every engine: the verdict is NOT ASSESSED and Engine
+  Specialist Findings say so, with a line naming why (stricter than v1.3.0,
+  which read only an empty or malformed helper result that way).
+- `/security-audit`'s Executive Summary gains `Category 7 — skipped:
+  engine.name is <engine>, not Custom`: Category 7 (engine memory safety and
+  untrusted input) runs on Custom only, and its skip is announced rather than
+  silent.
+- `/benchmark-report`, `/memory-audit` and `/perf-regression-triage` run on every
+  engine but are user-invoked only (`disable-model-invocation: true`): Claude
+  does not start them from context or through the Skill tool, so type the
+  command. `/perf-regression-triage` states its own triage rules on every engine
+  (confirmation on the same machine, a NOT REPRODUCED result kept open as
+  unconfirmed, `regression SLA NOT SET` when none is recorded);
+  `/benchmark-report` names its reports
+  `benchmark-<date>-<HHMM>-<scene-slug>.md` and never overwrites one.
+- `shader-code.md` also loads for any `**/*.slang` file: a Slang file is a
+  shader on any engine, and no 1.3.0 rule covered a `.slang` file outside
+  `assets/shaders/` and `Shaders/` (1.3.0 already loaded the rule for every
+  file in those two folders).
+- The `--output` deny rules under **Permissions** below apply on every engine.
+- The new Custom-only rules can still load in another engine's project that has
+  a path they match: a root `CMakeLists.txt`, `CMakePresets.json`,
+  `Cargo.toml`, `Cargo.lock` or `rust-toolchain.toml`; any file under
+  `engine/`, `crates/`, `third_party/`, `external/`, `vendor/`,
+  `game/scripts/`, `tools/ci/`, `tools/build/`, `tools/cook/`,
+  `tools/asset-pipeline/`, `tools/validators/`, `tools/reports/` or
+  `tools/editor/`; or a CMake or Cargo file under `cmake/` or `game/`
+  (`.claude/docs/rules-reference.md` lists each rule's paths). Each opens with
+  a sentence telling Claude to ignore it unless `engine.name` is `Custom`.
+- Three new agents on every engine, each on `model: inherit`:
+  `lighting-artist` (scene lighting, exposure, tone mapping, colour grading and
+  lightmap bake settings, from the art director's lighting direction) reports
+  to `art-director`; `cinematic-designer` (shot lists, camera, previs and the
+  edit, built in the engine's own sequencer) reports to `narrative-director`;
+  `xr-experience-designer` (VR comfort and locomotion, seated, standing and
+  room-scale play, world scale, calibration and interaction) reports to
+  `game-designer`. Each of those three directors gains one line naming its new
+  report. No skill starts them: on Godot, Unity, Unreal and Web they are
+  reached through their descriptions, the roster and their directors' lines,
+  and their handoffs to the Godot, Unity and Unreal specialists are one-way.
+  The agent lists (`agent-roster.md`, `engine-development-coverage.md`,
+  `README.md`, `docs/WORKFLOW-GUIDE.md`, `studio-tests/catalog.yaml`,
+  `studio-tests/CLAUDE.md`, `studio-tests/README.md` and
+  `studio-tests/quality-rubric.md`) name them, every published agent count is
+  now 77 (`agent-check.sh` and `/skill-test` included), and `model-tiers.md`
+  counts them under `inherit`. The `docs/WORKFLOW-GUIDE.md` table "I need to
+  do X -- which agent do I use?" also gains a `Godot C# help` row for the
+  existing `godot-csharp-specialist`, which the 1.3.0 table left out.
+- `technical-artist` gains "DCC Interchange" (exchange formats per asset type,
+  and scale, units, up-axis and handedness as each format defines them,
+  extending its Key Responsibilities 4 and 6) and "Character Technology" (rigs,
+  skinning, facial rigs and blendshapes, mocap data for the runtime); both
+  apply on every project.
+- `qa-lead` gains "VR Test Evidence", `release-manager` gains "VR Store
+  Certification" (added to the block `platform.cert_tier` selects, never in its
+  place) and `performance-analyst` gains "VR Frame Budgets". These three
+  sections apply only when `platform.targets` contains `XR`; any other project
+  gets no XR question beyond the platform question's XR option, and no XR item
+  in a checklist or verdict, with no skip line. `config-resolution.md` and
+  `effects-map.md` document `platform.targets` and its `XR` value.
+- The one-shot's VR card in `.claude/genres/online-and-devices.md` no longer
+  says the framework has no route for VR: the one-shot still builds a
+  flat-screen browser game, and the card adds that a VR game starts with
+  `/setup-engine` and the target `XR`. An existing VR project sets
+  `platform.targets` with `XR` (see UPGRADING.md, After Upgrading).
+
+- **25 agents**, used only on a Custom project: `chief-engine-architect`
+  (beside `technical-director`, owns engine internals and the frame budget) and
+  four teams. Core (`core-systems-lead`): `memory-allocator-specialist`,
+  `concurrency-job-system-engineer`, `ecs-dod-architect`, `platform-engineer`,
+  `world-streaming-engineer`, `online-services-engineer`,
+  `asset-build-tooling-engineer`. Rendering (`rendering-lead`):
+  `rhi-backend-engineer`, `render-graph-specialist`, `shader-pipeline-engineer`,
+  `graphics-features-engineer`, `vfx-runtime-engineer`. Simulation
+  (`simulation-systems-lead`): `physics-simulation-engineer`,
+  `animation-systems-engineer`, `scripting-runtime-engineer`,
+  `audio-engine-engineer`. Editor (`editor-architect`): `level-editor-engineer`,
+  `editor-ui-framework-engineer`, `cinematics-sequencer-engineer` (cameras and
+  the cinematics runtime); the editor UI framework (own retained UI, Qt 6,
+  Dear ImGui or a web UI) is an ADR choice. Docs: `engine-technical-writer`.
+  One architect, four leads, twenty specialists. 77 agents. On Custom,
+  `/team-audio` sends Step 3's engine-side audio work to
+  `audio-engine-engineer`; other engines keep the 1.3.0 specialist.
+- **One layout file**: `.claude/docs/custom-engine-layout.md` is the single
+  statement of path → rule → owner → lead, with a Lead column. `tools/` is
+  split into rows: `tools/ci/`, `tools/build/` and `tools/cook/` (CI and build
+  scripts, the cook-side tools) go to `asset-build-tooling-engineer` under
+  `core-systems-lead`; `tools/asset-pipeline/`, `tools/validators/` and
+  `tools/reports/` (standalone pipeline and batch tools, validators, report
+  generators) go to `tools-programmer` under `lead-programmer`; both rows load
+  `tools-code.md`; `tools/editor/` is `editor-architect`'s; and `tools/`
+  itself is the catch-all for any other tool, `asset-build-tooling-engineer`
+  under `core-systems-lead`, with no rule, since `tools/` exists on every
+  engine. Agents, skills and docs that routed by module
+  now refer to it instead of keeping a copy, and a path with no row has no
+  owner: `/code-review` reports it `NOT ASSESSED — no layout row`, `/dev-story`
+  blocks. Its precedence rule settles overlapping rows: every row that covers a
+  path adds its rule, and the owner and lead come from the most specific row.
+  `network-programmer` owns `engine/net/` under `core-systems-lead` and
+  `game/src/net/` under `lead-programmer`.
+- **6 skills**: `/benchmark-report` (frame-time P50/P95/P99, CPU or GPU bound,
+  from a profiler capture or benchmark output), `/memory-audit` (allocators,
+  leaks, use-after-free risks, from sanitizer or Miri output),
+  `/team-frame-pipeline` (a change to the main tick or frame graph),
+  `/api-review` (a change to the engine's public surface: C++ headers, Rust
+  `pub` API, C ABI), `/perf-regression-triage` (confirm, bisect and attribute a
+  `/benchmark-report` regression and open the bug) and `/engine-release` (cut
+  an engine version for the game teams: semver plan, changelog, migration
+  guide, sign-off). The two reports say `NOT ASSESSED` when there is nothing to
+  read. 81 skills. `/benchmark-report`'s statistics come from the new
+  read-only helper `.claude/scripts/frame-stats.sh`, and its `Bash(sort *)` and
+  `Bash(file *)` permissions are gone. `/api-review` records the `Base:`,
+  `Head:` and `Reviewed commits:` hashes, and `/engine-release` matches
+  API-review coverage by commit hash and reads a `custom:nonzero` test row as
+  FAIL. `/team-frame-pipeline` prints the `/benchmark-report` command for you to
+  run instead of running it, so an unattended run reports its benchmark NOT
+  ASSESSED.
+- **Stories for engine work**: on Custom, at `modes.workflow` standard or full,
+  a module spec, `docs/architecture/modules/<module>.md`, stands in for the GDD
+  in `/create-epics` (one epic per module spec, slugged `engine-<module>`, at
+  `production/epics/engine-<module>/`), `/create-stories`,
+  `/story-readiness` and `/story-done`. An engine story names `**Module**:`
+  where a game story names `**GDD**:`, quotes its acceptance criteria from the
+  spec's section 10, and carries a `Frame pipeline: yes | no` line.
+  `/story-done` closes a `yes` story only with a `/team-frame-pipeline` record
+  or a `/benchmark-report` report (`NOT ASSESSED — no perf evidence`), and
+  reads a missing line as `NOT ASSESSED — frame-pipeline scope not stated`.
+  At minimal, the default, `/create-epics` and `/create-stories` stop on a
+  Custom project with module specs and point to
+  `/project-settings modes.workflow=standard`. An engine-first project still
+  needs a game concept, a systems index and an architecture
+  (`/create-architecture`) before its first epic.
+  `/architecture-review` registers each spec's section-10 criteria as
+  `TR-[module]-NNN` in `tr-registry.yaml` and traces them to ADRs; a story
+  whose criterion has no registry entry carries `TR-[module]-???` and a
+  `NOT ASSESSED` line. `/create-architecture` layers modules from their specs.
+- **`/architecture-decision`** gains an engine mode with memory, threading,
+  latency and ABI trade-off sections. In full engine mode at
+  `review_mode: full` it writes `CEA-ADR: <verdict> (<date>[, CONCERNS
+  accepted])` under the ADR's `## Status`, and `/gate-check`'s Technical Setup
+  → Pre-Production gate reads that line.
+- **Rules**: eleven new rules, all Custom only: `engine-api-code.md` (loads for
+  every module under `engine/` and `crates/`: module dependencies, no `game/`
+  use, public API deprecation and `/api-review`, no OS or SDK type in a public
+  header), `rhi-renderer-code.md`, `ecs-math-code.md`, `simulation-code.md`,
+  `audio-code.md`, `streaming-io-code.md`, `scripting-code.md`,
+  `editor-code.md`, `tools-code.md`, `build-files.md` (CMake and Cargo files at
+  the project root and under `cmake/`, `engine/`, `crates/` and `game/` only)
+  and `third-party.md`. `engine-code.md`, `shader-code.md`, `gameplay-code.md`,
+  `test-standards.md` (module-local `tests/` and `benches/` too), `ai-code.md`,
+  `ui-code.md`, `data-files.md` and `network-code.md` gain Custom paths or a
+  Custom section. In `network-code.md` the replication model is the one an
+  Accepted ADR names: server authority and client prediction apply as written
+  to client-server; under lockstep or rollback, sourced stand-ins take their
+  place (validated inputs, a bit-exact determinism contract, state checksums,
+  the hidden-information exposure, a rollback sync test in CI). 25 rules.
+- **Engine sections in agents**; their technical statements have source
+  records in `docs/research/aaa-engine-support-2026/` (facts under NDA are
+  written `NOT SOURCEABLE`). `rendering-lead`: GPU and golden-image test
+  harness. `asset-build-tooling-engineer`: GPU test runner and CI job;
+  packaging, install chunks and patches; virtualized geometry build; encoding
+  formats. `rhi-backend-engineer`: ray-tracing acceleration structures;
+  present modes, frame pacing and VRR; console backends and NDA placement.
+  `shader-pipeline-engineer`: material system. `graphics-features-engineer`:
+  XR rendering; frame generation and latency SDKs; virtualized geometry.
+  `world-streaming-engineer`: virtualized geometry page streaming.
+  `network-programmer`: dedicated server target. `scripting-runtime-engineer`:
+  mods and UGC. `accessibility-specialist`: a Custom engine section (what the
+  runtime UI framework must expose). `security-engineer`: anti-cheat
+  integration. The rules gain package determinism (`tools-code.md`), a
+  dedicated-server preset and package (`build-files.md`), mod and downloaded
+  packages as untrusted input (`streaming-io-code.md`) and console backend
+  placement (`rhi-renderer-code.md`); `qa-lead`, `release-manager`,
+  `online-services-engineer`, `devops-engineer`, `audio-engine-engineer` and
+  `platform-engineer` gain the handoff lines to these owners.
+  `platform-engineer`: XR platform options (standalone headsets and
+  passthrough are ADR options; the ADR records the device's GPU class, thermal
+  limits and refresh rates, and the agent asserts none). `audio-engine-engineer`:
+  XR audio listener (an ADR records the `XrTime` at which the listener's head
+  pose is located). Both apply only when `platform.targets` contains `XR`, and
+  `cea-frame-budget.md` reports an XR project with
+  `performance.target_framerate` unset as NOT ASSESSED. `ecs-dod-architect`:
+  numerics (each numeric guarantee of `engine/math/` is an ADR decision:
+  precision per type, contraction, transcendental accuracy, the large-world
+  strategy, quaternion renormalization, near-singular inversion, robust
+  predicates); `ecs-math-code.md` requires a ULP bound or a tolerance per math
+  function, and `level-editor-engineer` and `world-streaming-engineer` apply
+  the large-world ADR owned by `ecs-dod-architect`. `chief-engine-architect`:
+  a research route (a question, an engine spike in `prototypes/`, a
+  measurement against the budgets, an ADR option; nothing merges into
+  `engine/` without an accepted ADR), which `/prototype` spike mode offers as
+  an engine spike on Custom. On Custom, `/vertical-slice` offers an engine
+  tech-demo path: each capability with its module owner, budget and evidence,
+  the demo build owned by `asset-build-tooling-engineer`, the footage by
+  `cinematic-designer`, and render-to-movie footage rejected as performance
+  evidence. `.claude/docs/engine-industry-lessons.md` (Custom only) records
+  lessons that the studios of in-house engines published (Frostbite, Naughty
+  Dog, id Tech, Decima, Northlight, Snowdrop, Minecraft Bedrock), each dated,
+  with the problem it solved and its cost (each `NOT SOURCEABLE` where the
+  studio states none) and its source, as inputs to ADR options;
+  `chief-engine-architect`, `render-graph-specialist`,
+  `concurrency-job-system-engineer`, `editor-architect`,
+  `graphics-features-engineer`, `shader-pipeline-engineer`,
+  `asset-build-tooling-engineer` and `world-streaming-engineer` each point to
+  the entries that bear on their module in one line.
+- **Templates**: `memory-invariants.md`, `frame-budget.md` and
+  `engine-module-spec.md`. 65 templates. The ADR template carries the six
+  engine-mode sections inside an HTML comment, so on Godot, Unity, Unreal and
+  Web `adr-status.sh` reports 17 template sections and no missing engine
+  section, as in 1.3.0. `frame-budget.md` has an XR section, "XR —
+  display-locked frame", that applies only when `platform.targets` contains
+  `XR`: it reads the refresh rate from `performance.target_framerate`, points
+  to `performance-analyst`'s "VR Frame Budgets" for the budget and missed
+  display deadlines, adds the OpenXR frame-submission rules, and records what
+  the display shows after a miss as runtime-defined (`NOT SOURCEABLE`).
+- **Tests and CI**: `test-run.sh custom` reads CTest and `cargo test` output;
+  zero tests run is never a pass, and with both runners in `commands.test` each
+  is read and the worse result wins. `test-scaffold.sh custom` makes the three
+  test folders and a CI workflow that builds first, then passes only on a
+  `custom:ctest-pass` or `custom:cargo-pass` row; a runner read by exit code
+  only fails it with `runner not recognised`. Its README uses the five story
+  types (Logic, Integration, Visual/Feel, UI, Config/Data) with a note on
+  benchmarks, and a Custom project with no pinned version is written
+  `Custom (version NOT DETERMINED)` with no `engine_version` NEEDS row.
+  `coding-standards.md` gains the Custom CI entry and, for Custom, golden-image
+  tests where a GPU runner exists. `/dev-story` may run `test-run.sh custom`;
+  every skill that runs it is granted that exact command (`/setup-engine`:
+  exactly `test-run.sh custom --no-build`), with no wildcard.
+- **Hooks**: on Custom only, `validate-commit.sh` validates `game/data/` JSON,
+  `detect-gaps.sh` looks for code in `engine/` and `game/`, suggests
+  `engine/[module]`, counts only `docs/architecture/adr-*.md` as ADRs and reads
+  the whole code root for its planning and stage checks, `write-guard.sh` takes
+  its code roots from the layout folders that exist (`engine/`, `game/`,
+  `crates/`, `tools/editor/`), and `yaml-helper.sh`, `project-state.sh` and
+  `code-markers.sh` skip `build/`, `target/`, `out/` and vendored code
+  (`third_party/`, `external/`, `vendor/`) and scan `tools/`. `/sprint-plan` on
+  Custom checks scenes by name and says the scene search did not run.
+- **Permissions**: `settings.json` denies `git diff *--output*`,
+  `git log *--output*`, `git show *--output*` and `git rev-list *--output*`
+  (Bash and PowerShell) on every engine. Those four accept `--output=<file>`, so
+  the new skills' read-only git permissions could otherwise write a file
+  without asking (`git rev-list --output=<file> HEAD` creates or truncates the
+  file, git 2.52.0). The display-only `--output-indicator-*` options of
+  `git diff`, `git log`, `git show` and `git rev-list` are refused as well, and
+  so is any of these commands whose text contains `--output`, such as a
+  read-only history search for it (`git log -S--output`,
+  `git log --grep=--output`); a commit message naming the flag is not.
+- **After a compaction or `/clear`**, `session-start.sh` re-prints a Custom
+  project's frame budget, Accepted ADR titles and the start of
+  `docs/architecture/memory-invariants.md` (up to 40 lines), and reminds that
+  the public headers and `lib.rs` traits are the interface of record.
+  `pre-compact.sh` logs the frame budget, the Accepted ADR titles and whether
+  `memory-invariants.md` exists.
+- **Run and observe**: a Custom engine runs `commands.run` with a frame cap,
+  windowed unless the engine renders off-screen on a real GPU, and keeps a
+  screenshot from its own capture or RenderDoc/PIX; with no capture path the
+  visual evidence is `NOT ASSESSED`.
+- **How this was checked**: the new skills' and agents' behaviour is specified
+  in spec cases under `studio-tests/` (each shared agent with Custom text has a
+  Custom and a non-Custom case) and checked structurally by
+  `test_engine_support.py`, `test_engine_scope.py`,
+  `test_engine_rules_scope.py`, `test_engine_authoring.py`,
+  `test_engine_new_skills.py`, `test_engine_accuracy.py`,
+  `test_engine_accuracy_gpu.py`, `test_engine_phase8.py`,
+  `test_engine_phase8b.py`, `test_engine_phase9.py`, `test_engine_phase11.py`,
+  `test_engine_phase12.py`, `test_engine_records.py`,
+  `test_engine_shared_guard.py` and `test_custom_ci.py`;
+  `check_audio_examples.py` compiles the audio rule's examples (needs `rustc`).
+  None of it was run in a live session.
+
+---
+
 ## [1.3.0] — 2026-11-09
 
 **"Make me a game" is the main road: `/prototype` asks a few questions, writes a

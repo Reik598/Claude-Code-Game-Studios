@@ -13,7 +13,7 @@
 # /smoke-check, which also decides what an unmatched exit code means.
 #
 # Usage: bash .claude/scripts/test-run.sh <engine> [options]
-#   <engine>            godot, unity, unreal or web (any case)
+#   <engine>            godot, unity, unreal, web or custom (any case)
 #   --cmd COMMAND       the test command to run, instead of project.yaml's
 #                       commands.test or the engine's default
 #   --exe PATH          the editor executable (default: the one commands.test
@@ -30,7 +30,7 @@
 #                       tests/unit/ runs Vitest on it alone, one under
 #                       tests/integration/ runs Playwright on it alone, and an
 #                       @tag runs Playwright's tests with that tag
-#   --no-build          unreal only: skip the build that comes first
+#   --no-build          unreal and custom: skip the build that comes first
 #   --tool T            force the timeout tool: timeout, gtimeout, perl or none (the
 #                       tests use this to reach the perl and no-tool paths)
 #   --log FILE          keep the runner's output here (default: a temp file); the
@@ -69,14 +69,30 @@
 # say. A package manager's test command over a package.json with no test script
 # (or npm's placeholder, "no test specified") runs nothing: web:no-test-script.
 #
+# custom (a project that builds its own engine): the test command is --cmd, else
+# commands.test, else `cargo test` when a Cargo.toml is at the root; a CMake
+# project has no default (its build folder and preset are its own), so it needs
+# commands.test (custom:no-test-command). commands.build, when set, runs first as
+# the build step (CTest runs what was built, it builds nothing), and a build
+# that fails runs no test. The runner is read from the command: CTest (`ctest`)
+# and cargo (`cargo test`) by their output, any other by its exit code only. A
+# command that reaches both is read by each, apart, and its rule is the worse of
+# the two (failed > compile-failed > zero > unread > pass): a pass needs both.
+# Both exit 0 when they found no test (CTest: "No tests were found!!!"; cargo:
+# every "test result:" line counts 0), so the zero-tests reading decides that,
+# never the exit code.
+#
 # Output: TSV, in this order (a row that cannot apply is left out).
-#   engine      <Godot|Unity|Unreal|Web>
+#   engine      <Godot|Unity|Unreal|Web|Custom>
 #   exe         <path|->  <commands.test|engine.path|path|--exe|->
 #   command     <--cmd|commands.test|default>  <the command>
 #   import      <command> | - <skipped: why>                godot, before the tests
-#   build       <command> | - <skipped: why>                unreal, before the tests
+#   build       <command> | - <skipped: why>                unreal, custom, before the tests
 #   timeout     <seconds>  <timeout|gtimeout|perl|none>
 #   runner      <vitest,jest,playwright|other>  <read from>   web, any other command
+#   runner      <ctest|cargo|ctest,cargo|other>  <read from>  custom
+#   reading     <ctest|cargo>   custom, ctest,cargo: before that runner's
+#                               zero_tests, tests, failed and evidence rows
 #   precheck    <what>  <present|absent>
 #   import_exit, build_exit   <code>                        when it ran
 #   import_timed_out, build_timed_out   <yes|no>            when it ran
@@ -110,7 +126,10 @@
 # unreal:mac-unsourced, unreal:build-failed, unreal:result-fail,
 # unreal:no-tests-matched, unreal:pass, unreal:other-nonzero, web:0, web:nonzero,
 # web:pass, web:failed, web:zero-tests, web:build-failed, web:no-browser,
-# web:no-test-script.
+# web:no-test-script, custom:no-test-command, custom:build-failed,
+# custom:ctest-pass, custom:ctest-failed, custom:ctest-zero, custom:cargo-pass,
+# custom:cargo-failed, custom:cargo-zero, custom:cargo-compile-failed, custom:0,
+# custom:nonzero.
 #
 # Exit codes: 0 the helper finished (whatever the tests did: read the rows);
 # 1 cannot read the root or write the log; 2 usage error; 3 unknown engine.
@@ -152,7 +171,8 @@ case "$(printf '%s' "$ENGINE_ARG" | tr 'A-Z' 'a-z')" in
   unity) ENGINE=unity; ENAME=Unity ;;
   unreal) ENGINE=unreal; ENAME=Unreal ;;
   web) ENGINE=web; ENAME=Web ;;
-  *) echo "test-run: '$ENGINE_ARG' is not an engine this knows (godot, unity, unreal, web)" >&2; exit 3 ;;
+  custom) ENGINE=custom; ENAME=Custom ;;
+  *) echo "test-run: '$ENGINE_ARG' is not an engine this knows (godot, unity, unreal, web, custom)" >&2; exit 3 ;;
 esac
 case "$PLATFORM" in editmode|playmode) ;; *) usage "--platform is editmode or playmode" ;; esac
 case "$OS_ARG" in ""|windows|linux|macos) ;; *) usage "--os is windows, linux or macos" ;; esac
@@ -173,7 +193,7 @@ yget() { [ -f project.yaml ] && YG_PATH="$1" awk -f "$HERE/yaml-get.awk" project
 printf 'engine\t%s\n' "$ENAME"
 
 # --- the editor executable ----------------------------------------------------
-CFG_TEST=$(yget commands.test); ENGINE_PATH=$(yget engine.path)
+CFG_TEST=$(yget commands.test); ENGINE_PATH=$(yget engine.path); CFG_BUILD=$(yget commands.build)
 # exe_ok P — an existing file, or a command found on PATH.
 exe_ok() { [ -n "$1" ] && { [ -f "$1" ] || command -v "$1" >/dev/null 2>&1; }; }
 EXE=""; EXE_SRC="-"
@@ -201,6 +221,7 @@ else
   elif [ "$ENGINE" = godot ] && exe_ok godot; then EXE="godot"; EXE_SRC="path"
   elif [ "$ENGINE" = unity ] && exe_ok Unity; then EXE="Unity"; EXE_SRC="path"
   elif [ "$ENGINE" = web ] && exe_ok npm; then EXE="npm"; EXE_SRC="path"
+  elif [ "$ENGINE" = custom ] && [ -f Cargo.toml ] && exe_ok cargo; then EXE="cargo"; EXE_SRC="path"
   fi
 fi
 printf 'exe\t%s\t%s\n' "${EXE:--}" "$EXE_SRC"
@@ -263,6 +284,11 @@ is_timeout() {
 ABS=$(pwd -W 2>/dev/null || pwd)
 RESULTS=""; BUILD=""; CMD=""; CMD_SRC="default"; PRE_FAIL=""; PRE_ID=""; PRE_WHY=""
 case "$ENGINE" in
+  custom)
+    # No row default (the engine table's cell is -): cargo test for a Cargo
+    # workspace; a CMake project names its own ctest command in commands.test.
+    [ -f Cargo.toml ] && CMD="cargo test 2>&1"
+    ;;
   web)
     # The engine table's test command (.claude/engines/engines.tsv).
     if [ -f "$HERE/engine-row.awk" ] && [ -f "$HERE/../engines/engines.tsv" ]; then
@@ -377,7 +403,25 @@ case "$ENGINE" in
     if [ "$NOBUILD" = 1 ]; then PRE_WHY="skipped: --no-build"
     elif [ -z "$EXE" ]; then PRE_WHY="skipped: no UE root (--exe or engine.path)"
     else PRE_CMD="$BUILD"; fi ;;
+  custom)
+    PRE_NAME=build
+    if [ "$NOBUILD" = 1 ]; then PRE_WHY="skipped: --no-build"
+    elif [ -z "$CFG_BUILD" ]; then PRE_WHY="skipped: no commands.build (the test command must build what it tests)"
+    else PRE_CMD="$CFG_BUILD 2>&1"; fi ;;
 esac
+# custom: the runner the test command reaches, read from the command.
+CUSTOM_RUNNER=""
+if [ "$ENGINE" = custom ] && [ -n "$CMD" ]; then
+  _has_ctest=no; _has_cargo=no
+  printf ' %s ' "$CMD" | grep -qE '[ /\\"(]ctest(\.exe)?[ "]' && _has_ctest=yes
+  printf ' %s ' "$CMD" | grep -qE '[ /\\"(]cargo(\.exe)?"? +test[ ]' && _has_cargo=yes
+  case "$_has_ctest$_has_cargo" in
+    yesyes) CUSTOM_RUNNER=both ;;
+    yesno) CUSTOM_RUNNER=ctest ;;
+    noyes) CUSTOM_RUNNER=cargo ;;
+    *) CUSTOM_RUNNER=other ;;
+  esac
+fi
 [ -n "$CMD" ] && printf 'command\t%s\t%s\n' "$CMD_SRC" "$CMD"
 if [ -n "$PRE_CMD" ]; then printf '%s\t%s\n' "$PRE_NAME" "$PRE_CMD"
 elif [ -n "$PRE_NAME" ]; then printf '%s\t-\t%s\n' "$PRE_NAME" "$PRE_WHY"; fi
@@ -394,6 +438,11 @@ if [ "$ENGINE" = web ] && [ "$HALVES" = 0 ] && [ -n "$CMD" ]; then
   if [ -n "$WEB_RUNNERS" ]; then printf 'runner\t%s\t%s\n' "$(printf '%s' "$WEB_RUNNERS" | tr ' ' ',')" "$WEB_RSRC"
   else printf 'runner\tother\tno Vitest, Jest or Playwright in %s: read by exit code only\n' "$WEB_RSRC"; fi
 fi
+case "$CUSTOM_RUNNER" in
+  ctest|cargo) printf 'runner\t%s\tthe command\n' "$CUSTOM_RUNNER" ;;
+  both) printf 'runner\tctest,cargo\tthe command: each read apart, the rule is the worse of the two\n' ;;
+  other) printf 'runner\tother\tno ctest or cargo test in the command: read by exit code only\n' ;;
+esac
 
 # --- prechecks ----------------------------------------------------------------
 ran_no() { printf 'ran\tno\t%s\n' "$2"; printf 'rule\t%s\t%s\n' "$1" "$3"; exit 0; }
@@ -418,6 +467,8 @@ case "$ENGINE" in
   web)
     [ -n "$CMD" ] || ran_no runner-unavailable "no test command (--cmd, commands.test or the engine table)" "no test command was found, so the tests could not be run here"
     [ -z "$NO_TEST_SCRIPT" ] || ran_no web:no-test-script "$NO_TEST_SCRIPT" "the project has no test script, so no test ran" ;;
+  custom)
+    [ -n "$CMD" ] || ran_no custom:no-test-command "no test command (--cmd, commands.test, or a Cargo.toml for cargo test)" "no test command is set: a CMake project names its ctest command in commands.test, so no test ran" ;;
 esac
 if [ -z "$EXE" ] && [ "$CMD_SRC" = default ]; then
   ran_no runner-unavailable "no editor executable (commands.test, engine.path, PATH)" "the engine executable was not found, so the tests could not be run here"
@@ -521,11 +572,20 @@ fi
 # is a failure): the editor would load the last good binaries, or none.
 if [ "$PRE_NAME" = build ] && [ -n "$PRE_CMD" ] && [ "$PRE_CODE" != 0 ]; then
   if [ "$PRE_TIMED" = yes ]; then
-    printf 'ran\tno\tthe editor build timed out after %ss\n' "$TIMEOUT"
+    if [ "$ENGINE" = custom ]; then
+      printf 'ran\tno\tthe build timed out after %ss\n' "$TIMEOUT"
+    else
+      printf 'ran\tno\tthe editor build timed out after %ss\n' "$TIMEOUT"
+    fi
     printf 'rule\ttimeout\tthe build did not complete: timed out after %ss, so nothing was verified\n' "$TIMEOUT"
   else
-    printf 'ran\tno\tthe editor build failed (exit %s)\n' "$PRE_CODE"
-    printf 'rule\tunreal:build-failed\tthe editor build failed, so no test ran\n'
+    if [ "$ENGINE" = custom ]; then
+      printf 'ran\tno\tthe build failed (exit %s)\n' "$PRE_CODE"
+      printf 'rule\tcustom:build-failed\tcommands.build failed, so no test ran\n'
+    else
+      printf 'ran\tno\tthe editor build failed (exit %s)\n' "$PRE_CODE"
+      printf 'rule\tunreal:build-failed\tthe editor build failed, so no test ran\n'
+    fi
   fi
   printf 'pre_log\t%s\n' "$PRE_LOG"
   exit 0
@@ -534,6 +594,10 @@ if [ "$ENGINE" = web ]; then
   # NO_COLOR, and the colour codes that still come stripped, so the lines read plainly.
   ESC=$(printf '\033')
   run_timed "$TIMEOUT" "export NO_COLOR=1; $CMD" 2>&1 | sed "s/${ESC}\\[[0-9;]*[A-Za-z]//g" | tr -d '\r' > "$LOG"
+  CODE=${PIPESTATUS[0]}
+elif [ "$ENGINE" = custom ]; then
+  # CR stripped: MSVC, CTest and cargo on Windows end their lines with it.
+  run_timed "$TIMEOUT" "$CMD" 2>&1 | tr -d '\r' > "$LOG"
   CODE=${PIPESTATUS[0]}
 else
   run_timed "$TIMEOUT" "$CMD" > "$LOG" 2>&1
@@ -558,6 +622,17 @@ list_failed() {
 }
 RULE_ID="-"; RULE_TXT="no row of the ladder fits"
 set_rule() { RULE_ID="$1"; RULE_TXT="$2"; }
+# custom_rank RULE_ID — how bad one runner's rule is, for a Custom command that
+# reaches both runners: failed > compile-failed > zero > unread > pass.
+custom_rank() {
+  case "$1" in
+    custom:cargo-compile-failed) echo 4 ;;
+    *-failed) echo 5 ;;
+    *-zero) echo 3 ;;
+    *-pass) echo 1 ;;
+    *) echo 2 ;;
+  esac
+}
 case "$ENGINE" in
   godot)
     marker=$(first_line 'No test cases found')
@@ -662,6 +737,73 @@ case "$ENGINE" in
       elif [ "$CODE" = 0 ]; then set_rule web:0 "exit 0, but no $_rn summary line was read, so a run of zero tests looks the same"
       else set_rule web:nonzero "the test command failed (exit $CODE) with no failed test or zero-tests line read ($_rn)"; fi
     fi ;;
+  custom)
+    # A command that reaches both runners (`ctest && cargo test`) is read by
+    # each in turn, apart, under a `reading` row; the rule is the worse of the
+    # two (custom_rank), so a pass needs both to pass.
+    _runners="$CUSTOM_RUNNER"; [ "$CUSTOM_RUNNER" = both ] && _runners="ctest cargo"
+    _worst=""; _worst_txt=""; _each=""
+    for _rn in $_runners; do
+    [ "$CUSTOM_RUNNER" = both ] && printf 'reading\t%s\n' "$_rn"
+    case "$_rn" in
+      ctest)
+        # CTest 3.x/4.x: "No tests were found!!!" (exit 0 unless --no-tests=error),
+        # "<p>% tests passed, <f> tests failed out of <t>" (CTest 4 drops the
+        # middle part when none failed: "100% tests passed out of <t>"), then the
+        # failing names under "The following tests FAILED:".
+        marker=$(first_line 'No tests were found')
+        sl=$(first_line '[0-9]+% tests passed(, [0-9]+ tests? failed)? out of [0-9]+')
+        nf=$(printf '%s\n' "$sl" | sed -n -E 's/.*, ([0-9]+) tests? failed out of.*/\1/p')
+        nt=$(printf '%s\n' "$sl" | sed -n -E 's/.* out of ([0-9]+).*/\1/p')
+        [ -n "$nt" ] && nf=${nf:-0}
+        if [ -n "$marker" ]; then printf 'zero_tests\tyes\t%s\n' "$marker"
+        elif [ -n "$nt" ] && [ "$nt" = 0 ]; then printf 'zero_tests\tyes\t%s\n' "$sl"; marker="$sl"
+        else printf 'zero_tests\tno\t-\n'; fi
+        if [ -n "$nt" ]; then printf 'tests\ttotal=%s passed=%s failed=%s\n' "$nt" "$((nt - nf))" "$nf"
+        else printf 'tests\t-\tno CTest summary line was read\n'; fi
+        awk '/The following tests FAILED:/ { on = 1; next } on && /^[ \t]+[0-9]+ - / { print; next } on { exit }' "$LOG" > "$LOG.failed"
+        list_failed '.' "$LOG.failed"; rm -f "$LOG.failed"
+        if [ -n "$nf" ] && [ "$nf" -gt 0 ]; then set_rule custom:ctest-failed "a test failed ($nf of $nt)"
+        elif [ -n "$marker" ]; then set_rule custom:ctest-zero "CTest found no tests ($marker), which is not a pass"
+        elif [ "$CODE" = 126 ] || [ "$CODE" = 127 ]; then set_rule runner-unavailable "ctest did not start (command not found or not executable)"
+        elif [ "$CODE" = 0 ] && [ -n "$nt" ]; then set_rule custom:ctest-pass "exit 0; tests passed: $nt"
+        elif [ "$CODE" = 0 ]; then set_rule custom:0 "exit 0, but no CTest summary line was read, so a run of zero tests looks the same"
+        else set_rule custom:nonzero "ctest exited $CODE with no failed test or zero-tests line read"; fi ;;
+      cargo)
+        # cargo test: one "test result: ok|FAILED. <p> passed; <f> failed; ..." line
+        # per test binary (unit, integration, doc-tests); every one 0 is zero tests.
+        nres=$(grep -E -c '^test result: ' "$LOG"); nres=${nres:-0}
+        np=$(grep -E '^test result: ' "$LOG" | sed -n -E 's/.* ([0-9]+) passed;.*/\1/p' | awk '{ s += $1 } END { print s + 0 }')
+        nf=$(grep -E '^test result: ' "$LOG" | sed -n -E 's/.* ([0-9]+) failed;.*/\1/p' | awk '{ s += $1 } END { print s + 0 }')
+        comp=$(first_line '^error(\[E[0-9]+\])?: (could not compile|aborting)|^error\[E[0-9]+\]')
+        if [ "$nres" -gt 0 ] && [ "$((np + nf))" = 0 ]; then printf 'zero_tests\tyes\tevery test result line counts 0 tests\n'; zero=1
+        elif [ "$nres" = 0 ]; then printf 'zero_tests\tunknown\tno test result line was read\n'; zero=0
+        else printf 'zero_tests\tno\t-\n'; zero=0; fi
+        printf 'tests\ttotal=%s passed=%s failed=%s\n' "$((np + nf))" "$np" "$nf"
+        list_failed '(\.\.\. FAILED|--- FAILED)$' "$LOG"
+        if [ "$nf" -gt 0 ]; then set_rule custom:cargo-failed "a test failed ($nf)"
+        elif [ -n "$comp" ] && [ "$CODE" != 0 ]; then printf 'evidence\t%s\n' "$comp"; set_rule custom:cargo-compile-failed "the crate did not compile, so no test ran"
+        elif [ "$zero" = 1 ]; then set_rule custom:cargo-zero "cargo test ran zero tests, which is not a pass"
+        elif [ "$CODE" = 126 ] || [ "$CODE" = 127 ]; then set_rule runner-unavailable "cargo did not start (command not found or not executable)"
+        elif [ "$CODE" = 0 ] && [ "$np" -gt 0 ]; then set_rule custom:cargo-pass "exit 0; tests passed: $np"
+        elif [ "$CODE" = 0 ]; then set_rule custom:0 "exit 0, but no test result line was read, so a run of zero tests looks the same"
+        else set_rule custom:nonzero "cargo test exited $CODE with no failed test, compile error or zero-tests line read"; fi ;;
+      *)
+        printf 'zero_tests\tunknown\tthe test command is read by its exit code only\n'
+        case "$CODE" in
+          0) set_rule custom:0 "exit 0: the test command passed (read by exit code only, so a run of zero tests looks the same)" ;;
+          126|127) set_rule runner-unavailable "the test command did not start (command not found or not executable)" ;;
+          *) set_rule custom:nonzero "the test command failed (exit $CODE; read by exit code only)" ;;
+        esac ;;
+    esac
+    if [ "$CUSTOM_RUNNER" = both ]; then
+      _each="${_each:+$_each, }$_rn: $RULE_ID"
+      if [ -z "$_worst" ] || [ "$(custom_rank "$RULE_ID")" -gt "$(custom_rank "$_worst")" ]; then
+        _worst="$RULE_ID"; _worst_txt="$_rn: $RULE_TXT"
+      fi
+    fi
+    done
+    [ -n "$_worst" ] && set_rule "$_worst" "$_worst_txt (each runner: $_each)" ;;
 esac
 if [ "$TIMED" = yes ]; then set_rule timeout "the run did not complete: timed out after ${TIMEOUT}s, so nothing was verified"; fi
 printf 'rule\t%s\t%s\n' "$RULE_ID" "$RULE_TXT"

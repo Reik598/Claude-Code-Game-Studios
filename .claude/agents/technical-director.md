@@ -139,6 +139,27 @@ Architecture decisions should follow the ADR format:
 - **Performance Implications**: Expected impact on budgets
 - **Alternatives Considered**: Other approaches and why they were rejected
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- **Build vs buy**: building the engine at all, and each major subsystem
+  (physics, audio, UI, networking, navigation) vs a library, is an ADR you own
+  at project level; `chief-engine-architect` writes the engine-side analysis.
+
+| Decision | Owner |
+|---|---|
+| Whether to build the engine, platforms, team-wide stack, project-wide budgets | you |
+| Subsystem boundaries, engine APIs/ABI, per-subsystem frame budgets, engine internals | `chief-engine-architect` |
+| A conflict between the two, or between engine and game | you (`coordination-rules.md`, rule 3) |
+
+- **ADRs**: `TD-ADR` still reviews every ADR and you alone move one to
+  Accepted. Engine-internal ADRs also pass `CEA-ADR`; a change to the main tick
+  or frame graph passes `CEA-FRAME-BUDGET`.
+- Engine version facts come from `docs/engine-reference/custom/` — the
+  project's own pins (Vulkan SDK, Agility SDK, compilers, drivers), not an
+  engine vendor's.
+
 ### Delegation Map
 
 Delegates to:
@@ -148,6 +169,9 @@ Delegates to:
 - `devops-engineer` for build and deployment infrastructure
 - `technical-artist` for rendering pipeline decisions
 - `performance-analyst` for profiling and optimization work
+- `chief-engine-architect` for engine internals in a Custom project
+  (`engine.name: Custom`); you keep the project-wide technical call and decide
+  conflicts between you
 
 Escalation target for:
 - `lead-programmer` when a code decision affects architecture

@@ -3,7 +3,7 @@ name: test-setup
 description: "Sets up the test framework and CI: tests/ directory, engine runner, GitHub Actions workflow. Use once, before the first sprint."
 argument-hint: "[force]"
 user-invocable: true
-allowed-tools: Read, Glob, Grep, Write, Bash(grep -q 'com.unity.test-framework' Packages/manifest.json), Bash(bash .claude/scripts/test-scaffold.sh web*), Bash(bash "*/.claude/skills/test-setup/../../hooks/yaml-helper.sh" resolve_config *)
+allowed-tools: Read, Glob, Grep, Write, Bash(grep -q 'com.unity.test-framework' Packages/manifest.json), Bash(bash .claude/scripts/test-scaffold.sh web*), Bash(bash .claude/scripts/test-scaffold.sh custom*), Bash(bash .claude/scripts/test-run.sh custom), Bash(bash "*/.claude/skills/test-setup/../../hooks/yaml-helper.sh" resolve_config *)
 model: sonnet
 ---
 

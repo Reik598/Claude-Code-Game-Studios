@@ -243,7 +243,53 @@ Fixture defaults.
 
 ---
 
+### Case 6: Custom Engine — Categories 1–3 NOT SOURCEABLE, Category 7 runs
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `engine.language: C++`, `platform.multiplayer: false`, `platform.online: false`
+- `engine/assets/src/mesh_loader.cpp` line 44: `memcpy(dst, src, header.vertex_bytes);` where `header.vertex_bytes` is read from the file with no check against the buffer; `game/src/` holds the implemented game
+- `docs/engine-reference/custom/VERSION.md` exists and names no save, parser, packet or input entry points
+- No sanitizer output, no fuzz targets
+- `CMakeLists.txt` uses `FetchContent` for two libraries
+
+**Input:** `/security-audit`
+
+**Expected behavior:**
+1. Categories 1 and 3 are `NOT SOURCEABLE` — the Custom column says the patterns must come from `docs/engine-reference/custom/`, which does not name them — so each is NOT ASSESSED; no Godot pattern list is used as a stand-in; Category 2 is skipped (both platform keys `false`) and named
+2. Category 4 uses the engine-agnostic list; the log-call pattern is the project's own log macro, and the report names where it came from (`docs/engine-reference/custom/` or `engine/core/`'s logging module)
+3. Category 6 lists the `FetchContent` dependencies as well as vendored folders
+4. Category 7 runs: the unchecked `memcpy` in the mesh loader is a finding with `file:line` and an attack scenario (a crafted asset file); `Category 7 sanitizers: NOT ASSESSED — no sanitizer output`; the parser with no fuzz target is a MEDIUM finding; the pattern scan is `NOT SOURCEABLE — parser entry points are not covered by docs/engine-reference/custom/`
+5. Release recommendation is decided first-match: the memcpy finding's severity outranks NOT ASSESSED; CLEAR TO SHIP is unreachable
+6. Phase 7 guidance names the missing inputs: the project's entry points in `docs/engine-reference/custom/`, and a sanitizer and a fuzz run for Category 7, and points to `/memory-audit`
+
+**Assertions:**
+- [ ] Categories 1 and 3 are NOT ASSESSED with the NOT SOURCEABLE reason; no zero-hit scan reads as clean
+- [ ] Category 7 runs and its finding uses category `Engine memory`
+- [ ] Category 7's sanitizer and fuzzing lines are NOT ASSESSED, named in the Executive Summary
+- [ ] CLEAR TO SHIP is not reported
+- [ ] "May I write" before the report is written
+- [ ] Variant — `docs/engine-reference/custom/` names every save, input and parser entry point (so Categories 1, 3 and Category 7's pattern scan are sourced), the `memcpy` is bounds-checked, and no CRITICAL or HIGH is open; still no sanitizer output and no fuzz run: Category 7 is **NOT ASSESSED** with `Category 7 sanitizers: NOT ASSESSED — no sanitizer output` and `Category 7 fuzzing: NOT ASSESSED — ...` as its reasons, and the release recommendation is **NOT ASSESSED**, never CLEAR TO SHIP; with an open HIGH as well, the recommendation is FIX BEFORE SHIPPING and Category 7's gap is named beside it
+
+---
+
+### Case 7: Non-Custom Engine — Category 7 skipped and named, the rest unchanged
+
+**Fixture:** As Case 1 (single-player Godot project, no findings).
+
+**Input:** `/security-audit`
+
+**Expected behavior:** Categories 1–6 run as in Case 1 with the Godot lists; the Executive Summary says `Category 7 — skipped: engine.name is Godot, not Custom`; the release recommendation equals Case 1's.
+
+**Assertions:**
+- [ ] Category 7 is named as skipped with its reason, not silently absent
+- [ ] Case 1's assertions all still hold; no Custom wording or `engine/` path appears in the findings
+
+---
+
 ## Protocol Compliance
+
+- [ ] A fuzz target, corpus and CI YAML with no completed run receipt leave fuzzing NOT ASSESSED; they cannot unlock CLEAR TO SHIP
+- [ ] A completed fuzz receipt identifies target, command, build/commit, duration or executions, exit and findings; stale or unknown-build receipts leave the current parser unassessed
 
 - [ ] Reads `engine.name`, `engine.language` and the `platform.*` keys from `project.yaml` before auditing
 - [ ] Spawns `security-engineer` via `Agent` with the fixed brief template — only its named slots filled (scope, engine/language, `platform.*` values, the resolved code root, `assets/data/` and config files, the categories, the report path) — and no sentence of the orchestrator's own: no pre-rated finding, no "single-player lowers the stakes"; an unresolved code root makes the code categories NOT ASSESSED, never clean

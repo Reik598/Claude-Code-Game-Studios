@@ -11,6 +11,7 @@
 - 4b. Director Panel Assessment: `review_mode` decides whether directors spawn, `workflow` decides the panel width
 - Gate IDs
 - Naming the omissions, and applying the panel to the verdict
+- Custom engine: `chief-engine-architect` (CEA gates), only when `engine` is `Custom`
 
 For items that can't be automatically verified, **ask the user**:
 
@@ -143,5 +144,69 @@ Art Director:       [READY / CONCERNS / NOT READY / NOT ASSESSED]
 - Any director returns CONCERNS → verdict is minimum CONCERNS
 - Any director returns NOT ASSESSED (and none returned NOT READY or CONCERNS) → verdict at best NOT ASSESSED; name the input that director said was missing — it never counts as READY
 - Every director that ran returns READY → eligible for PASS (still subject to artifact and quality checks from Section 3)
+
+### Custom engine: chief-engine-architect
+
+**Only when the resolved `engine` line reads `Custom`** and the loaded gate
+file's `## Custom engine additions` block names a CEA gate. On any other engine
+this subsection does not run and prints nothing beyond the gate file's own
+skip line.
+
+`review_mode` decides whether it runs, by the shared rule in
+`.claude/docs/director-gates.md`: CEA-ADR and CEA-FRAME-BUDGET are not
+PHASE-GATEs, so only `full` runs them.
+- `solo` → skip, and print `CEA-[gate] skipped — Solo mode`, naming the gate
+  this phase would have run (`CEA-ADR` or `CEA-FRAME-BUDGET`).
+- `lean` → skip, and print `CEA-[gate] skipped — Lean mode` the same way. Lean
+  runs the four PHASE-GATEs only; the CEA gates are per-skill gates, as they are
+  in `/team-frame-pipeline` and `/architecture-decision`.
+- `full` → run.
+
+A skipped CEA gate stays out of the verdict, as the panel's own skip does, and
+the line above names it in the report, so the reader sees that no
+`chief-engine-architect` review happened. `workflow` does **not** narrow it away: at
+every tier where the gate file keeps the CEA item, `chief-engine-architect`
+(Opus) is spawned in parallel with the panel's directors — engine internals are
+outside every phase-gate director's domain, and `technical-director` keeps the
+whole-project call. Where the tier reduction drops the CEA item, print
+`chief-engine-architect not run — CEA item not required at workflow: [tier]`.
+
+| Gate | CEA gate | One `Agent` call per |
+|---|---|---|
+| Technical Setup → Pre-Production | **CEA-ADR** (`.claude/docs/director-gates/cea-adr.md`) | core engine ADR with no `CEA-ADR: <verdict> (<date>…)` line under `## Status` |
+| Pre-Production → Production | **CEA-FRAME-BUDGET** (`.claude/docs/director-gates/cea-frame-budget.md`) | the baseline `/benchmark-report` |
+| Production → Polish | **CEA-FRAME-BUDGET** | the newest `/benchmark-report`, against the baseline |
+| Polish → Release | **CEA-FRAME-BUDGET** | the release candidate's report, per target platform |
+
+The `Agent` prompt tells the agent to read the gate file first; this session
+does not. If the file does not exist, the item is `NOT ASSESSED — gate
+definition not found`. Pass the context the gate file lists — the ADR path, or
+the report paths with tool, machine, GPU and build preset — and
+`performance.frame_budget_ms` and `performance.target_framerate`, read from
+`project.yaml` (else `technical-preferences.md`) as the performance check in
+`3-run-gate-check.md` reads them, or "unset". When
+the input a call would review does not exist (no ADR, no report), make no call
+and print `CEA-[gate] not run — no [ADR | /benchmark-report] to review`: the
+item's own missing-artifact status (Blocker, or CONCERNS where the tier made it
+recommended) already carries it.
+
+Present the result as its own row under the Director Panel summary
+(`Chief Engine Architect: [APPROVE / CONCERNS / REJECT / NOT ASSESSED]`, one
+per call) and apply it to the item it reviews:
+- **CEA-ADR** — REJECT → Blocker (the ADR cannot count as reviewed); CONCERNS
+  → CONCERNS; NOT ASSESSED → that ADR's item is NOT ASSESSED, naming the input
+  the agent said was missing; APPROVE → the ADR counts as reviewed.
+- **CEA-FRAME-BUDGET** — a frame-time verdict, so `performance.enforce`
+  (Section 3) decides its weight, with Section 3's stage rule: REJECT is a
+  breach — CONCERNS at `warn`; at `block`, a **Blocker** only from the Polish
+  gate on (Production → Polish, Polish → Release) and CONCERNS at
+  Pre-Production → Production; informational at `off`. CONCERNS is CONCERNS
+  except at `off`; NOT ASSESSED makes the frame item NOT ASSESSED; APPROVE
+  passes it. At
+  Pre-Production → Production, the "no baseline" concern is expected on the
+  first baseline and is not carried over.
+
+A CEA call that was due and did not return is a missing reviewer (Section 5's
+trigger), never a pass.
 
 ---

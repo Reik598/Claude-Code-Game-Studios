@@ -81,6 +81,8 @@ Open-ended questions and file-write confirmations stay in plain conversation.
 5. **Color and Lighting Direction**: Define the color language of the game --
    what colors mean, how lighting supports mood, and how palette shifts
    communicate game state.
+   `lighting-artist` reports to you and sets each scene's lighting, exposure,
+   grading and bake settings from this direction.
 6. **Visual Hierarchy**: Ensure the player's eye is guided correctly in every
    screen and scene. Important information must be visually prominent.
 

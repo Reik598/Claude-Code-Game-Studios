@@ -20,7 +20,7 @@
 #          [--budget KEY=SIZE ...] [--max-dim N] [--sample-rates LIST]
 #          [--name-regex ERE] [--files]
 #   --root DIR          the project; defaults to the repo this script is in
-#   --engine E          godot, unity, unreal or web (default: engine.name from
+#   --engine E          godot, unity, unreal, web or custom (default: engine.name from
 #                       project.local.yaml, then project.yaml, as content-count.sh)
 #   --category C        keep one category: on godot a folder of assets/ (art,
 #                       audio, vfx, shaders or data); on unity and unreal the
@@ -237,17 +237,18 @@ ETAB="$HERE/../engines/engines.tsv"
 [ -f "$ETAB" ] && [ -f "$HERE/engine-row.awk" ] || { echo "asset-scan: the engine table $ETAB or engine-row.awk is missing" >&2; exit 1; }
 cell() { awk -F'\t' -v engine="$RAW" -v col="$1" -f "$HERE/engine-row.awk" "$ETAB"; }
 # The asset root per engine is the skill's Phase 2, from the engine table:
-# assets/ on Godot and Web, Assets/ on Unity, Content/ on Unreal. The rules
+# assets/ on Godot, Web and Custom, Assets/ on Unity, Content/ on Unreal. The rules
 # below differ per engine, so the engine keeps its own case.
 case "$LOW" in
   godot) ENG=godot ;;
   unity) ENG=unity ;;
   unreal*) ENG=unreal ;;
   web) ENG=web ;;
+  custom) ENG=custom ;;
   *)
-    if [ "$ESRC" = flag ]; then usage "--engine takes godot, unity, unreal or web, got $RAW"; fi
+    if [ "$ESRC" = flag ]; then usage "--engine takes godot, unity, unreal, web or custom, got $RAW"; fi
     printf 'engine\t%s\t%s\n' "$RAW" "$ESRC"
-    echo "asset-scan: engine $RAW has no asset rules here (godot, unity, unreal or web)" >&2
+    echo "asset-scan: engine $RAW has no asset rules here (godot, unity, unreal, web or custom)" >&2
     exit 3 ;;
 esac
 ROOTDIR=$(cell asset_root)
@@ -517,7 +518,7 @@ fi
     else if (havefile != 1) { ratest = "not_run"; rated = "file is not installed" }
     else { ratest = "ran"; rated = (nra > 0) ? ("file -b; allowed " ENVIRON["RATES"]) : "file -b; no --sample-rates flag given, none compared" }
     if (nodata != "") { orphst = "not_run"; orphd = nodata }
-    else if (eng == "web") { orphst = "not_run"; orphd = "no reference syntax is defined for " eng }
+    else if (eng == "web" || eng == "custom") { orphst = "not_run"; orphd = "no reference syntax is defined for " eng }
     else if (eng != "godot") { orphst = "not_run"; orphd = "references live in scenes, prefabs and other assets, not in code" }
     else if (srcn == 0) { orphst = "not_run"; orphd = "no source files under src/" }
     else { orphst = "ran"; orphd = ncorp " files searched for res:// paths" }

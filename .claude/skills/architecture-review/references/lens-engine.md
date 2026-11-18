@@ -2,7 +2,8 @@
 
 Read after the engine audit, once an engine is set. It holds what the primary
 engine specialist checked; you apply it here. Use the section for `engine.name`:
-Godot, Unity or Unreal; for Web, the lead programmer's section.
+Godot, Unity or Unreal; for Web, the lead programmer's section; for Custom (a
+project building its own engine), the chief engine architect's section.
 
 ## How to look
 
@@ -71,6 +72,40 @@ reference does not cover is marked `unverified`, never asserted from memory.
 - Work every frame that could be event-driven; allocation in the frame loop.
 - Cost claims with numbers: cite the entity counts and frame budget and the gap,
   and name one alternative that fits.
+
+## Custom (the chief engine architect's lens)
+
+The engine is the project's own, so there is no vendor API to check: the
+reference is `docs/engine-reference/custom/` (the pinned toolchain, SDKs and
+graphics API versions) and the project's own public headers and traits.
+
+**Gaps are written down and reach the verdict.** A graphics-API, driver,
+compiler or SDK claim an ADR rests on that `docs/engine-reference/custom/` does
+not cover is written, by ADR, as
+`NOT SOURCEABLE — <claim> is not covered by docs/engine-reference/custom/` —
+never confirmed or challenged from memory. Each such line is also a named
+`NOT ASSESSED` line item for that ADR's engine compatibility (Phase 7's rule):
+it keeps the verdict from PASS, and does not outrank a CONCERNS or FAIL found
+elsewhere. With no `docs/engine-reference/custom/VERSION.md` at all, the whole
+engine-compatibility check is `NOT ASSESSED — docs/engine-reference/custom/VERSION.md
+not found`; the structural checks below still run, since they need no pinned fact.
+
+- An engine-internal ADR without the engine-mode sections (Memory, Threading,
+  Latency and Frame Budget, ABI/API stability, Determinism, Platform and
+  graphics-API matrix); a frame-budget claim with no number in ms per thread or
+  queue against `performance.frame_budget_ms`.
+- The dependency direction broken: engine code that includes game code, or a
+  module that reaches past another's public interface.
+- Heap allocation, locks or blocking I/O in a per-frame path with no stated
+  allocator, job or async plan.
+- A renderer ADR with manual barriers and no resource-state tracking, or
+  per-frame descriptor allocation in a bindless design.
+- Shared mutable state between jobs with no ownership rule; determinism claimed
+  with unordered iteration or uncontrolled floating point.
+- A public header or trait change with no versioning or deprecation plan.
+- A Custom editor ADR that picks its UI framework without the trade-offs (own
+  retained UI, Qt 6, Dear ImGui, web UI) or mixes editor-only code into
+  shipping modules.
 
 ## Output
 

@@ -466,6 +466,59 @@ The `full` column of the file-check table has its own STOP rule, so the
 
 ---
 
+### Case 12: Custom — a lead-owned module and a frame-pipeline story
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`
+- Story A: `**Module**: docs/architecture/modules/core.md`, `Frame pipeline: no`,
+  plans a change to `engine/core/log.cpp` (layout row `engine/core/`: Owner
+  `core-systems-lead`, Lead `chief-engine-architect`)
+- Story B: `**Module**: docs/architecture/modules/renderer.md`,
+  `Frame pipeline: yes`, a change inside `engine/renderer/features/` that does not
+  change the tick or frame graph
+
+**Input:** `/dev-story` on each
+
+**Expected behavior:**
+1. A: path → owner → lead listed as `engine/core/log.cpp` → `core-systems-lead` →
+   `chief-engine-architect`; `core-systems-lead`, itself a lead, takes the story
+   directly; `chief-engine-architect` is never asked to implement or delegate it
+2. B: the summary says the story needs perf evidence before `/story-done` and
+   names `/benchmark-report <capture> --story <story path>` as the command for the
+   user to run (not `/team-frame-pipeline`, since the tick is unchanged)
+
+**Assertions:**
+- [ ] A is implemented by `core-systems-lead`, never routed "through its lead" to `chief-engine-architect`
+- [ ] B names the `--story` perf evidence `/story-done` will look for
+
+---
+
+### Case 13: Custom — a third-party path, whose Lead is `none`
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`
+- An Accepted story that updates a vendored library: it plans changes to
+  `third_party/zstd/` (the pinned source and its `UPSTREAM.md`) and to
+  `third_party/zstd/patches/0001-msvc-warning.patch` (layout row `third_party/`:
+  Owner `security-engineer`, Lead `none` — "reviews and escalates to
+  `technical-director`; it reports to no engine lead")
+
+**Input:** `/dev-story [story-path]`
+
+**Expected behavior:**
+1. Path → owner → lead listed as `third_party/zstd/` → `security-engineer` → `none`
+2. The skill does not treat `security-engineer` as a lead that takes the story
+   directly: it follows `third-party.md`, with `asset-build-tooling-engineer`
+   doing the build integration and `security-engineer` reviewing the update
+3. `chief-engine-architect` is not asked to implement it
+
+**Assertions:**
+- [ ] `security-engineer` is never the agent that implements the change; it is spawned (if at all) as the reviewer
+- [ ] The implementing agent is `asset-build-tooling-engineer`, per `third-party.md`
+- [ ] The routing does not apply the "Owner is itself a lead" rule to a Lead of `none`
+
+---
+
 ## Protocol Compliance
 
 - [ ] Does NOT write source code directly — delegates to specialist agents
@@ -481,6 +534,17 @@ The `full` column of the file-check table has its own STOP rule, so the
 ---
 
 ## Coverage Notes
+
+### Custom-engine routing regression scenario
+
+Given `engine.name: Custom`, code root `.`, and an Accepted allocator story
+touching `crates/memory/src/arena.rs`, invoking `/dev-story` must resolve
+memory-allocator-specialist through core-systems-lead from the owner map.
+Pass scoped rules and test evidence; engine-programmer owns integration glue.
+A story spanning memory and renderer modules requires chief-engine-architect
+coordination. An unmapped module blocks routing. A `custom:cargo-zero` row is
+NOT VERIFIED; a build failure leaves the story INCOMPLETE. Game-only stories
+keep the game programmer route. This is a spec, not evidence of execution.
 
 - The code root is covered for Godot (`src/`) and Unity (`Assets/`, Case 6) and for
   an unresolved engine (Case 7). Unreal (`Source/<Module>/<System>/`, with the

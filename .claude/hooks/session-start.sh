@@ -379,5 +379,94 @@ if [ -f "$STATE_FILE" ] && { ! command -v session_state_enabled >/dev/null 2>&1 
     echo "=== END SESSION STATE PREVIEW ==="
 fi
 
+# --- Engine context after a compaction or /clear (Custom engine only) --------
+# A project that builds its own engine (engine.name: Custom) carries facts no
+# summary keeps reliably: the frame budget, which ADRs are Accepted, the memory
+# invariants. PreCompact output never reaches Claude, so this is where they come
+# back -- only on source `compact` or `clear`, where the conversation lost them.
+#
+# Placed AFTER the checkpoint: hook output past 10,000 characters is cut, and
+# the checkpoint matters more. Every read is capped (15 ADR titles, 40 lines /
+# 2,500 characters of invariants), so the block stays under ~4,500 characters.
+#
+# stdin is read ONLY here, ONLY on a Custom project, and bounded: `read -t 1`
+# per line, at most 20 lines. A harness that leaves stdin open costs this hook
+# one second, not its budget. Other engines never touch stdin.
+# engine.name through yaml-get.awk, not _yh_engine_name: that one starts Python
+# (~0.6s on Windows), and every non-Custom session would pay it for nothing.
+# engine.* is team-wide, so project.yaml alone is the source (effects-map.md).
+_SS_ENG=""
+if [ -f project.yaml ] && [ -f .claude/scripts/yaml-get.awk ]; then
+    _SS_ENG=$(YG_PATH=engine.name awk -f .claude/scripts/yaml-get.awk project.yaml 2>/dev/null \
+              | tr -d '\r' | tr '[:upper:]' '[:lower:]')
+fi
+if [ "$_SS_ENG" = "custom" ]; then
+    _SS_SOURCE=""
+    if [ ! -t 0 ]; then
+        _SS_IN=""; _SS_LINE=""; _SS_N=0
+        while [ "$_SS_N" -lt 20 ] && IFS= read -r -t 1 _SS_LINE; do
+            _SS_IN="$_SS_IN$_SS_LINE"; _SS_LINE=""; _SS_N=$((_SS_N + 1))
+        done
+        # A final line with no newline is read but returns non-zero.
+        _SS_IN="$_SS_IN$_SS_LINE"
+        _SS_SOURCE=$(printf '%s' "$_SS_IN" | grep -oE '"source"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 \
+                     | sed 's/"source"[[:space:]]*:[[:space:]]*"//; s/"$//')
+    fi
+    case "$_SS_SOURCE" in
+    compact|clear)
+        echo ""
+        echo "=== ENGINE CONTEXT (Custom engine, restored after $_SS_SOURCE) ==="
+        _SS_FPS=$(get_effective_yaml_key performance.target_framerate 2>/dev/null)
+        _SS_FBM=$(get_effective_yaml_key performance.frame_budget_ms 2>/dev/null)
+        echo "Frame budget: target_framerate ${_SS_FPS:-NOT SET}, frame_budget_ms ${_SS_FBM:-NOT SET}"
+        if [ ! -f .claude/scripts/adr-status.sh ]; then
+            echo "Accepted ADRs: NOT ASSESSED (.claude/scripts/adr-status.sh is missing)"
+        elif ! ls docs/architecture/adr-*.md >/dev/null 2>&1; then
+            echo "Accepted ADRs: none (no docs/architecture/adr-*.md)"
+        else
+            _SS_ADR=$(bash .claude/scripts/adr-status.sh --root . 2>/dev/null)
+            _SS_ADR_RC=$?
+            if [ "$_SS_ADR_RC" -ne 0 ] && [ "$_SS_ADR_RC" -ne 3 ]; then
+                echo "Accepted ADRs: NOT ASSESSED (adr-status.sh exited $_SS_ADR_RC)"
+            else
+                _SS_ACC=$(printf '%s\n' "$_SS_ADR" | awk -F'\t' '$1 == "ADR" && $4 == "Accepted" { print $3 }')
+                _SS_ACC_N=0
+                [ -n "$_SS_ACC" ] && _SS_ACC_N=$(printf '%s\n' "$_SS_ACC" | wc -l | tr -d ' ')
+                echo "Accepted ADRs ($_SS_ACC_N):"
+                if [ "$_SS_ACC_N" -gt 0 ]; then
+                    # Title = the first `# ` heading in an ADR's first 5 lines,
+                    # else its path. One awk for all of them, not one per ADR.
+                    printf '%s\n' "$_SS_ACC" | head -15 | tr '\n' '\0' \
+                        | xargs -0 awk 'FNR == 1 { if (f != "" && !d) print f; d = 0; f = FILENAME }
+                                        !d && FNR <= 5 && /^# / { sub(/^# /, ""); print; d = 1 }
+                                        END { if (f != "" && !d) print f }' 2>/dev/null \
+                        | tr -d '\r' | sed 's/^/  /'
+                    [ "$_SS_ACC_N" -gt 15 ] && echo "  ... $((_SS_ACC_N - 15)) more (bash .claude/scripts/adr-status.sh)"
+                fi
+            fi
+        fi
+        _SS_MI="docs/architecture/memory-invariants.md"
+        if [ -f "$_SS_MI" ]; then
+            echo "Memory invariants ($_SS_MI, first 40 lines):"
+            awk '{ n++; c += length($0) + 1 }
+                 n > 40 || c > 2500 { cut = 1; exit }
+                 { print "  " $0 }
+                 END { if (cut) print "  ... truncated -- read the file for the rest" }' "$_SS_MI" 2>/dev/null | tr -d '\r'
+        else
+            echo "Memory invariants: absent ($_SS_MI does not exist)"
+        fi
+        echo "Interface of record: the public headers under engine/*/include/ and the"
+        echo "traits in each crate's lib.rs. Re-read them before changing an engine API;"
+        echo "do not rely on a summary of them. Verbose build and profiler logs were not kept."
+        echo "=== END ENGINE CONTEXT ==="
+        ;;
+    startup|resume) ;;
+    *)
+        echo ""
+        echo "Engine context: not shown (SessionStart source unreadable: '${_SS_SOURCE:-none}')."
+        ;;
+    esac
+fi
+
 echo "==================================="
 exit 0

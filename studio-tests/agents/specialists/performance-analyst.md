@@ -61,6 +61,51 @@ No gate IDs assigned.
 - Labels each metric's Status as OK or OVER based on the provided numbers
 - Does NOT use different budget numbers than those provided in the context
 
+### Case 6: On a Custom Engine Project — a benchmark regression
+**Fixture:** `project.yaml` sets `engine.name: Custom`; a benchmark in `tests/benchmarks/` failed its threshold on last night's CI run; no regression response time is recorded; the bisect lands on a commit that changes only files under `engine/ui/`.
+**Input:** "The frame got slower after last week's merges. Find out why and who fixes it."
+**Expected behavior:**
+- Confirms first: re-runs on the same machine, preset and GPU/driver; one noisy run is not a regression
+- Bisects over CI build artifacts, then commits in the last good–bad range (`git bisect run` with the benchmark and its threshold)
+- Attributes through `.claude/docs/custom-engine-layout.md`: the Lead of each changed path's row (the Owner where the Lead is `chief-engine-architect` or `none`; paths whose rows name different leads go to `chief-engine-architect`), so the `engine/ui/` commit goes to `lead-programmer`, the Lead of the `engine/ui/` row
+- Does NOT pick the lead from a fixed list of engine leads that leaves out `lead-programmer`
+- Hands over with the `/benchmark-report` before/after (P50/P95/P99, CPU and GPU separately), the commit and the budget slice it breaks
+- Says "regression SLA NOT SET" rather than assuming a response time
+**Assertions:**
+- [ ] The regression is confirmed before it is bisected
+- [ ] The regression goes to `lead-programmer`, the layout's Lead for `engine/ui/`
+- [ ] "regression SLA NOT SET" is reported
+
+### Case 7: Other engine — the same regression without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Godot`; a frame-time capture got slower after last week's merges.
+**Input:** "The frame got slower after last week's merges. Find out why and who fixes it."
+**Expected behavior:**
+- Profiles and reports with its normal workflow
+- Does NOT attribute the regression to `core-systems-lead`, `rendering-lead`, `simulation-systems-lead`, `editor-architect` or `chief-engine-architect`, and does NOT route a budget change through `CEA-FRAME-BUDGET`
+- Does NOT report "regression SLA NOT SET" as a Custom triage step
+**Assertions:**
+- [ ] The Custom section is not applied: no Custom engine lead, gate or Custom-only agent named
+
+### Case 8: VR Frame Budgets — an average that hides missed frames
+**Fixture**: `project.yaml` sets `engine.name: Custom`, `platform.targets: [PC, XR]`, `performance.target_framerate` and `performance.frame_budget_ms`; a headset capture averages under the budget but some frames finished after the display needed them.
+**Input**: "Our VR capture averages under budget. Are we fine?"
+**Expected behavior**:
+- Takes the budget from `performance.frame_budget_ms` and the rate from `performance.target_framerate`, not from a figure assumed for the headset
+- Counts each late frame as a missed display deadline and reports their number and when they occur beside P50/P95/P99, and does not pass the capture on its average
+- On an OpenXR runtime, compares against the `predictedDisplayPeriod` the runtime reports
+**Assertions**:
+- [ ] The missed display deadlines are listed; the average does not decide the result
+- [ ] No refresh rate is stated that the project's settings do not hold
+
+### Case 9: VR Frame Budgets — refresh rate not set
+**Fixture**: `project.yaml` sets `engine.name: Unity` and `platform.targets: [XR]`, and no `performance` block.
+**Input**: "Profile the VR build against its budget."
+**Expected behavior**:
+- Reports the VR budget NOT ASSESSED because the refresh rate and budget are unset, and asks for them
+- Does NOT assume a headset's refresh rate
+**Assertions**:
+- [ ] The verdict is NOT ASSESSED, not a pass
+
 ---
 
 ## Protocol Compliance

@@ -37,6 +37,18 @@ For each requirement you extract, the matching rule is:
 For any requirement with `status: deprecated` in the registry — skip it.
 It was removed from the GDD intentionally.
 
+**Custom engine** (`engine.name: Custom`): each module spec Phase 1b loaded
+from `docs/architecture/modules/` is a requirement source like a GDD. Every
+testable criterion in its section 10 (each `Done when` criterion and each
+benchmark threshold) is one requirement of that module, numbered
+`TR-[module]-NNN`: `[module]` is the spec's file stem (`audio.md` →
+`TR-audio-NNN`) and is the registry entry's `system:`. Rules 1–4 above apply
+unchanged, matched against the entries whose `gdd:` is that spec, so a
+criterion keeps its ID across runs. A GDD system with the same slug shares the
+sequence (next free number), so no ID repeats; the `gdd:` path tells the two
+apart. List the module's requirements under `Module: [spec path]` in place of
+`GDD:` in the list below.
+
 For each GDD, read it and extract all **technical requirements** — things the
 architecture must provide for the system to work. A technical requirement is any
 statement that implies a specific architectural decision.

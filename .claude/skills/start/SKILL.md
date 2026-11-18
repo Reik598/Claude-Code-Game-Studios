@@ -254,6 +254,7 @@ the other. With no engine set, `/prototype` goes between them.
 
 **`minimal`: 4 steps to running code**
 1. `/setup-engine`: choose and configure the engine (web, unless you name another)
+   — or `/setup-engine custom` for a project that builds its own engine (`engine.name: Custom`)
 2. `/brainstorm`: write the one-page `design/game-brief.md`
 3. `/create-stories`: turn the brief's Features list into stories (no epics or sprint plan needed)
 4. `/dev-story`: the first line of game code

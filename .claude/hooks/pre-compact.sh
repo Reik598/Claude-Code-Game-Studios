@@ -30,7 +30,8 @@ else
 fi
 [ -n "$CCGS_ROOT" ] && cd "$CCGS_ROOT" 2>/dev/null || true
 
-# Claude Code PreCompact hook: log the compaction. Nothing else.
+# Claude Code PreCompact hook: log the compaction (and, on a Custom-engine
+# project, the engine context -- see below). Nothing else.
 #
 # PRINTS NOTHING, ON PURPOSE. Claude Code writes PreCompact stdout to the debug
 # log and discards its systemMessage (hooks documentation), so a state summary
@@ -50,5 +51,53 @@ SESSION_LOG_DIR="production/session-logs"
 mkdir -p "$SESSION_LOG_DIR" 2>/dev/null
 echo "Context compaction occurred at $(date)." \
     >> "$SESSION_LOG_DIR/compaction-log.txt" 2>/dev/null
+
+# Custom engine (engine.name: Custom): also log the engine context that
+# session-start.sh re-injects after the compaction -- frame budget, Accepted
+# ADRs, whether memory-invariants.md exists -- so the log shows what the
+# session was working against. Same caps as session-start.sh; nothing printed.
+# Verbose build and profiler logs are NOT preserved by either hook: keep the
+# numbers that matter in a file (a /benchmark-report, active.md).
+_PC_ENG=""
+if command -v _yh_engine_name >/dev/null 2>&1; then
+    _yaml_helper_set_root
+    _yh_engine_name
+    _PC_ENG=$(printf '%s' "$_YH_ENAME" | tr '[:upper:]' '[:lower:]')
+fi
+if [ "$_PC_ENG" = "custom" ]; then
+    {
+        echo "  Engine context (Custom):"
+        # An unset key prints nothing, so the default is applied to the value,
+        # not by sed (which never sees a line to rewrite).
+        _PC_FPS=$(get_effective_yaml_key performance.target_framerate 2>/dev/null)
+        _PC_FBM=$(get_effective_yaml_key performance.frame_budget_ms 2>/dev/null)
+        echo "    frame budget: target_framerate ${_PC_FPS:-NOT SET} / frame_budget_ms ${_PC_FBM:-NOT SET}"
+        if [ ! -f .claude/scripts/adr-status.sh ]; then
+            echo "    accepted ADRs: NOT ASSESSED (.claude/scripts/adr-status.sh is missing)"
+        elif ! ls docs/architecture/adr-*.md >/dev/null 2>&1; then
+            echo "    accepted ADRs: none (no docs/architecture/adr-*.md)"
+        else
+            _PC_ACC=$(bash .claude/scripts/adr-status.sh --root . 2>/dev/null \
+                      | awk -F'\t' '$1 == "ADR" && $4 == "Accepted" { print $3 }')
+            _PC_N=0
+            [ -n "$_PC_ACC" ] && _PC_N=$(printf '%s\n' "$_PC_ACC" | wc -l | tr -d ' ')
+            echo "    accepted ADRs ($_PC_N):"
+            if [ "$_PC_N" -gt 0 ]; then
+                printf '%s\n' "$_PC_ACC" | head -15 | tr '\n' '\0' \
+                    | xargs -0 awk 'FNR == 1 { if (f != "" && !d) print f; d = 0; f = FILENAME }
+                                    !d && FNR <= 5 && /^# / { sub(/^# /, ""); print; d = 1 }
+                                    END { if (f != "" && !d) print f }' 2>/dev/null \
+                    | tr -d '\r' | sed 's/^/      /'
+                [ "$_PC_N" -gt 15 ] && echo "      ... $((_PC_N - 15)) more"
+            fi
+        fi
+        if [ -f docs/architecture/memory-invariants.md ]; then
+            echo "    memory invariants: docs/architecture/memory-invariants.md present"
+        else
+            echo "    memory invariants: absent"
+        fi
+        echo "    not preserved: verbose build and profiler logs"
+    } >> "$SESSION_LOG_DIR/compaction-log.txt" 2>/dev/null
+fi
 
 exit 0

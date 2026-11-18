@@ -14,7 +14,8 @@ Files created:
 - tests/README.md
 - tests/unit/ and tests/integration/ (Godot) — or the engine's test root:
   Unity Assets/Tests/EditMode/ and PlayMode/, Unreal Source/<Module>/Private/Tests/;
-  Web: tests/unit/ and tests/integration/, and playwright.config.ts
+  Web: tests/unit/ and tests/integration/, and playwright.config.ts;
+  Custom: tests/unit/, tests/integration/ and tests/benchmarks/
 - tests/smoke/critical-paths.md
 - production/qa/evidence/.gitkeep
 [engine-specific files]
@@ -22,12 +23,15 @@ Files created:
 
 Next steps:
 1. [Engine-specific install step, e.g., "Install GdUnit4 via the Asset Store (AssetLib before Godot 4.7)";
-   Web: "npm ci", when /setup-engine web did not run it]
+   Web: "npm ci", when /setup-engine web did not run it;
+   Custom: set commands.build and commands.test (/setup-engine custom) when the helper listed them as NEEDS]
 2. Write your first test in the engine's test root:
    tests/unit/[system]/[system]_[feature]_test.gd (Godot),
    Assets/Tests/EditMode/[System]Tests.cs (Unity), or
    Source/<Module>/Private/Tests/[System]Test.cpp (Unreal), or
-   tests/unit/[module].test.ts (Web)
+   tests/unit/[module].test.ts (Web), or
+   a CTest or cargo test under tests/unit/[module]/ (Custom — naming in
+   .claude/rules/test-standards.md)
 3. Run `/qa-plan sprint` before your first sprint to classify stories and set
    test evidence requirements. At `workflow: minimal` — the default — skip
    this: there are no sprints. At `qa.level: minimal`, also the default, tests
@@ -39,7 +43,7 @@ Gate note: /gate-check Technical Setup → Pre-Production now requires:
 - the engine's test root: tests/unit/ and tests/integration/ (Godot),
   Assets/Tests/EditMode/ and Assets/Tests/PlayMode/ (Unity), or
   Source/<Module>/Private/Tests/ (Unreal), or tests/unit/ and
-  tests/integration/ (Web)
+  tests/integration/ (Web, Custom)
 - .github/workflows/tests.yml
 - At least one example test file
 Run /test-setup and write one example test before advancing.

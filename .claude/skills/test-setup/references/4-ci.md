@@ -11,6 +11,7 @@
 - Unity
 - Unreal Engine
 - Web
+- Custom
 
 ### Godot 4
 
@@ -231,5 +232,16 @@ GitHub's `ubuntu-latest` image has Google Chrome on the `PATH`, which is what
 `page-shot.sh --which` finds there; `.claude/` must be in the repository, as it
 is in every Claude Code Game Studios project. `test-results/` holds Playwright's traces and
 screenshots of a failing test, and is empty when every test passed.
+
+### Custom
+
+`test-scaffold.sh custom` writes it (Phase 3): a Linux and Windows matrix that
+checks out, runs `commands.build`, then `commands.test`, from `project.yaml`.
+Do not write a CI file by hand for Custom. Its comment leaves pinning compilers,
+the Vulkan SDK or shader compilers to the project's ADRs; which versions to pin
+is the project's own and `NOT SOURCEABLE` here unless
+`docs/engine-reference/custom/` records it. Report the helper's `NEEDS` rows for
+the commands still unset. GPU tests need a self-hosted runner with a GPU (the
+README the helper writes says so).
 
 ---

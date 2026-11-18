@@ -3,6 +3,12 @@ paths:
   - "tests/**"
   - "Assets/Tests/**/*.cs"
   - "Source/**/Tests/**/*.{h,cpp}"
+  - "engine/**/tests/**"
+  - "game/**/tests/**"
+  - "crates/**/tests/**"
+  - "engine/**/benches/**"
+  - "crates/**/benches/**"
+  - "game/**/benches/**"
 ---
 
 # Test Standards
@@ -26,6 +32,22 @@ paths:
     (Vitest) or `[system].spec.ts` under `tests/integration/` (Playwright),
     test `'[scenario] [expected]'` in plain words —
     `it('keeps the square inside the field')`
+  - **Custom, C++ (CTest):** file `[system]_[feature]_test.cpp` under
+    `tests/unit/` or `tests/integration/`, case `[scenario]_[expected]`
+    (`allocate_past_capacity_returns_null`), each registered with CTest so
+    `commands.test` runs it
+  - **Custom, Rust (cargo test):** `#[test] fn [scenario]_[expected]()` in the
+    crate's `tests/` or a `#[cfg(test)] mod tests`. An inline
+    `#[cfg(test)] mod tests` sits in a `src/` file, so this rule is not loaded
+    for it by path; the same standards apply
+  - **Custom, benchmarks:** `[system]_[feature]_bench` under
+    `tests/benchmarks/` or a module's or crate's `benches/`; each states its threshold (time per iteration or per
+    frame, against `performance.frame_budget_ms`) and fails when it is exceeded.
+    A benchmark with no threshold is a measurement, not a test
+  - **Custom, test locations:** module-local `engine/<module>/tests/` and
+    `engine/<module>/benches/`, `game/**/tests/` and `game/**/benches/`, a
+    crate's `crates/<crate>/tests/` and `crates/<crate>/benches/` are valid
+    alongside `tests/unit/` and `tests/integration/`
 - Every test must have a clear arrange/act/assert structure
 - Unit tests must not depend on external state (filesystem, network, database)
 - Integration tests must clean up after themselves
@@ -111,6 +133,23 @@ bool FHealthTakeDamageTest::RunTest(const FString& Parameters)
 }
 
 #endif
+```
+
+Custom engine, Rust (`engine/memory`'s crate, `tests/arena.rs`):
+
+```rust
+#[test]
+fn allocate_past_capacity_returns_none() {
+    // Arrange
+    let mut arena = FrameArena::with_capacity(64);
+    arena.allocate::<[u8; 64]>().unwrap();
+
+    // Act
+    let result = arena.allocate::<u8>();
+
+    // Assert
+    assert!(result.is_none());
+}
 ```
 
 **Incorrect**:

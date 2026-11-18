@@ -7,6 +7,16 @@
 
 Before doing anything else, establish the engine environment:
 
+> **Full engine mode** (`engine.name: Custom`): `[engine]`
+> below is `custom` — the project's own pinned toolchain and dependency facts,
+> not a vendor's reference — and the domains are the engine's modules
+> (`references/engine-mode.md`). When `docs/engine-reference/custom/VERSION.md`
+> does not exist, say `Engine reference: NOT SOURCEABLE —
+> docs/engine-reference/custom/VERSION.md not found`, write the ADR's Knowledge
+> Risk as `HIGH — no pinned reference`, and continue; do not send the user to
+> `/setup-engine` when `engine.name` is already set. `--engine-internal` on any
+> other engine does not change this step: `[engine]` stays the vendor's.
+
 1. Read `docs/engine-reference/[engine]/VERSION.md` to get:
    - Engine name and version
    - LLM knowledge cutoff date

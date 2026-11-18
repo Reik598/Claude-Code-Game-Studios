@@ -16,6 +16,15 @@
 
 If invoked as `/setup-engine upgrade [old-version] [new-version]`:
 
+**On Custom (`engine.name: Custom`) upgrade does not apply — stop here.** The
+engine is this project's own code: there is no vendor release and no migration
+guide to search for, and Steps 1–6 would fill `VERSION.md` from a web search.
+Say so in one line, name the two routes, and stop without searching, auditing
+or writing anything:
+
+> `/setup-engine upgrade does not apply to a Custom engine: it is versioned by this project.`
+> `To version the engine for its game teams, run /engine-release. To record a new compiler, CMake, Cargo or SDK version, run /setup-engine refresh (it re-runs the toolchain probes in references/custom.md, C4).`
+
 ### Step 1 — Read Current Version State
 
 Read `docs/engine-reference/<engine>/VERSION.md` to confirm the current pinned

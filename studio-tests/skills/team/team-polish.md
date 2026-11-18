@@ -335,3 +335,11 @@ Fixture defaults.
   the same qa-tester delegation pattern when the hardware is available.
 - The `studio` addition (the adversarial review pass) is asserted in Protocol Compliance
   but not given its own case.
+
+### Custom-engine optimization regression scenario
+
+Given a measured allocator hotspot in a Custom project, resolve its owner via
+the module map and delegate through core-systems-lead to memory-allocator-specialist.
+Apply this at small and studio team sizes. A frame-graph change also uses
+`/team-frame-pipeline`; unknown ownership blocks the change. Report comparable
+before/after captures. Game-facing integration glue may use engine-programmer.

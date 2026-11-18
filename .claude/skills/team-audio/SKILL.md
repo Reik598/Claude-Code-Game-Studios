@@ -42,6 +42,7 @@ below), and the agents that work at them are team members, not director gates.
 **`team.size`**: which agents are active (orthogonal to review_mode gate-depth and workflow docs).
 - **`individual`** (default): `sound-designer` only. Other agents consulted via the sound-designer, not spawned separately.
 - **`small`**: + `audio-director` + `technical-artist` + `gameplay-programmer`.
+- **Custom** (`engine.name: Custom`): `small` and `studio` also include `audio-engine-engineer` (Step 3's Custom block); at `studio` it is the primary engine specialist.
 - **`studio`**: + `accessibility-specialist` + the primary engine specialist (the full pipeline as documented).
 A non-core agent needed at `individual` routes through the nearest active core agent with an informational note. **"Phase gate" means any phase that ends in an `AskUserQuestion` decision point this pipeline itself lists** — a transition under Decision Points above, or a **Gate** step written into the pipeline below — **whatever the `automation` mode.** `guided` and `autonomous` change how a gate is passed (it auto-advances, or is recorded with `log_decision`), not whether it is one, so bounded-exception condition (3) below holds at it in every mode. An agent restricted to "phase gates only" is spawned at those points and no others. This active-set scoping applies throughout the pipeline below: any phase that names an agent outside the active set routes through the nearest core agent rather than spawning it.
 
@@ -165,6 +166,18 @@ Spawn the **primary engine specialist** in parallel (`<engine>-specialist` deriv
 - Any engine-specific audio node/component patterns that should be used?
 - Known audio system changes in the pinned engine version that affect the integration plan?
 - Output: engine audio integration notes to merge with the technical-artist's plan
+
+**Custom** (`engine.name: Custom`): the engine's audio runtime is the project's
+own code under `engine/audio/` (mixer, DSP graph, spatialization, or the
+middleware integration), which `.claude/docs/custom-engine-layout.md` gives to
+`audio-engine-engineer`, Lead `simulation-systems-lead`. On Custom, Step 3
+spawns `audio-engine-engineer` for the middleware or in-house integration, the
+bus structure, the per-platform audio memory budgets and the streaming
+strategy, and for the integration check above, as the primary engine
+specialist; `technical-artist` keeps the audio-reactive visual effects only.
+A disagreement between them escalates to `simulation-systems-lead`.
+`chief-engine-architect` is consulted only when the audio ADR itself is in
+question (a middleware change, or a boundary with another engine module).
 
 If no engine is configured, skip the specialist spawn. **Record ``Engine validation: NOT ASSESSED — no engine configured (`engine.name` unset in `project.yaml`)`` in this run's output.** A skipped check that says nothing is indistinguishable from a check that passed; the reader cannot tell engine guidance was never sought.
 

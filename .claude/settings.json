@@ -113,6 +113,10 @@
       "Bash(git *clean* -qXdf*)",
       "Bash(git *clean* -Xdqf*)",
       "Bash(git *clean* -Xqdf*)",
+      "Bash(git diff *--output*)",
+      "Bash(git log *--output*)",
+      "Bash(git show *--output*)",
+      "Bash(git rev-list *--output*)",
       "Bash(sudo *)",
       "Bash(chmod 777*)",
       "Read(**/.env*)",
@@ -171,6 +175,10 @@
       "PowerShell(git *clean* -qXdf*)",
       "PowerShell(git *clean* -Xdqf*)",
       "PowerShell(git *clean* -Xqdf*)",
+      "PowerShell(git diff *--output*)",
+      "PowerShell(git log *--output*)",
+      "PowerShell(git show *--output*)",
+      "PowerShell(git rev-list *--output*)",
       "PowerShell(Get-Content *.env*)",
       "PowerShell(*>.env*)"
     ]

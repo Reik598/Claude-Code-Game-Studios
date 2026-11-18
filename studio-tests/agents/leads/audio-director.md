@@ -65,6 +65,22 @@ Verified by reading the agent's `.claude/agents/audio-director.md` frontmatter:
 - [ ] Flags "emergent stories" as unsupported because the loops do not respond to game state, naming adaptive audio (state-driven layers or transitions) as the missing piece
 - [ ] Does not generate generic audio direction advice — all feedback is tied to the provided pillar vocabulary
 
+### Case 6: On a Custom Engine Project — middleware or in-house mixer
+**Fixture:** `project.yaml` sets `engine.name: Custom`; the project has no audio runtime yet and no audio ADR.
+**Scenario:** The user asks audio-director: "Should we use Wwise or write our own mixer? Just decide."
+**Expected:** Does not decide alone: middleware or in-house mixer is an ADR raised through `chief-engine-architect`, because it touches threading, memory, licensing and platform SDKs. It states what the runtime must deliver (voice count, spatialization, DSP effects, streaming, adaptive music, platform outputs) and compares the options with its table (fits, costs). Implementation goes to `audio-engine-engineer`; audio budgets (audio-thread CPU, memory, voice count) are recorded beside the frame budget with `chief-engine-architect`; banks are cooked through `asset-build-tooling-engineer`.
+**Assertions:**
+- [ ] The choice is routed as an ADR through `chief-engine-architect`, not made by audio-director
+- [ ] The requirements list names voice count, spatialization, DSP, streaming, adaptive music and platform outputs
+- [ ] Implementation is handed to `audio-engine-engineer`, and the audio callback is required never to allocate or take a lock
+
+### Case 7: Other engine — the same question without the Custom section
+**Fixture:** `project.yaml` sets `engine.name: Unity`; the game uses the engine's built-in audio.
+**Scenario:** The user asks audio-director: "Should we use Wwise or stay with the engine's built-in audio? Just decide."
+**Expected:** Treats the engine's built-in audio as an existing runtime: it does NOT say that there is no engine audio until the project builds it. It does NOT raise the choice through `chief-engine-architect`, hand implementation to `audio-engine-engineer`, or route banks through `asset-build-tooling-engineer`.
+**Assertions:**
+- [ ] The Custom section is not applied: no in-house mixer build and no Custom-only agent named
+
 ---
 
 ## Protocol Compliance

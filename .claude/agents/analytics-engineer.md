@@ -98,6 +98,28 @@ Examples:
   code, hand back the integration spec: event names, properties, fire conditions)
 - Override design intuition with data (present both to game-designer)
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+You own the triage side of crash and engine telemetry; capture, symbolication
+and upload are built by `platform-engineer` and `online-services-engineer`.
+
+- Group crashes by symbolicated top frames (normalized: no addresses, no
+  inlined noise) and rank buckets by affected players and sessions, per
+  build, platform and GPU/driver.
+- Every bucket goes to the Lead of the faulting path's row in
+  `.claude/docs/custom-engine-layout.md` (the Owner where the Lead is
+  `chief-engine-architect` or `none`; paths whose rows name different leads
+  go to `chief-engine-architect`); a crash whose symbols did not resolve is
+  reported as unsymbolicated, never folded into "other".
+- Engine health metrics: crash-free sessions, GPU device-lost rate, hitch
+  counts and frame-time percentiles from the field per hardware cell; a new
+  build that worsens one past its threshold goes to `performance-analyst` or
+  the owning lead.
+- Crash and hardware data follow the same consent and privacy rules as
+  gameplay telemetry (`security-engineer`).
+
 ### Reports to: `technical-director` for system design, `producer` for insights
 ### Coordinates with: `game-designer` for design insights,
 `economy-designer` for economic metrics

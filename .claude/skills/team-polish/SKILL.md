@@ -8,6 +8,25 @@ model: sonnet
 ---
 # Team Polish
 
+**Custom engine override.** When the resolved `engine:` line (Phase 0) reads
+`Custom`, engine-level work in any phase below goes through the owning lead
+and specialist from `.claude/docs/custom-engine-layout.md`, including Rust
+`crates/` aliases.
+Where the path's Lead is `chief-engine-architect`, the Owner, itself a lead
+(`engine/core/` → `core-systems-lead`), takes the work directly. A Lead of
+`none` puts the Owner outside the engine hierarchy, and it is not a lead:
+`game/data/` tuning is `systems-designer`'s, `tests/` is `qa-lead`'s, and a
+`third_party/`, `external/` or `vendor/` change follows `third-party.md`
+(`asset-build-tooling-engineer` does the build integration; `security-engineer`
+reviews it and never implements it).
+`engine-programmer` owns game-facing integration glue. Record each measured
+hotspot's owner before spawning; unresolved ownership is BLOCKED. Cross-lead
+changes go to `chief-engine-architect`; tick or frame-graph changes use
+`/team-frame-pipeline`. Return the same report fields and before/after captures
+required below, naming the actual implementing specialist. This override applies
+at every team size and review mode; small teams combine responsibilities without
+waiving subsystem rules or evidence.
+
 If no argument is provided, output usage guidance and exit without spawning any agents:
 > Usage: `/team-polish [feature or area to polish] [--review full|lean|solo]` — specify the feature or area to polish (e.g., `combat`, `main menu`, `inventory system`, `level-1`). Do not use `AskUserQuestion` here; output the guidance directly.
 
@@ -25,7 +44,7 @@ in `autonomous` mode it runs end to end, recording each phase outcome via
 
 ## Phase 0: Resolve Config
 
-!`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys review_mode,automation,team.size,workflow`
+!`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys review_mode,automation,team.size,workflow,engine`
 
 Resolved above — use as-is; `--review` overrides `review_mode`. No block →
 defaults in `.claude/docs/config-resolution.md`.

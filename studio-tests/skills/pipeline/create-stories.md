@@ -307,6 +307,54 @@ Fixture defaults.
 
 ---
 
+### Case 7: Custom engine — stories from a module spec, with a Frame pipeline line
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, `modes.workflow: standard` (pinned: the module route is the `standard`/`full` branch)
+- `production/epics/engine-audio/EPIC.md` (a module epic's slug is `engine-<module>`) names `**Module**: docs/architecture/modules/audio.md` and no GDD
+- `docs/architecture/modules/audio.md`: section 6 assigns the mixer 0.5 ms of the frame budget; section 10 lists three "Done when" criteria
+- `docs/architecture/tr-registry.yaml` has no `system: audio` entry
+
+**Input:** `/create-stories engine-audio`
+
+**Expected behavior:**
+1. The spec is read by heading: "2. Public Interface", "6. Performance Budget", "10. Test Plan and Acceptance Criteria", "11. Consumer and Handoff Contracts"
+2. Each story names `**Module**: docs/architecture/modules/audio.md` in place of its GDD line, and quotes its criteria from section 10
+3. Requirements read `TR-audio-???`, are called provisional, and each carries `NOT ASSESSED — criterion not registered; run /architecture-review`
+4. Every story carries `Frame pipeline: yes` (section 6 assigns a slice); a spec whose section 6 assigns none gives `Frame pipeline: no`
+5. A missing `docs/architecture/modules/audio.md` stops the epic as a missing GDD does
+6. The Phase 6 list shows each story `NOT ASSESSED (criterion not registered)` where it would show `Ready`, and the run ends `Verdict: COMPLETE — [N] stories written to production/epics/engine-audio/ (0 Ready, 0 Blocked, [N] with criteria not registered: NOT ASSESSED — run /architecture-review)` with `Next step: /architecture-review`
+
+**Assertions:**
+- [ ] No story is written without a `Frame pipeline:` line
+- [ ] No story names both a GDD and a module spec
+- [ ] No TR-ID is invented as registered: each is `TR-audio-???` while the registry has no audio entry
+- [ ] No story with `TR-audio-???` is counted as Ready, in the Phase 6 list or in the verdict line
+- [ ] Variant — the registry has `TR-audio-001` to `TR-audio-003`, `gdd: docs/architecture/modules/audio.md`, one per criterion (as `/architecture-review` registers them): each story cites the entry for the criterion it quotes, no `NOT ASSESSED` requirement line appears, and the verdict line has no "with criteria not registered" count
+
+---
+
+### Case 8: Custom engine at `minimal` — the module route stops with a pointer
+
+**Fixture:**
+- `project.yaml`: `engine.name: Custom`, no `modes` keys (pinned: unset resolves to `workflow: minimal`, the tier under test)
+- `docs/architecture/modules/audio.md` exists; `design/game-brief.md` exists
+- Variant (no module spec): the same project without `docs/architecture/modules/`
+
+**Input:** `/create-stories`
+
+**Expected behavior:**
+1. Phase 2's `minimal` branch stops before reading the brief: "The engine module route needs workflow standard or full: run `/project-settings modes.workflow=standard`, then `/create-epics` and `/create-stories` again. At `minimal` no module spec becomes a story."
+2. No story and no epic is written
+3. Variant: with no module spec, the `minimal` branch runs as on any other engine, building the epic from the brief
+
+**Assertions:**
+- [ ] The stop names `/project-settings` and the `standard` tier
+- [ ] Nothing is written in the stopped run
+- [ ] The module spec is never silently ignored at `minimal`
+
+---
+
 ## Protocol Compliance
 
 - [ ] All context (EPIC, GDD, ADRs, manifest layer rules, TR registry entries) loaded before drafting stories

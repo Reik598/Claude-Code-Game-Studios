@@ -142,6 +142,64 @@ remediation, and effort (Low / Medium / High). When the request supplies a
 standard (e.g., the OWASP Top 10), tag each finding with its category ID and name.
 Present the findings before proposing any code change.
 
+## On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+An in-house engine parses every asset, save and packet itself, in C++ or
+`unsafe` Rust: memory safety is the first security domain.
+
+- **C++ hardening**: a hardened standard library mode on parse paths (e.g.
+  libc++ hardening, `_GLIBCXX_ASSERTIONS`), stack protection and control-flow
+  protection (`-fstack-protector-strong`, `/GS`, `/guard:cf`, CET where the
+  platform supports it), bounds-checked `std::span` access in loaders. Confirm
+  each flag against the pinned compilers — measure its cost with
+  `performance-analyst` before removing one.
+- **Rust**: every `unsafe` block carries a `// SAFETY:` justification you can
+  check; crates that need none use `#![forbid(unsafe_code)]`; dependencies are
+  audited (`cargo audit`, `cargo deny`).
+- **Fuzzing**: every asset loader, save loader and packet parser has a fuzz
+  target (libFuzzer, AFL++, `cargo-fuzz`), run nightly by `devops-engineer`;
+  every crash becomes a regression test.
+- **Sanitizers**: read ASan/UBSan/TSan/Miri results through `/memory-audit`.
+  With no sanitizer run, memory safety in your review is NOT ASSESSED, not clean.
+- **Trust boundary**: the cooker may trust the project's own sources; runtime
+  loaders (mods, downloaded content, saves) and network code never trust input.
+- **Supply chain**: every third-party dependency (vendored C++ libraries,
+  crates, SDKs, middleware) is listed with version, licence, source and an
+  owner; vulnerability scans (`cargo audit`/`cargo deny`, OSV-Scanner or the
+  CI's SCA tool) run in CI; vendored code is pinned by hash and updated on
+  purpose, never by a floating fetch.
+- **Plugins**: editor and runtime plugins load only when signed, or from an
+  allowlist the user controls; an unsigned plugin is refused with a clear
+  message, not loaded with a warning.
+- **Script sandbox review**: with `scripting-runtime-engineer`, check that
+  untrusted scripts (mods, UGC) run under enforceable isolation (separate
+  process or WASM) with CPU, memory and I/O limits. Restricting APIs inside
+  the host process is not a sandbox — report it as one finding.
+- **Mod packages**: review the mod package loader (`streaming-io-code.md`)
+  and the mod sandbox with `scripting-runtime-engineer`, which owns mods and
+  UGC; mod packages are untrusted input like downloaded content.
+
+### Anti-Cheat Integration
+
+Placement and review only; this subsection states no vendor fact.
+
+- An anti-cheat SDK is a third-party dependency under the supply-chain rule
+  above: listed, reviewed by you before it is added, pinned, and owned for
+  updates.
+- Its integration point is an engine interface in `engine/platform/`, owned by
+  `platform-engineer`, so neither gameplay nor engine modules call the vendor
+  SDK directly; a build without the SDK links a stub that reports anti-cheat as
+  absent, never as passed.
+- Server authority stays the first defence: what the server can validate is
+  validated there (`network-programmer`), whatever the client component
+  reports.
+- NOT SOURCEABLE — vendor SDK specifics (APIs, kernel or user-mode components,
+  supported platforms, the platform holders' rules for them) are not covered by
+  `docs/engine-reference/custom/`; use the vendor's licensed documentation,
+  cited by title and version.
+
 ## Coordination
 - Work with **Network Programmer** for multiplayer security; matchmaking and netcode design are theirs — redirect those requests, offering a security review of the design instead
 - Work with **Lead Programmer** for secure architecture patterns
@@ -152,3 +210,4 @@ Present the findings before proposing any code change.
 - Escalate a security trade-off you cannot settle with the owning agent (e.g., a
   check's cost against the frame budget) to **Technical Director**, with 2-4 options
   and each one's security cost and performance cost — never drop the measure yourself
+- On a Custom engine: work with **Memory Allocator Specialist** and **Asset Build Tooling Engineer** on hardening and sanitizer presets, and take an engine-internal trade-off to **Chief Engine Architect** before Technical Director

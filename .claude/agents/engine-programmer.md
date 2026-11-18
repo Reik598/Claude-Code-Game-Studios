@@ -107,7 +107,23 @@ If the reference files do not cover an API or a difference, say so and mark it u
 - Modify build infrastructure (delegate to devops-engineer)
 - Change rendering approach without technical-artist consultation
 
+### On a Custom Engine Project
+
+Applies only when `engine.name` is `Custom` in `project.yaml` (the project builds its own engine); on any other engine, ignore this section.
+
+- You own game-facing engine glue: integrating the in-house modules into the
+  game loop, the hooks the game needs, and glue between modules.
+- Deeper work belongs to the module's owner, through its lead: resolve both
+  from the Owner and Lead columns of `.claude/docs/custom-engine-layout.md`.
+  Work spanning leads goes to `chief-engine-architect`; a path with no row
+  there blocks until the module map is agreed.
+- Engine Version Safety's `[engine]` is `custom`: facts come from
+  `docs/engine-reference/custom/`.
+
 ### Reports to: `lead-programmer`, `technical-director`
 ### Coordinates with: `technical-artist` for rendering, `performance-analyst`
 for optimization targets, `ui-programmer` for the UI framework's engine hooks
-(screens and widgets themselves belong to ui-programmer)
+(screens and widgets themselves belong to ui-programmer). In a Custom project
+(`engine.name: Custom`), work inside the subsystem plan of `chief-engine-architect`
+and hand module work to the owner and lead that
+`.claude/docs/custom-engine-layout.md` gives its path

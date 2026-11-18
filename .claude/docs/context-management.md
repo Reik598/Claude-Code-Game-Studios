@@ -162,6 +162,25 @@ When context is compacted, preserve the following in the summary:
 actively worked on to recover full context. The files contain the decisions; the
 conversation history is secondary.
 
+### Custom engine projects
+
+When `engine.name` is `Custom`, `session-start.sh` adds an **Engine context** block
+after a compaction or `/clear` (SessionStart `source` `compact` or `clear`; never on
+startup or resume). PreCompact output does not reach Claude, so this is the only
+place the block can come back. It holds:
+
+- the frame budget: `performance.target_framerate` and `performance.frame_budget_ms`,
+  or `NOT SET`
+- the titles of the Accepted ADRs, from `adr-status.sh` (at most 15, then "N more")
+- the first 40 lines of `docs/architecture/memory-invariants.md`, or that it is absent
+- a reminder that the public headers under `engine/**/include/` (nested modules included) and the traits in each
+  crate's `lib.rs` are the interface of record: re-read them, do not trust a summary
+
+`pre-compact.sh` writes the same facts (invariants as present or absent) to
+`production/session-logs/compaction-log.txt`. Neither hook keeps verbose build or
+profiler logs; put the numbers that matter in a file (`/benchmark-report`,
+`active.md`) before compacting.
+
 ## Recovery After Session Crash
 
 If a session dies ("prompt too long") or you start a new session to continue work:

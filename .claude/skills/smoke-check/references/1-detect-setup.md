@@ -24,11 +24,35 @@ Before running anything, understand the environment:
    that `tests/` does. Check the engine's **test root** (from step 3; the table
    is in `.claude/docs/directory-structure.md` — Godot `tests/unit/` and
    `tests/integration/`, Unity `Assets/Tests/`, Unreal
-   `Source/*/Private/Tests/`) and `tests/smoke/` for actual test files. A
+   `Source/*/Private/Tests/`, Custom `tests/unit/` and `tests/integration/`) and `tests/smoke/` for actual test files. A
    **test file** is one the engine's test runner executes — a `*_test.gd` suite,
-   a C# test class, an Unreal automation test source. Markdown checklists do not
+   a C# test class, an Unreal automation test source, on Custom a C++ or Rust
+   test source CTest or `cargo test` runs (`tests/benchmarks/` holds benchmarks,
+   not tests, and does not count). Markdown checklists do not
    count: `/test-setup` always writes `tests/smoke/critical-paths.md`, and
    counting it would hide exactly the zero-test state this step exists to catch.
+
+   **On Custom, an empty glob does not decide — the runner's observed count
+   does.** A Rust crate's tests live inline (`#[cfg(test)]` modules in
+   `engine/**/src/` and `game/src/`) and in crate-local `tests/` folders
+   (`engine/<crate>/tests/`), and CTest runs whatever `add_test` registered
+   anywhere CMake reaches, so a glob of the test root misses real suites and its
+   emptiness proves nothing. Test files found by the glob → tests exist; go on to
+   Phase 2 as normal (a `custom:ctest-zero` there means the files are not
+   registered, and Phase 2 reads it as NOT ASSESSED). The glob finds none → run
+   Phase 2's `bash .claude/scripts/test-run.sh custom` now and read its `rule` row:
+   - `custom:ctest-pass`, `custom:cargo-pass`, `custom:ctest-failed`,
+     `custom:cargo-failed` → tests exist (the runner counted them); continue to
+     Phase 2 with this run as its result — do not run it twice.
+   - `custom:ctest-zero`, `custom:cargo-zero` → the runner found **no game
+     tests**: apply the `qa.level` rules below exactly as for an empty glob,
+     naming the rule as the evidence.
+   - Any other rule (`custom:no-test-command`, `custom:0`, `custom:build-failed`,
+     `custom:cargo-compile-failed`, `custom:nonzero`, `timeout`,
+     `runner-unavailable`, `-`) → the count is unknown or the build failed:
+     continue to Phase 2 with this run, which reads the rule; a waiver is never
+     inferred from a count nobody observed.
+
    If none are found **at `qa.level: minimal`**, tests are waived at this level:
    record the automated row as `WAIVED — qa.level: minimal, no game tests`, skip
    the test run in Phase 2 and all of Phase 3 (say so in one line each), run
@@ -77,6 +101,8 @@ Before running anything, understand the environment:
    space; on Unreal, `<UE root>` is `engine.path`. If none resolves, the test
    runner is not available (Phase 2) — on Godot,
    `NOT ASSESSED — Godot executable not found (commands.test, engine.path, PATH)`.
+   **Custom** has no editor: the runner is the tool `commands.test` names
+   (`ctest` or `cargo`), and `test-run.sh custom` resolves it (Phase 2).
 
 4. **Smoke test list**: check whether `production/qa/smoke-tests.md` or
    `tests/smoke/` exists. If a smoke test list is found, load it for use in
